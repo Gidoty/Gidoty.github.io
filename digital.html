@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body data-page="digital">
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">Port<span>folio</span></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"></button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="engineering.html">Engineering</a></li>
+        <li><a href="digital.html" class="active">Digital</a></li>
+        <li><a href="academics.html">Academics</a></li>
+        <li><a href="awards.html">Awards</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <div class="wrap">
+        <h1>Digital</h1>
+        <p>Websites, apps, tools, and design work.</p>
+      </div>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <div class="filters" id="filters"></div>
+        <div class="card-grid" id="grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="contact">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <h3>Let's connect</h3>
+          <p>Reach out about opportunities, collaborations, or just to say hi.</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+            <a id="profile-email" href="mailto:you@example.com" class="btn btn-primary">you@example.com</a>
+            <a id="profile-email-2" href="mailto:you@example.com" class="btn btn-outline">you@example.com</a>
+          </div>
+        </div>
+        <div>
+          <h3>Elsewhere</h3>
+          <div class="social-links">
+            <a id="profile-github" href="#" target="_blank" rel="noopener">GitHub</a>
+            <a id="profile-linkedin" href="#" target="_blank" rel="noopener">LinkedIn</a>
+            <a id="profile-twitter" href="#" target="_blank" rel="noopener">Twitter</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">&copy; <span id="year"></span> — Built with plain HTML, CSS &amp; JS.</div>
+    </div>
+  </footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
