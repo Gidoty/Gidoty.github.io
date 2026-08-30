@@ -20,11 +20,11 @@ window.PORTFOLIO_DATA = {
     tagline: "Chemical Engineer, AI Educator, Cybersecurity Educator, Academic Researcher, Entrepreneur",
     bio:
       "Gideon Owhonda is a Chemical Engineer, researcher, entrepreneur, and award-winning youth leader " +
-      "based in Port Harcourt, Nigeria. He holds a degree in Chemical Engineering and works at the " +
-      "intersection of sustainable energy, gas processing, methane emission reduction, and carbon " +
+      "based in Port Harcourt, Nigeria. He holds a Master's degree in Chemical Engineering and works at " +
+      "the intersection of sustainable energy, gas processing, methane emission reduction, and carbon " +
       "management, alongside emerging fields such as artificial intelligence, cybersecurity, and " +
       "blockchain. A Tony Elumelu Foundation alumnus and international youth advocate, he founded " +
-      "Metabridge Academy, which has trained over 1,500 young people in technology skills, and leads " +
+      "Metabridge Academy, which has trained over 5,000 young people in technology skills, and leads " +
       "several other technology and innovation initiatives across Africa. His work brings together " +
       "engineering, research, education, leadership, and entrepreneurship to build practical solutions " +
       "and expand opportunities for young people.",
@@ -76,12 +76,13 @@ window.PORTFOLIO_DATA = {
   digital: [
     {
       title: "Metabridge Academy Website",
-      tags: ["Web Development", "AI-Assisted Development", "Education"],
+      tags: ["Web Development", "Claude Code", "Education"],
+      period: "2026",
       description:
         "Official website for Metabridge Academy, Africa-focused digital skills academy based in " +
         "Port Harcourt, Nigeria, offering Cybersecurity, Data Analytics, AI, and Blockchain training " +
         "through a three-belt curriculum with blockchain-verified certificates. Built end-to-end using " +
-        "AI tools.",
+        "Claude Code.",
       highlights: [
         "Over 5,000 graduates",
         "Blockchain-verified certificates",
