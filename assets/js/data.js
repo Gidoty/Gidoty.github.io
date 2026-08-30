@@ -16,20 +16,22 @@
 window.PORTFOLIO_DATA = {
   profile: {
     name: "Gideon Owhonda",
-    title: "[Your Title — e.g. Chemical Engineer & Researcher]",
+    title: "Scholar",
     tagline: "Chemical Engineer, AI Educator, Cybersecurity Educator, Academic Researcher, Entrepreneur",
     bio:
-      "Gideon Owhonda is a Chemical Engineer, researcher, entrepreneur, AI and cybersecurity educator, " +
-      "blockchain advocate, and youth leader from Nigeria. He holds degrees in Industrial Chemistry/" +
-      "Petrochemical Technology and Gas, Refining and Petrochemical Engineering. He is passionate about " +
-      "sustainable energy, gas processing, methane emission reduction, carbon management, and emerging " +
-      "technologies. Gideon founded Metabridge Academy, which has trained over 1,500 young people in " +
-      "technology skills, and leads several technology and innovation initiatives. His work combines " +
-      "engineering, research, education, leadership, and entrepreneurship to create practical solutions " +
-      "and expand opportunities for young people across Africa.",
-    location: "[City, Country]",
+      "Gideon Owhonda is a Chemical Engineer, researcher, entrepreneur, and award-winning youth leader " +
+      "based in Port Harcourt, Nigeria. He holds a degree in Chemical Engineering and works at the " +
+      "intersection of sustainable energy, gas processing, methane emission reduction, and carbon " +
+      "management, alongside emerging fields such as artificial intelligence, cybersecurity, and " +
+      "blockchain. A Tony Elumelu Foundation alumnus and international youth advocate, he founded " +
+      "Metabridge Academy, which has trained over 1,500 young people in technology skills, and leads " +
+      "several other technology and innovation initiatives across Africa. His work brings together " +
+      "engineering, research, education, leadership, and entrepreneurship to build practical solutions " +
+      "and expand opportunities for young people.",
+    location: "Port Harcourt, Nigeria",
     email: "gideonowhonda@gmail.com",
     secondaryEmail: "gideon.owhonda@cgrpng.org",
+    whatsapp: "2347034357206",
     links: {
       github: "https://github.com/yourusername",
       linkedin: "https://www.linkedin.com/in/gidotyo",

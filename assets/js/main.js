@@ -92,6 +92,15 @@ function populateFooter() {
     }
   }
 
+  const waLink = document.getElementById("profile-whatsapp");
+  if (waLink) {
+    if (profile.whatsapp) {
+      waLink.href = `https://wa.me/${profile.whatsapp}`;
+    } else {
+      waLink.style.display = "none";
+    }
+  }
+
   const socials = { github: "profile-github", linkedin: "profile-linkedin", twitter: "profile-twitter" };
   Object.entries(socials).forEach(([key, id]) => {
     const el = document.getElementById(id);
