@@ -75,13 +75,20 @@ window.PORTFOLIO_DATA = {
 
   digital: [
     {
-      title: "[App or Website Name]",
-      tags: ["Web Development", "React"],
-      period: "[Year]",
-      description: "[What the app/site does, the stack you built it with, and who it's for.]",
-      highlights: ["[Notable feature]", "[Users / scale / impact if relevant]"],
-      link: "",
-      linkLabel: "Visit site",
+      title: "Metabridge Academy Website",
+      tags: ["Web Development", "AI-Assisted Development", "Education"],
+      description:
+        "Official website for Metabridge Academy, Africa-focused digital skills academy based in " +
+        "Port Harcourt, Nigeria, offering Cybersecurity, Data Analytics, AI, and Blockchain training " +
+        "through a three-belt curriculum with blockchain-verified certificates. Built end-to-end using " +
+        "AI tools.",
+      highlights: [
+        "Over 5,000 graduates",
+        "Blockchain-verified certificates",
+        "Three-belt curriculum spanning Cybersecurity, Data Analytics, AI, and Blockchain",
+      ],
+      link: "https://metabridgeacademy.com",
+      linkLabel: "Visit website",
       featured: true,
     },
     {
