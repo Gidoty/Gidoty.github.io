@@ -1,0 +1,6 @@
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/README.md
+__pycache__/
+*.pyc
+.venv/
