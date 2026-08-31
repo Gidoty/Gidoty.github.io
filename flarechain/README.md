@@ -12,7 +12,7 @@ so it can be browsed independently.
 
 ## Status
 
-Being built in batches. Current status: **Batch 2 — blockchain verification layer.**
+Being built in batches. Current status: **Batch 3 — dashboard.**
 
 - [x] Batch 1: Data acquisition (World Bank GGFR/GFMR flaring data → Nigeria,
       cleaned into structured JSON) — scripts written, not yet run against
@@ -22,7 +22,11 @@ Being built in batches. Current status: **Batch 2 — blockchain verification la
       `docs/blockchain_verification.md`). Code is complete and locally
       tested; a **live on-chain run hasn't happened yet** — see that doc
       for exactly why and what's needed to do one.
-- [ ] Dashboard (dashboard/)
+- [x] Batch 3: Dashboard (`dashboard/`) — Next.js + Tailwind, shows the
+      anchored record and a live re-verify button. Builds clean and was
+      exercised locally with a temporary test fixture (removed, never
+      committed); it currently renders its real, honest empty state since
+      no record has actually been anchored yet. See `dashboard/README.md`.
 - [ ] Full methodology write-up (docs/)
 
 ## Structure
@@ -35,7 +39,7 @@ flarechain/
 ├── scripts/       # data processing (Python) and blockchain (Node.js) scripts
 │   └── lib/       # shared hashing + CLI-parsing helpers for the Node scripts
 ├── contracts/     # smart contract code (not used — see docs/blockchain_verification.md for why)
-├── dashboard/     # frontend (later batch)
+├── dashboard/     # Next.js + Tailwind frontend — see dashboard/README.md
 ├── package.json   # Node deps for the blockchain scripts (npm install)
 ├── .env.example   # copy to .env — RPC_URL + PRIVATE_KEY, never committed
 └── docs/          # methodology, data sources, and limitations
@@ -78,3 +82,16 @@ node scripts/verify_record.js --file data/processed_flaring_data.json --index 0 
 See `docs/blockchain_verification.md` for the design (plain transaction,
 not a smart contract — and why), and for exactly what's been tested so
 far versus what still needs a live run with real network access.
+
+## Dashboard (current batch)
+
+```
+cd dashboard
+npm install
+cp .env.example .env.local   # set RPC_URL — no private key needed here
+npm run dev
+```
+
+Open http://localhost:3000. See `dashboard/README.md` for details and
+`docs/blockchain_verification.md` for how the record gets anchored in the
+first place.
