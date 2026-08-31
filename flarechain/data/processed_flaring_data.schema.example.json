@@ -1,0 +1,10 @@
+[
+  {
+    "site_name": "EXAMPLE — not real data, structure only",
+    "country": "Nigeria",
+    "year": 2023,
+    "flared_volume_bcm": 0.0,
+    "data_source": "World Bank Global Flaring and Methane Reduction (GFMR) Partnership — Global Gas Flaring Database",
+    "source_url": "https://www.worldbank.org/en/programs/gasflaringreduction/global-flaring-data"
+  }
+]
