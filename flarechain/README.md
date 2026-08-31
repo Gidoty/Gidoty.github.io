@@ -12,11 +12,16 @@ so it can be browsed independently.
 
 ## Status
 
-Being built in batches. Current status: **Batch 1 — data acquisition only.**
+Being built in batches. Current status: **Batch 2 — blockchain verification layer.**
 
 - [x] Batch 1: Data acquisition (World Bank GGFR/GFMR flaring data → Nigeria,
-      cleaned into structured JSON)
-- [ ] Blockchain verification layer (contracts/)
+      cleaned into structured JSON) — scripts written, not yet run against
+      real data (see `docs/data_sources.md`)
+- [x] Batch 2: Blockchain verification layer — hash-anchor a record on
+      Polygon Amoy testnet, detect tampering by re-verifying (see
+      `docs/blockchain_verification.md`). Code is complete and locally
+      tested; a **live on-chain run hasn't happened yet** — see that doc
+      for exactly why and what's needed to do one.
 - [ ] Dashboard (dashboard/)
 - [ ] Full methodology write-up (docs/)
 
@@ -24,12 +29,15 @@ Being built in batches. Current status: **Batch 1 — data acquisition only.**
 
 ```
 flarechain/
-├── data/          # raw and processed datasets
+├── data/          # raw and processed datasets, + anchors.json (local anchor index)
 │   ├── raw/       # untouched downloads (gitignored — see data/raw/README.md)
 │   └── processed_flaring_data.json   # cleaned output (generated, not hand-written)
-├── scripts/       # data processing and (later) blockchain scripts
-├── contracts/     # smart contract code (later batch)
+├── scripts/       # data processing (Python) and blockchain (Node.js) scripts
+│   └── lib/       # shared hashing + CLI-parsing helpers for the Node scripts
+├── contracts/     # smart contract code (not used — see docs/blockchain_verification.md for why)
 ├── dashboard/     # frontend (later batch)
+├── package.json   # Node deps for the blockchain scripts (npm install)
+├── .env.example   # copy to .env — RPC_URL + PRIVATE_KEY, never committed
 └── docs/          # methodology, data sources, and limitations
 ```
 
@@ -55,3 +63,18 @@ python scripts/clean_flaring_data.py             # produces data/processed_flari
 See `docs/data_sources.md` for the full data source, methodology, and
 known limitations (including why "marginal field" status can't currently
 be determined from this dataset alone).
+
+## Blockchain verification (current batch)
+
+```
+npm install
+cp .env.example .env
+npm run generate-wallet         # prints a throwaway testnet address + key
+# fund the address at https://faucet.polygon.technology/ (select Amoy)
+node scripts/anchor_record.js --file data/processed_flaring_data.json --index 0
+node scripts/verify_record.js --file data/processed_flaring_data.json --index 0 --tx <TX_HASH_FROM_ABOVE>
+```
+
+See `docs/blockchain_verification.md` for the design (plain transaction,
+not a smart contract — and why), and for exactly what's been tested so
+far versus what still needs a live run with real network access.

@@ -1,0 +1,16 @@
+{
+  "name": "flarechain-verification",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FlareChain blockchain verification layer — anchors flaring-data record hashes on the Polygon Amoy testnet and checks them for tampering.",
+  "type": "commonjs",
+  "scripts": {
+    "generate-wallet": "node scripts/generate_wallet.js",
+    "anchor": "node scripts/anchor_record.js",
+    "verify": "node scripts/verify_record.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.4"
+  }
+}

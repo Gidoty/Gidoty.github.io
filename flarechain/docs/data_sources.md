@@ -77,6 +77,36 @@ cross-reference against NUPRC's published marginal field register/license
 block boundaries (a real but non-trivial GIS matching exercise) — flagged
 here as future work, not attempted in this batch.
 
+### Candidate NUPRC sources for that future cross-reference
+
+Found via web search (real, citable government sources), but **not yet
+read or verified** — `www.nuprc.gov.ng` was also network-blocked from the
+sandbox this was written in, so these are pointers to go fetch yourself,
+not data that's been extracted or cross-checked:
+
+- NUPRC Marginal Field Bid Round page (program overview, likely links to
+  the current field/award list):
+  https://www.nuprc.gov.ng/marginal-field-bid-round/
+- **"Guidelines for the Award and Operations of Marginal Fields in
+  Nigeria"** (official NUPRC guidelines PDF — defines what qualifies as a
+  marginal field and the award process; this is the closest thing to an
+  authoritative definition/source, but confirm it actually contains a
+  named field list, since I couldn't open it to check):
+  https://www.nuprc.gov.ng/wp-content/uploads/2020/08/Guidelines-for-the-Award-and-Operations-of-Marginal-Fields-in-Nigeria.pdf
+- NUPRC Concession Situation report (periodically updated; may list
+  license/lease blocks including marginal fields by operator):
+  https://www.nuprc.gov.ng/wp-content/uploads/2026/03/NUPRC-Concession-Situation-Final-Merged-@-1st-March-2026-v.1.pdf
+- NUPRC Annual Report (2024): may contain a marginal field status table —
+  https://www.nuprc.gov.ng/wp-content/uploads/2025/04/UPDATED-NUPRC-2024-ANNUAL-REPORT-1.pdf
+
+None of these have been opened and parsed. If you want the marginal-field
+cross-reference actually built, the next step is: open these (or have
+someone with access fetch them), confirm which one has a field-name +
+location/license-block list, and only then design the join against the
+World Bank site coordinates. Until that happens, no record in this
+project is labeled as a marginal field — that would be a guess, not a
+finding.
+
 ## Other limitations to keep in mind
 
 - **Estimates, not metered data.** Satellite-derived volumes carry

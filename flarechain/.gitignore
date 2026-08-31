@@ -4,3 +4,7 @@ data/raw/*
 __pycache__/
 *.pyc
 .venv/
+
+# Node / blockchain layer
+node_modules/
+.env
