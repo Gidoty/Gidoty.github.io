@@ -3,6 +3,10 @@
 A small Next.js + Tailwind CSS dashboard that displays one anchored flaring
 record and lets you re-verify it against Polygon Amoy live, on demand.
 
+**Prototype, not production.** Runs on the Polygon Amoy *testnet*, not
+mainnet, and shows exactly one demo record — see `../docs/methodology.md`
+for the full scope and limitations.
+
 ## What it shows
 
 - The reported flaring record (site, country, year, volume, source)
