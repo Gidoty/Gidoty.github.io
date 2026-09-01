@@ -7,6 +7,8 @@ FlareChain hashes a reported flaring record and anchors that hash on a
 public blockchain, so anyone can later re-check the record against the
 chain and know instantly whether it's been altered since it was reported.
 
+**Live demo (no setup required):** https://gidoty.github.io/flarechain/site/
+
 > **This is a prototype, not a production system.** It runs entirely on a
 > public *test* blockchain (Polygon Amoy), uses one publicly available
 > dataset, and has not been deployed, adopted, or reviewed by any real
@@ -37,7 +39,9 @@ The pipeline has three parts, each runnable independently:
    that hash on the Polygon Amoy testnet as a plain transaction; a second
    script re-checks any record against that anchor for tamper detection.
 3. **Dashboard** (`dashboard/`, Next.js) — shows the anchored record and
-   lets you re-verify it against the live chain with one click.
+   lets you re-verify it against the live chain with one click. Published
+   as a static site directly from this repo — no separate hosting account
+   needed. Live at: **https://gidoty.github.io/flarechain/site/**
 
 ## Quick start
 
@@ -76,14 +80,18 @@ what has and hasn't been tested end-to-end: `docs/blockchain_verification.md`.
 
 ### 3. Run the dashboard
 
+**Already live, no setup required:** https://gidoty.github.io/flarechain/site/
+
+To run it locally instead (e.g. while making changes):
+
 ```
 cd dashboard
 npm install
-cp .env.example .env.local         # set RPC_URL — no private key needed here, read-only
 npm run dev
 ```
 
-Open http://localhost:3000. Details: `dashboard/README.md`.
+Open http://localhost:3000. Details, including how the static publish
+works: `dashboard/README.md`.
 
 ## Project structure
 
@@ -95,7 +103,8 @@ flarechain/
 ├── scripts/                 # data processing (Python) and blockchain (Node.js) scripts
 │   └── lib/                 # shared hashing + CLI-parsing helpers
 ├── contracts/                # smart contract code — not used; see docs/blockchain_verification.md
-├── dashboard/                # Next.js + Tailwind frontend
+├── dashboard/                # Next.js + Tailwind frontend (source)
+├── site/                     # dashboard/, built as a static export — this is what GitHub Pages serves
 └── docs/
     ├── methodology.md              # problem, approach, prototype scope — start here
     ├── data_sources.md             # data source, access method, limitations
