@@ -21,11 +21,10 @@ and oversimplified crack spread calculators.
 
 ## Methodology
 
-Based on the RPE 904 Advanced Refining Management methodology, NLNG Centre for Gas, Refining and
-Petrochemical Engineering, University of Port Harcourt. See the in-app **About** page for the
-full methodology write-up, including the specific corrections made to a couple of textbook
-formulas (crack spread unit conversion, a furnace-duty mass-flow unit error, and an IPCC CO2
-emission factor mismatch) during development.
+Grounded in published petroleum refining engineering correlations and industry benchmarks. See
+the in-app **About** page for the full methodology write-up, including the specific corrections
+made to a couple of textbook formulas (crack spread unit conversion, a furnace-duty mass-flow
+unit error, and an IPCC CO2 emission factor mismatch) during development.
 
 ## Live Tool
 

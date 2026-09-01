@@ -121,7 +121,6 @@ export default function About() {
             and Petrochemical Engineering, University of Port Harcourt. It is grounded in:
           </p>
           <ul className="ml-5 list-disc space-y-1.5">
-            <li>RPE 904 Advanced Refining Management methodology</li>
             <li>Published crude assay data (Bonny Light, Forcados)</li>
             <li>Academic LP optimisation frameworks</li>
             <li>IEA, EIA, and IOGP industry benchmarks</li>

@@ -14,7 +14,6 @@ import {
   Check,
   X,
   Link2,
-  BookOpen,
   ExternalLink,
 } from 'lucide-react'
 
@@ -270,9 +269,7 @@ export default function Home() {
           <p className="max-w-xl text-sm text-armit-muted">
             ARMIT is a portfolio project demonstrating the application of petroleum engineering
             principles, LP optimisation, and energy management to real-world African refinery
-            challenges. It is grounded in the RPE 904 Advanced Refining Management methodology
-            developed at the NLNG Centre for Gas, Refining and Petrochemical Engineering,
-            University of Port Harcourt.
+            challenges.
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -290,13 +287,6 @@ export default function Home() {
             >
               <Link2 size={15} />
               Connect on LinkedIn
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-armit-bg px-5 py-2.5 text-sm font-semibold text-armit-text transition hover:border-armit-teal/40 hover:text-armit-teal"
-            >
-              <BookOpen size={15} />
-              Academic Profile
             </a>
           </div>
         </div>
