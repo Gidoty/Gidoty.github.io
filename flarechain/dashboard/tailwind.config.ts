@@ -5,14 +5,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#0B1F26",
+        // Deep forest green + warm industrial neutrals — evokes the
+        // environmental-monitoring / methane-reduction space this project
+        // sits in, rather than a generic corporate teal.
+        ink: "#13201A",
         brand: {
-          50: "#EAF3F2",
-          100: "#CFE4E1",
-          400: "#12746C",
-          500: "#0F5C56",
-          600: "#0C4A45",
-          700: "#093834",
+          50: "#EAF3EA",
+          100: "#CFE3CE",
+          400: "#3F7A4C",
+          500: "#2C6B3B",
+          600: "#1F4F2C",
+          700: "#163A20",
         },
       },
       fontFamily: {
