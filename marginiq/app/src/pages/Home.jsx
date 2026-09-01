@@ -282,8 +282,10 @@ export default function Home() {
               View Portfolio
             </a>
             <a
-              href="#"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-armit-bg px-5 py-2.5 text-sm font-semibold text-armit-text transition hover:border-armit-teal/40 hover:text-armit-teal"
+              href="https://www.linkedin.com/in/gidotyo?utm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-armit-teal px-5 py-2.5 text-sm font-semibold text-armit-bg transition hover:bg-armit-teal/90"
             >
               <Link2 size={15} />
               Connect on LinkedIn
