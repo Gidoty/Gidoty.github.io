@@ -7,6 +7,11 @@ record and lets you re-verify it against Polygon Amoy live, on demand.
 mainnet, and shows exactly one demo record — see `../docs/methodology.md`
 for the full scope and limitations.
 
+**Live at:** https://gidoty.github.io/flarechain/site/ — published as a
+static export directly from this repo via GitHub Pages, no separate
+hosting account needed. See `../site/README.md` for how that's kept in
+sync with this source.
+
 ## What it shows
 
 - The reported flaring record (site, country, year, volume, source)
@@ -19,53 +24,61 @@ for the full scope and limitations.
 ## Prerequisites
 
 This dashboard reads (but does not write) two files from the parent
-`flarechain/` project:
+`flarechain/` project **at build time**:
 
 - `../data/anchors.json` — written by `../scripts/anchor_record.js`
 - (indirectly, via the anchor entry) the record that was anchored
 
 **If you haven't run the data-acquisition and anchoring steps yet**, the
-dashboard still runs — it just shows an honest "No anchored record yet"
-empty state with the exact command to run, instead of fake data. See
-`../docs/data_sources.md` and `../docs/blockchain_verification.md` for
-those steps.
+dashboard still builds and runs — it just shows an honest "No anchored
+record yet" empty state with the exact command to run, instead of fake
+data. See `../docs/data_sources.md` and `../docs/blockchain_verification.md`
+for those steps.
 
 ## Setup
 
 ```
 cd flarechain/dashboard
 npm install
-cp .env.example .env.local
 ```
 
-Edit `.env.local` and set `RPC_URL` (a Polygon Amoy RPC endpoint — the
-public default in `.env.example` works but can be rate-limited; an
-Alchemy/Infura Amoy endpoint is more reliable). No private key is needed
-here — the dashboard only reads transactions to verify them, it never
-sends any.
+No `.env` file is needed to develop or build this dashboard. It's a fully
+static site — see "Architecture" below for why.
 
-## Run it
+## Run it locally
 
 ```
 npm run dev
 ```
 
-Open http://localhost:3000. To build for production:
+Open http://localhost:3000.
+
+## Build (what actually gets published)
 
 ```
 npm run build
-npm start
 ```
 
-## Design notes
+This produces a static `out/` folder — no server involved. Publishing it
+means copying that folder's contents into `../site/` and committing them;
+see `../site/README.md` for the exact commands.
 
-- App Router (Next.js 16), Tailwind CSS 3, TypeScript, no UI/icon library
-  — deliberately minimal dependencies for a demo that needs to build
-  reliably.
-- The hashing logic in `lib/canonicalHash.ts` is a direct TypeScript port
-  of `../scripts/lib/canonicalHash.js`, so a hash computed here always
-  matches one computed by the CLI anchoring script for the same record.
-- `app/api/verify/route.ts` is the only place that talks to the
-  blockchain (via `ethers`, read-only). It's a plain Next.js Route
-  Handler, not a Server Action, so it's easy to test directly with
-  `curl -X POST http://localhost:3000/api/verify`.
+## Architecture: fully static, no server
+
+This dashboard is published as plain files via GitHub Pages, which can
+only serve static content — it cannot run server-side code. So unlike a
+typical Next.js app, there is **no API route and no server-only
+environment variable**:
+
+- `next.config.mjs` sets `output: "export"` (produces static HTML/JS/CSS)
+  and `basePath: "/flarechain/site"` (where it's actually served from).
+- The **Verify** button's blockchain check runs entirely in the visitor's
+  browser (`components/VerifyPanel.tsx`), using `ethers.js` client-side
+  against a public Polygon Amoy RPC endpoint — a plain constant in that
+  file, not a secret (a read-only RPC URL isn't sensitive; no private key
+  is ever used in this dashboard).
+- `lib/canonicalHash.ts` uses the Web Crypto API (`crypto.subtle`) instead
+  of Node's `crypto` module specifically so the identical code runs both
+  at build time (Server Component, reading `../data/anchors.json`) and in
+  the browser (the Verify button) — producing byte-identical SHA-256
+  hashes to `../scripts/lib/canonicalHash.js` either way.

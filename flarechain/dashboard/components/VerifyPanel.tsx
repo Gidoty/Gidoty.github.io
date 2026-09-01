@@ -1,25 +1,81 @@
 "use client";
 
 import { useState } from "react";
-import type { VerifyResult } from "@/lib/types";
+import { ethers } from "ethers";
+import type { AnchorEntry, VerifyResult } from "@/lib/types";
+import { hashRecord } from "@/lib/canonicalHash";
+
+// This is a static site (see next.config.mjs) — there is no server to hold
+// this value, so it's a plain constant baked into the page. It's not a
+// secret: a read-only RPC endpoint URL is public information (nothing
+// resembling a private key is ever used in this dashboard). If this
+// endpoint becomes unreliable, swap in another public Amoy RPC — e.g.
+// https://polygon-amoy.drpc.org — and rebuild.
+const RPC_URL = "https://polygon-amoy-bor-rpc.publicnode.com";
 
 type State = { kind: "idle" } | { kind: "loading" } | { kind: "done"; result: VerifyResult };
 
-export default function VerifyPanel() {
+export default function VerifyPanel({ anchor }: { anchor: AnchorEntry }) {
   const [state, setState] = useState<State>({ kind: "idle" });
 
   async function handleVerify() {
     setState({ kind: "loading" });
     try {
-      const res = await fetch("/api/verify", { method: "POST" });
-      const result: VerifyResult = await res.json();
-      setState({ kind: "done", result });
+      const { hash: computedHash } = await hashRecord(anchor.record);
+
+      const provider = new ethers.JsonRpcProvider(RPC_URL);
+
+      let tx;
+      try {
+        tx = await provider.getTransaction(anchor.txHash);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        setState({
+          kind: "done",
+          result: { status: "network_error", message: `Could not reach the blockchain network: ${message}` },
+        });
+        return;
+      }
+
+      if (!tx) {
+        setState({
+          kind: "done",
+          result: { status: "not_found", message: `Transaction ${anchor.txHash} was not found on-chain.` },
+        });
+        return;
+      }
+
+      const onChainHash = tx.data;
+      const match = onChainHash.toLowerCase() === computedHash.toLowerCase();
+
+      let blockTimestampIso: string | null = null;
+      if (tx.blockNumber != null) {
+        try {
+          const block = await provider.getBlock(tx.blockNumber);
+          if (block) blockTimestampIso = new Date(block.timestamp * 1000).toISOString();
+        } catch {
+          // Non-fatal: the match verdict doesn't depend on the timestamp.
+        }
+      }
+
+      setState({
+        kind: "done",
+        result: {
+          status: match ? "verified" : "mismatch",
+          match,
+          computedHash,
+          onChainHash,
+          txHash: anchor.txHash,
+          blockTimestampIso,
+          explorerUrl: anchor.explorerUrl,
+        },
+      });
     } catch (err) {
       setState({
         kind: "done",
         result: {
           status: "network_error",
-          message: err instanceof Error ? err.message : "The verify request failed to complete.",
+          message: err instanceof Error ? err.message : "The verify check failed to complete.",
         },
       });
     }

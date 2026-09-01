@@ -88,7 +88,7 @@ function AnchoredRecord({ anchor }: { anchor: AnchorEntry }) {
           <p className="mb-3 text-sm text-slate-600">
             Re-check this record against the blockchain right now:
           </p>
-          <VerifyPanel />
+          <VerifyPanel anchor={anchor} />
         </div>
       </section>
     </div>
