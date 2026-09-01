@@ -1,0 +1,22 @@
+[
+  {
+    "record_site_name": "Yoho",
+    "record_year": 2012,
+    "hash": "0x1720f4ad59f0b2bf6d5b4b9c572f315acfcf67cce333bcd0296aa3148fbe5b79",
+    "txHash": "0x25f32f0c3d5d4025a59d1ba8fbd1bbe3f204c7d57ec75cf97c696fbde6866d6a",
+    "blockNumber": 46410463,
+    "blockTimestamp": 1788228905,
+    "blockTimestampIso": "2026-09-01T02:15:05.000Z",
+    "explorerUrl": "https://amoy.polygonscan.com/tx/0x25f32f0c3d5d4025a59d1ba8fbd1bbe3f204c7d57ec75cf97c696fbde6866d6a",
+    "anchoredAt": "2026-09-01T02:15:04.599Z",
+    "canonical": "{\"country\":\"Nigeria\",\"data_source\":\"World Bank Global Flaring and Methane Reduction (GFMR) Partnership — Global Gas Flaring Database\",\"flared_volume_bcm\":0.0393832557284664,\"site_name\":\"Yoho\",\"source_url\":\"https://www.worldbank.org/en/programs/gasflaringreduction/global-flaring-data\",\"year\":2012}",
+    "record": {
+      "site_name": "Yoho",
+      "country": "Nigeria",
+      "year": 2012,
+      "flared_volume_bcm": 0.0393832557284664,
+      "data_source": "World Bank Global Flaring and Methane Reduction (GFMR) Partnership — Global Gas Flaring Database",
+      "source_url": "https://www.worldbank.org/en/programs/gasflaringreduction/global-flaring-data"
+    }
+  }
+]
