@@ -134,11 +134,13 @@ export function computeArmitResult(inputs) {
   const netMarginPerBbl = grossMarginPerBbl - opexPerBbl
   const netMarginPerDay = netMarginPerBbl * throughputBpd
 
-  // 3-2-1 crack spread (simplified benchmark), per the standard futures-style
-  // formula: product prices are treated as $/gal and annualised to $/bbl (x42)
-  // against a $/bbl crude cost. Intentionally a rough external benchmark, not
-  // an assay-based figure — that's what the ARMIT true margin is for.
-  const crack321 = (2 * (prices.motorSpirit * 42) + 1 * (prices.diesel * 42) - 3 * crudeCost) / 3
+  // 3-2-1 crack spread (simplified benchmark): 2 bbl gasoline + 1 bbl diesel
+  // vs. 3 bbl crude, all in $/bbl (the classic NYMEX version multiplies
+  // gasoline/heating-oil by 42 because those futures are quoted in $/gal —
+  // not applicable here since our product prices are already $/bbl).
+  // Intentionally a rough external benchmark, not an assay-based figure —
+  // that's what the ARMIT true margin is for.
+  const crack321 = (2 * prices.motorSpirit + 1 * prices.diesel - 3 * crudeCost) / 3
 
   // EII-style energy intensity index (Solomon EII-style proxy).
   const actualEnergyGcalPerDay = throughputBpd * 0.00102

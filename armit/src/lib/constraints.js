@@ -1,11 +1,18 @@
 // ARMIT Constraint Intelligence — simplified LP shadow price engine.
 // Pure functions only, derived entirely from the margin pipeline result
 // (src/lib/calculations.js) plus unit capacities the user sets.
+//
+// A shadow price here is always the textbook LP definition: the change in
+// margin per ONE additional unit of a binding constraint's capacity (per
+// bpd, per mmHg, per MMscfd) — never per an arbitrary batch size. CDU, FCC,
+// and HC all derive theirs the same way (compute the $ impact of a 1,000
+// unit increment, then divide by 1,000 to normalise back to a per-unit
+// rate), so all three are reported and labelled on that same per-unit basis.
 
 const OPERATING_DAYS_PER_YEAR = 330
 const H2_DEMAND_HT_MMSCFD = 4.2 // fixed hydrotreater H2 demand
 const H2_FACTOR_MMSCFD_PER_BPD = 0.00097
-const L_PER_BBL = 0.159 // spec uses the rounded 0.159 bbl/L factor for shadow-price deltas
+const M3_PER_BBL_APPROX = 0.159 // rounded m3/bbl factor used in the shadow-price deltas below
 
 function utilisationStatus(utilPct) {
   if (utilPct >= 95) return 'BINDING'
@@ -73,19 +80,19 @@ export function computeConstraintAnalysis({
   // FCC: value of one more bpd of FCC feed capacity (naphtha uplift vs. fuel oil).
   const shadowFcc =
     utilFcc >= 85
-      ? ((1000 * 0.46 * (1 / 0.74) * L_PER_BBL) * (prices.motorSpirit - prices.fuelOil)) / 1000
+      ? ((1000 * 0.46 * (1 / 0.74) * M3_PER_BBL_APPROX) * (prices.motorSpirit - prices.fuelOil)) / 1000
       : 0
 
   // HC: value of one more bpd of Hydrocracker feed capacity (diesel uplift vs. fuel oil).
   const shadowHc =
     utilHc >= 85
-      ? ((1000 * 0.68 * (1 / 0.84) * L_PER_BBL) * (prices.diesel - prices.fuelOil)) / 1000
+      ? ((1000 * 0.68 * (1 / 0.84) * M3_PER_BBL_APPROX) * (prices.diesel - prices.fuelOil)) / 1000
       : 0
 
   // H2: value of one more MMscfd of hydrogen supply, routed to extra HC feed.
   const shadowH2 =
     statusH2 === 'H2_DEFICIT' || statusH2 === 'H2_TIGHT'
-      ? ((1 / H2_FACTOR_MMSCFD_PER_BPD) * 0.68 * (1 / 0.84) * L_PER_BBL) *
+      ? ((1 / H2_FACTOR_MMSCFD_PER_BPD) * 0.68 * (1 / 0.84) * M3_PER_BBL_APPROX) *
         (prices.diesel - prices.fuelOil)
       : 0
 
@@ -126,8 +133,8 @@ export function computeConstraintAnalysis({
       util: utilFcc,
       status: statusFcc,
       shadowPrice: shadowFcc,
-      shadowSuffix: '/1000 bpd feed',
-      incrementLabel: '1,000 bpd of FCC feed capacity',
+      shadowSuffix: '/bpd feed relaxed',
+      incrementLabel: '1 bpd of FCC feed capacity',
     },
     {
       key: 'hc',
@@ -139,8 +146,8 @@ export function computeConstraintAnalysis({
       util: utilHc,
       status: statusHc,
       shadowPrice: shadowHc,
-      shadowSuffix: '/1000 bpd feed',
-      incrementLabel: '1,000 bpd of Hydrocracker feed capacity',
+      shadowSuffix: '/bpd feed relaxed',
+      incrementLabel: '1 bpd of Hydrocracker feed capacity',
     },
     {
       key: 'h2',
