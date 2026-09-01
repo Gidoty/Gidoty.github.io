@@ -21,13 +21,14 @@ can't find what it needs, rather than guessing silently.
 Output schema (one object per site/year, exactly as specified):
     site_name, country, year, flared_volume_bcm, data_source, source_url
 
-KNOWN LIMITATION — read before using this for anything real:
-This dataset (satellite-detected flare volumes) does not identify which
-sites are legally designated "marginal fields" under Nigerian petroleum
-law (small/isolated leases, e.g. NUPRC's marginal field program). Every
-Nigeria record produced here is left unlabeled with respect to marginal
-field status — see docs/data_sources.md for details rather than any
-in-code guess.
+MARGINAL FIELD STATUS — update: the real downloaded file (2012-2025
+edition) does have "Field Type", "Field name", and "Operator" columns
+that earlier drafts of this project didn't know existed. Whether "Field
+Type" actually distinguishes NUPRC-designated marginal fields (rather
+than e.g. onshore/offshore) is NOT yet confirmed — --inspect now prints
+the real values found in that column for Nigeria rows so this can be
+checked against real data instead of assumed either way. Until that's
+confirmed, output records still don't carry a marginal-field label.
 """
 
 import argparse
@@ -50,7 +51,15 @@ SHEET_NAME = 0  # first sheet by default; set to a sheet name string if --inspec
 # Candidate column names to search for, in priority order. Edit these if
 # --inspect shows your file uses different headers.
 COLUMN_MAP = {
-    "site_name": ["Flare_ID", "Site", "Site Name", "Name", "flare_name", "Id_Flare"],
+    # Confirmed against the real 2012-2025 by-location file: "Field name" is
+    # a human-readable name but can be blank for some flares; "Flare id" is
+    # always present. site_name resolution below prefers the former and
+    # falls back to the latter per row, rather than picking one column for
+    # the whole file.
+    "field_name": ["Field name", "Field Name", "field_name"],
+    "flare_id": ["Flare id", "Flare ID", "Flare_ID", "Id_Flare"],
+    "field_type": ["Field Type", "Field type", "field_type"],
+    "operator": ["Operator", "operator"],
     "country": ["Country", "country", "COUNTRY"],
 }
 YEAR_COLUMN_CANDIDATES = ["Year", "year", "YEAR"]
@@ -75,10 +84,35 @@ def inspect(path: Path):
             df = xl.parse(name, nrows=5)
             print(f"\n--- Sheet '{name}' — columns ---")
             print(list(df.columns))
+        # Full read (not just the 5-row preview above) so the marginal-field
+        # question below is checked against every Nigeria row, not a sample.
+        full_df = xl.parse(xl.sheet_names[0])
     else:
-        df = pd.read_csv(path, nrows=5)
+        full_df = pd.read_csv(path)
         print(f"Columns in {path.name}:")
-        print(list(df.columns))
+        print(list(full_df.columns))
+
+    country_col = find_column(full_df, COLUMN_MAP["country"])
+    field_type_col = find_column(full_df, COLUMN_MAP["field_type"])
+    field_name_col = find_column(full_df, COLUMN_MAP["field_name"])
+    operator_col = find_column(full_df, COLUMN_MAP["operator"])
+
+    if country_col and field_type_col:
+        ng = full_df[full_df[country_col].astype(str).str.strip().str.lower() == COUNTRY_FILTER.lower()]
+        print(f"\n--- Marginal-field check: {len(ng)} Nigeria rows found ---")
+        print(f"Real values in '{field_type_col}' for Nigeria rows:")
+        print(ng[field_type_col].value_counts(dropna=False).to_string())
+        if field_name_col:
+            n_named = ng[field_name_col].notna().sum()
+            print(f"\n'{field_name_col}' is filled in for {n_named} of {len(ng)} Nigeria rows.")
+        if operator_col:
+            n_op = ng[operator_col].notna().sum()
+            print(f"'{operator_col}' is filled in for {n_op} of {len(ng)} Nigeria rows.")
+        print(
+            "\nCompare the values above against NUPRC's own marginal-field "
+            "terminology (see docs/data_sources.md) before assuming a match "
+            "— e.g. 'Onshore'/'Offshore' would NOT mean marginal-field status."
+        )
 
 
 def find_column(df, candidates):
@@ -103,8 +137,17 @@ def detect_year_columns(df):
     return year_cols
 
 
+def resolve_site_name(row, field_name_col, flare_id_col):
+    if field_name_col and pd.notna(row[field_name_col]) and str(row[field_name_col]).strip():
+        return str(row[field_name_col]).strip()
+    if flare_id_col and pd.notna(row[flare_id_col]):
+        return f"Flare {row[flare_id_col]}"
+    return "UNKNOWN"
+
+
 def clean(df: pd.DataFrame):
-    site_col = find_column(df, COLUMN_MAP["site_name"])
+    field_name_col = find_column(df, COLUMN_MAP["field_name"])
+    flare_id_col = find_column(df, COLUMN_MAP["flare_id"])
     country_col = find_column(df, COLUMN_MAP["country"])
 
     if country_col is None:
@@ -113,12 +156,12 @@ def clean(df: pd.DataFrame):
         print("Add the real column name to COLUMN_MAP['country'] in this script and re-run.")
         sys.exit(1)
 
-    if site_col is None:
+    if not field_name_col and not flare_id_col:
         print(
-            "WARNING: could not find a site-name column. Columns found:\n"
+            "WARNING: could not find a field-name or flare-id column. Columns found:\n"
             f"{list(df.columns)}\n"
             "Proceeding with site_name='UNKNOWN' for all rows — add the real "
-            "column name to COLUMN_MAP['site_name'] and re-run for real site names."
+            "column name(s) to COLUMN_MAP and re-run for real site names."
         )
 
     df = df[df[country_col].astype(str).str.strip().str.lower() == COUNTRY_FILTER.lower()].copy()
@@ -136,7 +179,7 @@ def clean(df: pd.DataFrame):
     if year_cols:
         # Wide format: one column per year, one row per site.
         for _, row in df.iterrows():
-            site_name = str(row[site_col]) if site_col else "UNKNOWN"
+            site_name = resolve_site_name(row, field_name_col, flare_id_col)
             for yc in year_cols:
                 value = row[yc]
                 if pd.isna(value):
@@ -167,7 +210,7 @@ def clean(df: pd.DataFrame):
             )
             sys.exit(1)
         for _, row in df.iterrows():
-            site_name = str(row[site_col]) if site_col else "UNKNOWN"
+            site_name = resolve_site_name(row, field_name_col, flare_id_col)
             value = row[volume_col]
             if pd.isna(value):
                 continue
