@@ -1,14 +1,28 @@
 import { useMemo, useState } from 'react'
 import CRUDES from '../data/crudes.js'
 import { computeArmitResult } from '../lib/calculations.js'
+import { computeConstraintAnalysis } from '../lib/constraints.js'
 import { Field, inputClass } from '../components/calculator/FieldGroup.jsx'
 import Slider from '../components/calculator/Slider.jsx'
+import CollapsibleSection from '../components/calculator/CollapsibleSection.jsx'
 import MetricCard from '../components/calculator/MetricCard.jsx'
 import YieldTable from '../components/calculator/YieldTable.jsx'
 import ProductPieChart from '../components/calculator/ProductPieChart.jsx'
 import EiiGauge from '../components/calculator/EiiGauge.jsx'
 import CrackSpreadCompare from '../components/calculator/CrackSpreadCompare.jsx'
+import ConstraintTable from '../components/calculator/ConstraintTable.jsx'
+import BindingAlert from '../components/calculator/BindingAlert.jsx'
+import ConstraintPriorityChart from '../components/calculator/ConstraintPriorityChart.jsx'
+import AnnualOpportunityCard from '../components/calculator/AnnualOpportunityCard.jsx'
 import { formatUsd0, formatUsd2 } from '../lib/format.js'
+
+const DEFAULT_CAPACITIES = {
+  cdu: 60000,
+  vdu: 28000,
+  fcc: 18000,
+  hc: 5700,
+  h2Supply: 32,
+}
 
 const DEFAULT_PRICES = {
   lpg: 85.0,
@@ -38,6 +52,7 @@ export default function Calculator() {
   const [hcDieselYieldPct, setHcDieselYieldPct] = useState(68)
   const [prices, setPrices] = useState(DEFAULT_PRICES)
   const [opexPerBbl, setOpexPerBbl] = useState(10.2)
+  const [capacities, setCapacities] = useState(DEFAULT_CAPACITIES)
 
   const crude = CRUDES[crudeKey]
 
@@ -57,7 +72,20 @@ export default function Calculator() {
     [crude, throughputBpd, crudeCost, vacuumPressure, fccSplitPct, fccConversionPct, hcDieselYieldPct, prices, opexPerBbl],
   )
 
+  const constraintAnalysis = useMemo(
+    () =>
+      computeConstraintAnalysis({
+        result,
+        throughputBpd,
+        vacuumPressure,
+        capacities,
+        prices,
+      }),
+    [result, throughputBpd, vacuumPressure, capacities, prices],
+  )
+
   const updatePrice = (key, value) => setPrices((prev) => ({ ...prev, [key]: value }))
+  const updateCapacity = (key, value) => setCapacities((prev) => ({ ...prev, [key]: value }))
 
   return (
     <div className="px-4 py-10 sm:px-6 lg:px-8">
@@ -194,6 +222,57 @@ export default function Calculator() {
                 />
               </Field>
             </section>
+
+            <CollapsibleSection title="Unit Capacities">
+              <Field label="CDU Capacity (bpd)">
+                <input
+                  type="number"
+                  className={inputClass}
+                  min={0}
+                  step={100}
+                  value={capacities.cdu}
+                  onChange={(e) => updateCapacity('cdu', Number(e.target.value))}
+                />
+              </Field>
+              <Field label="VDU Capacity (bpd)">
+                <input
+                  type="number"
+                  className={inputClass}
+                  min={0}
+                  step={100}
+                  value={capacities.vdu}
+                  onChange={(e) => updateCapacity('vdu', Number(e.target.value))}
+                />
+              </Field>
+              <Field label="FCC Capacity (bpd)">
+                <input
+                  type="number"
+                  className={inputClass}
+                  min={0}
+                  step={100}
+                  value={capacities.fcc}
+                  onChange={(e) => updateCapacity('fcc', Number(e.target.value))}
+                />
+              </Field>
+              <Field label="HC Capacity (bpd)">
+                <input
+                  type="number"
+                  className={inputClass}
+                  min={0}
+                  step={100}
+                  value={capacities.hc}
+                  onChange={(e) => updateCapacity('hc', Number(e.target.value))}
+                />
+              </Field>
+              <Slider
+                label="H2 Supply"
+                value={capacities.h2Supply}
+                min={10}
+                max={45}
+                unit=" MMscfd"
+                onChange={(v) => updateCapacity('h2Supply', v)}
+              />
+            </CollapsibleSection>
           </div>
 
           {/* Results panel */}
@@ -240,6 +319,28 @@ export default function Calculator() {
             </div>
 
             <EiiGauge eii={result.eiiProxy} firedDutyGcalPerHr={result.firedDutyGcalPerHr} />
+          </div>
+        </div>
+
+        {/* Constraint Intelligence */}
+        <div className="mt-12">
+          <div className="mb-6">
+            <h2 className="text-2xl font-extrabold text-armit-text sm:text-3xl">
+              Active Constraint Intelligence
+            </h2>
+            <p className="mt-2 text-sm text-armit-muted">
+              Identifying your binding constraints and their economic value
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <ConstraintTable rows={constraintAnalysis.rows} />
+            <BindingAlert
+              primaryBottleneck={constraintAnalysis.primaryBottleneck}
+              operatingDaysPerYear={constraintAnalysis.operatingDaysPerYear}
+            />
+            <ConstraintPriorityChart rows={constraintAnalysis.rows} />
+            <AnnualOpportunityCard annualOpportunity={constraintAnalysis.annualOpportunity} />
           </div>
         </div>
       </div>
