@@ -121,7 +121,17 @@ window.PORTFOLIO_DATA = {
 
   awards: [
     {
-      title: "Agip Oil Company Undergraduate Scholarship",
+      title: "🏆 Tony Elumelu Foundation Award",
+      tags: ["Award", "Entrepreneurship"],
+      description:
+        "Recognised by the Tony Elumelu Foundation, Africa's leading entrepreneurship philanthropy, for " +
+        "leadership and impact in technology and youth empowerment.",
+      highlights: [],
+      link: "",
+      featured: true,
+    },
+    {
+      title: "🎓 Agip Oil Company Undergraduate Scholarship",
       tags: ["Scholarship", "Award"],
       period: "2014–2019",
       description: "Full undergraduate scholarship awarded by Agip Oil Company.",
@@ -130,7 +140,7 @@ window.PORTFOLIO_DATA = {
       featured: true,
     },
     {
-      title: "Academic Honours",
+      title: "🥇 Academic Honours",
       tags: ["Award"],
       period: "2019–2022",
       description: "Recognitions for leadership and academic commitment.",
@@ -139,6 +149,53 @@ window.PORTFOLIO_DATA = {
         "Student Leadership Excellence, University of Port Harcourt (2019)",
         "Most Committed Student, Petrochemical Engineering Department (2019)",
       ],
+      link: "",
+    },
+    {
+      title: "👑 Longest-Serving President, Hall of Residence",
+      tags: ["Leadership"],
+      period: "2016–2019",
+      description:
+        "University of Port Harcourt. Elected to the role three consecutive times, becoming the " +
+        "longest-serving Hall of Residence President in the university's history — representing over " +
+        "10,000 students.",
+      highlights: [
+        "Member of the Vice Chancellor's Committee for Hostel Management and Student Welfare",
+        "Collaborated with university authorities on facility upgrades and student engagement",
+      ],
+      link: "",
+    },
+    {
+      title: "🗳️ Most Transparent Election Delivered",
+      tags: ["Leadership", "Governance"],
+      period: "2025–2026",
+      description:
+        "As Electoral Committee Chairman, led YALI Alumni Nigeria's national electoral committee to " +
+        "deliver one of the most transparent elections in the association's history.",
+      highlights: ["Coordinated election timelines, compliance frameworks, and stakeholder communication"],
+      link: "",
+    },
+    {
+      title: "🤝 Community Impact — toes.today NGO",
+      tags: ["Volunteering", "Community Impact"],
+      period: "2020–2021",
+      description:
+        "As Rivers State Coordinator, led outreach teams across multiple local government areas for a " +
+        "community development NGO.",
+      highlights: [
+        "Empowered 30+ orphanage homes, reaching 3,000+ orphans",
+        "Mentored and supported 1,000+ volunteers",
+      ],
+      link: "",
+    },
+    {
+      title: "🎯 80%+ Success Rate Mentoring Undergraduates",
+      tags: ["Mentorship"],
+      period: "2018–2020",
+      description:
+        "Coached and mentored prospective undergraduates at the University of Port Harcourt, achieving " +
+        "an average success rate of over 80% yearly.",
+      highlights: [],
       link: "",
     },
   ],
