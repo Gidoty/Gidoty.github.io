@@ -92,9 +92,12 @@ the core mechanism end-to-end rather than to operate at scale:
   underlying volume estimate is accurate.
 - **No marginal-field cross-reference yet.** Nigeria's legally designated
   "marginal fields" are a regulatory/licensing category that the flaring
-  dataset alone cannot identify. Building that link would require a
-  separate geographic cross-reference against NUPRC's own published
-  records — real, but unbuilt, future work.
+  dataset alone cannot identify. Checked against a real download: the
+  dataset's `Field Type` column is a hydrocarbon type (oil/gas/LNG), not a
+  marginal-field designation — confirmed, not assumed. It does carry
+  `Field name` and `Operator` for most Nigeria rows, which is a real hook
+  for a future name-matching join against NUPRC's own published
+  marginal-field register — real, but unbuilt, future work.
 - **No partnerships or integrations.** FlareChain is not connected to
   NUPRC, any oil operator, any carbon registry, or any monitoring body. No
   organization has reviewed, endorsed, or adopted this prototype.

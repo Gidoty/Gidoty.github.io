@@ -21,14 +21,14 @@ can't find what it needs, rather than guessing silently.
 Output schema (one object per site/year, exactly as specified):
     site_name, country, year, flared_volume_bcm, data_source, source_url
 
-MARGINAL FIELD STATUS — update: the real downloaded file (2012-2025
-edition) does have "Field Type", "Field name", and "Operator" columns
-that earlier drafts of this project didn't know existed. Whether "Field
-Type" actually distinguishes NUPRC-designated marginal fields (rather
-than e.g. onshore/offshore) is NOT yet confirmed — --inspect now prints
-the real values found in that column for Nigeria rows so this can be
-checked against real data instead of assumed either way. Until that's
-confirmed, output records still don't carry a marginal-field label.
+MARGINAL FIELD STATUS — confirmed against a real download (476 Nigeria
+rows, 2012-2025 edition): "Field Type" is OIL / GAS / LNG — a hydrocarbon
+type, not a marginal-field designation. It does NOT identify NUPRC
+marginal fields. "Field name" and "Operator" ARE populated for ~88% of
+Nigeria rows, which is a real (if manual) hook for a future cross-
+reference against NUPRC's own marginal-field register — see
+docs/data_sources.md. Output records still don't carry a marginal-field
+label; that cross-reference hasn't been built.
 """
 
 import argparse
@@ -257,10 +257,11 @@ def main():
 
     print(f"Wrote {len(records)} records to {OUTPUT_PATH}")
     print(
-        "\nLIMITATION: this dataset does not distinguish 'marginal fields' (a "
-        "Nigerian regulatory designation for small/isolated leases) from other "
-        "oil field types. Every Nigeria record above is included as-is, with "
-        "no marginal-field label attached — see docs/data_sources.md."
+        "\nLIMITATION: this dataset's 'Field Type' column is a hydrocarbon "
+        "type (OIL/GAS/LNG), confirmed NOT to be a 'marginal field' (a "
+        "Nigerian regulatory designation for small/isolated leases). Every "
+        "Nigeria record above is included as-is, with no marginal-field "
+        "label attached — see docs/data_sources.md."
     )
 
 
