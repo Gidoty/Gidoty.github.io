@@ -304,6 +304,15 @@ section {
   gap: 22px;
 }
 
+/* Tighter columns so featured work reliably packs ~4 per row instead of 3 */
+.card-grid--featured {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.card-grid[hidden] {
+  display: none;
+}
+
 .card {
   background: var(--white);
   border-radius: var(--radius);

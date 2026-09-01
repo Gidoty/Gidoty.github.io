@@ -112,6 +112,19 @@ function populateFooter() {
   });
 }
 
+function initFeaturedToggle() {
+  const toggle = document.getElementById("featured-toggle");
+  const grid = document.getElementById("featured-grid");
+  if (!toggle || !grid) return;
+  toggle.addEventListener("click", () => {
+    const willShow = grid.hasAttribute("hidden");
+    if (willShow) grid.removeAttribute("hidden");
+    else grid.setAttribute("hidden", "");
+    toggle.textContent = willShow ? "Hide featured work" : "Show featured work";
+    toggle.setAttribute("aria-expanded", String(willShow));
+  });
+}
+
 function initHomePage() {
   const data = window.PORTFOLIO_DATA || {};
   const categories = ["engineering", "digital", "academics", "awards"];
@@ -123,6 +136,7 @@ function initHomePage() {
 
   const featured = categories.flatMap((key) => data[key] || []).filter((item) => item.featured);
   renderCards(document.getElementById("featured-grid"), featured);
+  initFeaturedToggle();
 
   const profile = data.profile || {};
   const setText = (id, value) => {
