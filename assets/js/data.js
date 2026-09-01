@@ -129,80 +129,14 @@ window.PORTFOLIO_DATA = {
       featured: true,
     },
     {
-      title: "President, Hall of Residence (Elected)",
-      tags: ["Leadership"],
-      period: "2016–2019",
-      description:
-        "University of Port Harcourt. Elected to represent over 10,000 students, resolving welfare " +
-        "issues and managing residence operations.",
-      highlights: [
-        "Collaborated with university authorities on facility upgrades and student engagement",
-        "Member of the Vice Chancellor's Committee for Hostel Management and Student Welfare",
-        "Longest serving President of Hall of Residence in the university's history",
-      ],
-      link: "",
-    },
-    {
-      title: "Rivers State Coordinator (Volunteer)",
-      tags: ["Volunteering"],
-      period: "2020–2021",
-      description:
-        "toes.today NGO. Coordinated outreach teams across multiple local government areas for a " +
-        "community development NGO.",
-      highlights: [
-        "Empowered 30+ orphanage homes and reached 3,000+ orphans",
-        "Mentored and supported 1,000+ volunteers",
-      ],
-      link: "",
-    },
-    {
-      title: "Electoral Committee Chairman",
-      tags: ["Leadership"],
-      period: "2025–2026",
-      description:
-        "YALI Alumni Nigeria. Led the national electoral committee, delivering one of the most " +
-        "transparent elections in the association's history.",
-      highlights: ["Coordinated election timelines, compliance frameworks, and stakeholder communication"],
-      link: "",
-    },
-    {
-      title: "Academic & Leadership Honours",
+      title: "Academic Honours",
       tags: ["Award"],
       period: "2019–2022",
-      description: "Additional recognitions for leadership and academic commitment.",
+      description: "Recognitions for leadership and academic commitment.",
       highlights: [
         "Excellence in Leadership, NYSC Community Development Service (2022)",
         "Student Leadership Excellence, University of Port Harcourt (2019)",
         "Most Committed Student, Petrochemical Engineering Department (2019)",
-      ],
-      link: "",
-    },
-    {
-      title: "Professional Certifications",
-      tags: ["Certification"],
-      description: "Professional and technical certifications across cybersecurity, environmental management, and safety.",
-      highlights: [
-        "Cybersecurity Analyst, Google Cybersecurity Professional Programme (2026)",
-        "Cybersecurity Professional, Harvoxx Tech Hub (2026)",
-        "Certified Environmental Specialist, NREP (2023)",
-        "Emerging Leadership, YALI — Young African Leaders Initiative (2020)",
-        "HSE Levels 1, 2 and 3, Starbroz Academy & Nigerian Society of Chemical Engineers (2018)",
-        "National Youth Service Corps (NYSC) (2022)",
-      ],
-      link: "",
-    },
-    {
-      title: "Professional Memberships",
-      tags: ["Membership"],
-      description: "Professional bodies and associations Gideon holds membership with.",
-      highlights: [
-        "Nigeria Society of Engineers (NSE)",
-        "Nigeria Society of Chemical Engineers (NSChE)",
-        "Society of Petroleum Engineers (SPE)",
-        "Cybersecurity Expert Association of Nigeria (CEAN)",
-        "Google Cybersecurity Professional Programme (2026)",
-        "Environmental and Safety Management Institute",
-        "National Registry of Environmental Professionals (NREP)",
       ],
       link: "",
     },
