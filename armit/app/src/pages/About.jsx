@@ -117,7 +117,7 @@ export default function About() {
             Research Background
           </h2>
           <p>
-            This tool was developed as part of PhD research at the NLNG Centre for Gas, Refining
+            This tool draws on coursework and methodology from the NLNG Centre for Gas, Refining
             and Petrochemical Engineering, University of Port Harcourt. It is grounded in:
           </p>
           <ul className="ml-5 list-disc space-y-1.5">
