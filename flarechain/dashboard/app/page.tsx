@@ -1,14 +1,14 @@
 import { getLatestAnchor } from "@/lib/getAnchoredRecord";
 import type { AnchorEntry } from "@/lib/types";
 import VerifyPanel from "@/components/VerifyPanel";
-import ForestHero from "@/components/ForestHero";
+import FlareHero from "@/components/FlareHero";
 
 export default function Home() {
   const anchor = getLatestAnchor();
 
   return (
     <main>
-      <ForestHero />
+      <FlareHero />
 
       <div className="mx-auto max-w-3xl px-6 pb-16">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-stone-200 py-5 text-xs uppercase tracking-wide text-stone-500">
