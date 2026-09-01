@@ -86,7 +86,7 @@ export default function VerifyPanel({ anchor }: { anchor: AnchorEntry }) {
       <button
         onClick={handleVerify}
         disabled={state.kind === "loading"}
-        className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {state.kind === "loading" ? "Checking Polygon Amoy…" : "Verify on-chain"}
       </button>
