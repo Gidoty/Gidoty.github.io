@@ -41,47 +41,23 @@ window.PORTFOLIO_DATA = {
 
   engineering: [
     {
-      title: "Chemical Process Technician",
-      tags: ["Process Engineering", "Manufacturing"],
-      period: "2020–2021",
+      title: "FlareChain",
+      tags: ["Blockchain", "Methane Verification", "Data Engineering"],
+      period: "2026",
       description:
-        "Produced solvent- and water-based paints at De Dove Paints Nigeria Ltd, Port Harcourt, operating " +
-        "industrial mixers, dispersers, and milling equipment under standardised formulas.",
+        "A working prototype that makes gas flaring emissions data tamper-evident: each reported record " +
+        "is hashed and the hash is anchored on a public blockchain, so anyone can later re-check the " +
+        "record and instantly detect if it has been altered since it was reported. Built as a concrete, " +
+        "end-to-end extension of my conference paper on methane verification, and submitted as a " +
+        "competition entry.",
       highlights: [
-        "Applied quality control procedures and safety/environmental standards",
-        "Supported process optimisation and waste reduction during batch production",
-        "Monitored viscosity, density, and drying properties for product consistency",
+        "Full pipeline: World Bank GFMR flaring data (Nigeria) → SHA-256 record hashing → on-chain anchoring (Polygon Amoy) → live verification dashboard",
+        "One-click re-verification: re-hashes a record and checks it against the chain, reporting a clear match/mismatch result",
+        "Openly documented as a testnet prototype, not a production system — every claim is traceable to a named public data source",
       ],
-      link: "",
+      link: "https://gidoty.github.io/flarechain/site/",
+      linkLabel: "Open live dashboard",
       featured: true,
-    },
-    {
-      title: "Chemical Engineering Intern",
-      tags: ["Internship", "Process Engineering"],
-      period: "2018",
-      description:
-        "Assisted in the preparation and production of solvent- and water-based chemical formulations at " +
-        "De Dove Paints Nigeria Ltd, supporting batch production from raw material weighing through " +
-        "mixing, dispersion, and blending.",
-      highlights: [
-        "Learned safe handling, disposal, and storage of industrial chemicals per HSE standards",
-        "Conducted basic quality control checks and assisted in safety operations",
-      ],
-      link: "",
-    },
-    {
-      title: "Junior Laboratory Analyst",
-      tags: ["Laboratory Analysis", "Quality Control"],
-      period: "2021–2022",
-      description:
-        "Performed routine and analytical chemical laboratory experiments at POSE Specialists Diagnostic " +
-        "Services Limited, Ondo State, collaborating with a senior analyst on experimental workflows and " +
-        "data verification.",
-      highlights: [
-        "Maintained detailed laboratory records: sample tracking, documentation, technical reports",
-        "Conducted quantitative and qualitative data analysis using Excel and statistical methods",
-      ],
-      link: "",
     },
   ],
 
