@@ -60,6 +60,26 @@ window.PORTFOLIO_DATA = {
       linkLabel: "Open live dashboard",
       featured: true,
     },
+    {
+      title: "MarginIQ",
+      tags: ["Refinery Engineering", "Process Simulation", "React"],
+      period: "2026",
+      description:
+        "A free, browser-based refinery margin intelligence tool built for African refinery operators " +
+        "and analysts, closing the gap between expensive commercial LP planning suites and " +
+        "oversimplified crack spread calculators. Turns a real crude assay into unit-by-unit yields, " +
+        "true Gross Refinery Margin, and an energy intensity index, then uses LP shadow-price logic to " +
+        "identify the constraints actually limiting margin — built specifically for configurations like " +
+        "Nigeria's PHRC and Dangote refineries.",
+      highlights: [
+        "Assay-driven yield calculator across 6 crude types, with a Crude Switching Advisor and ROI-ranked Constraint Relief Simulator",
+        "Margin Stress-Tester with a carbon cost overlay",
+        "Methodology grounded in published refining correlations — corrects unit errors found in textbook formulas during development",
+      ],
+      link: "https://gidoty.github.io/marginiq/",
+      linkLabel: "Open live tool",
+      featured: true,
+    },
   ],
 
   digital: [
