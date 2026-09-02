@@ -30,3 +30,28 @@ body {
   background-color: var(--color-teal);
   color: #0a1628;
 }
+
+.leaflet-popup-content-wrapper {
+  background-color: var(--color-card);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.leaflet-popup-tip {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+}
+
+.leaflet-popup-close-button {
+  color: var(--color-muted) !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--color-text) !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  top: 6px;
+  right: 6px;
+}

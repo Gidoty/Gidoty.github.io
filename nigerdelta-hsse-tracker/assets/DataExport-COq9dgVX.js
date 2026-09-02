@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-DxmMVGVZ.js";import{t}from"./code-Bf3mRkj4.js";import{t as n}from"./Placeholder-C2lAnDok.js";var r=e();function i(){return(0,r.jsx)(n,{title:`Open Data API and Export`,icon:t,accent:`text-teal`})}export{i as default};

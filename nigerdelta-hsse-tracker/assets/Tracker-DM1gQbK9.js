@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-DxmMVGVZ.js";import{t}from"./bell-ZKzSswPI.js";import{t as n}from"./Placeholder-C2lAnDok.js";var r=e();function i(){return(0,r.jsx)(n,{title:`Regulatory Escalation Tracker`,icon:t,accent:`text-danger`})}export{i as default};
