@@ -123,10 +123,11 @@ window.PORTFOLIO_DATA = {
     {
       title: "🏆 Tony Elumelu Foundation Award",
       tags: ["Award", "Entrepreneurship"],
+      period: "2023",
       description:
         "Recognised by the Tony Elumelu Foundation, Africa's leading entrepreneurship philanthropy, for " +
         "leadership and impact in technology and youth empowerment.",
-      highlights: [],
+      highlights: ["$5,000 grant"],
       link: "",
       featured: true,
     },
@@ -145,9 +146,11 @@ window.PORTFOLIO_DATA = {
       period: "2019–2022",
       description: "Recognitions for leadership and academic commitment.",
       highlights: [
-        "Excellence in Leadership, NYSC Community Development Service (2022)",
+        "Certificate of Leadership Excellence, NYSC Community Development Service — CDS President (2022)",
         "Student Leadership Excellence, University of Port Harcourt (2019)",
         "Most Committed Student, Petrochemical Engineering Department (2019)",
+        "Certificate of Excellence, International Youth Diplomacy Conference (Model UN), University of Ghana, Legon (2019)",
+        "3rd Place, First Lady Public Speaking Competition, NYSC Camp, Ikare Akoko, Ondo State (2022)",
       ],
       link: "",
     },
@@ -170,9 +173,13 @@ window.PORTFOLIO_DATA = {
       tags: ["Leadership", "Governance"],
       period: "2025–2026",
       description:
-        "As Electoral Committee Chairman, led YALI Alumni Nigeria's national electoral committee to " +
-        "deliver one of the most transparent elections in the association's history.",
-      highlights: ["Coordinated election timelines, compliance frameworks, and stakeholder communication"],
+        "As Electoral Committee Chairman, delivered YALI Alumni Nigeria's most transparent election, " +
+        "restoring member trust after a period of court cases and a damaged leadership outlook.",
+      highlights: [
+        "Recommended and got approved a third-party election platform for a free and fair process",
+        "Led a committee representing all 6 geopolitical zones of Nigeria",
+        "Delivered equal male and female representation across all offices — a first in the association's history",
+      ],
       link: "",
     },
     {
