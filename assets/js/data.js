@@ -17,7 +17,7 @@ window.PORTFOLIO_DATA = {
   profile: {
     name: "Gideon Owhonda",
     title: "Scholar",
-    tagline: "Chemical Engineer, AI Educator, Cybersecurity Educator, Academic Researcher, Entrepreneur",
+    tagline: "Chemical Engineer | AI Educator | Cybersecurity Educator | Academic Researcher | Software Developer | Entrepreneur",
     bio:
       "Gideon Owhonda is a Chemical Engineer, researcher, and entrepreneur based in Port Harcourt, " +
       "Nigeria. He holds a Master's degree in Chemical Engineering and works at the intersection of " +
