@@ -16,7 +16,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-bg text-text">
       <Navbar />
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-20 print:pt-0">
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />

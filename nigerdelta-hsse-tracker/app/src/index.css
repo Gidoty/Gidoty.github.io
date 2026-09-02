@@ -55,3 +55,15 @@ body {
   top: 6px;
   right: 6px;
 }
+
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
