@@ -1,88 +1,91 @@
-// ─── CONSTANTS ─────────────────────────────
-export const COMBUSTION_EFFICIENCY = 0.98 // API standard
-export const UNBURNED_FRACTION = 1 - COMBUSTION_EFFICIENCY // 0.02
-export const CH4_DENSITY_KG_M3 = 0.67 // at 20°C, 1 atm
-export const GWP20 = 84 // IPCC AR6 2021
-export const GWP100 = 29.8 // IPCC AR6 2021
-export const IPCC_CH4_FACTOR = 2000 // tonnes per 10^6 m3
-export const IPCC_CO2_FACTOR = 2000 // tonnes per 10^6 m3
+// ─── CONSTANTS ───────────────────────────────
+export const CONSTANTS = {
+  COMBUSTION_EFFICIENCY: 0.98,
+  UNBURNED_FRACTION: 0.02,
+  CH4_DENSITY_KG_M3: 0.67,
+  GWP20: 84,
+  GWP100: 29.8,
+  IPCC_CH4_FACTOR_TONNES_PER_M3: 2000 / 1_000_000,
+  IPCC_CO2_FACTOR_TONNES_PER_M3: 2000 / 1_000_000,
+  BASE_FLOW_RATES: {
+    low: 500,
+    medium: 2000,
+    high: 8000,
+    unknown: 2000,
+  },
+  STACK_MULTIPLIERS: {
+    small: 0.5,
+    medium: 1.0,
+    large: 2.5,
+    very_large: 5.0,
+  },
+}
 
-export const DEFAULT_CH4_FRACTION = 0.9
-export const DEFAULT_CARBON_PRICE = 15
-
-export const STACK_HEIGHT_OPTIONS = [
-  { id: 'small', label: 'Small (< 5m)', multiplier: 0.5 },
-  { id: 'medium', label: 'Medium (5–15m)', multiplier: 1.0 },
-  { id: 'large', label: 'Large (15–30m)', multiplier: 2.5 },
-  { id: 'very_large', label: 'Very Large (>30m)', multiplier: 5.0 },
-]
-
-export const PRESSURE_OPTIONS = [
-  { id: 'low', label: 'Low pressure — small intermittent flame', flowRate: 500 },
-  { id: 'medium', label: 'Medium pressure — steady continuous flame', flowRate: 2000 },
-  { id: 'high', label: 'High pressure — large roaring flame', flowRate: 8000 },
-  { id: 'unknown', label: 'Unknown', flowRate: 2000 },
-]
-
-export const DURATION_QUICK_OPTIONS = [
-  { label: '1 hr', hours: 1 },
-  { label: '8 hrs', hours: 8 },
-  { label: '24 hrs', hours: 24 },
-  { label: '7 days', hours: 24 * 7 },
-  { label: '30 days', hours: 24 * 30 },
-  { label: '1 year', hours: 8760 },
-]
-
-// ─── FORMULA 1: Estimate gas volume flared ──
-// V_flared (m3) = base_flow_rate * stack_multiplier * duration_hours
+// ─── FORMULA 1: Gas volume flared ────────────
+// V_flared (m³) = baseFlowRate × stackMultiplier × durationHours
 export function estimateFlaredVolume(baseFlowRate, stackMultiplier, durationHours) {
   return baseFlowRate * stackMultiplier * durationHours
 }
 
-// ─── FORMULA 2: CH4 mass emitted ────────────
-export function calculateCH4Emissions(V_flared_m3, ch4Fraction) {
-  const ch4_unburned_kg = V_flared_m3 * ch4Fraction * UNBURNED_FRACTION * CH4_DENSITY_KG_M3
+// ─── FORMULA 2: CH₄ emissions ────────────────
+// Method A — IPCC Tier 1 (PRIMARY):
+//   CH4_ipcc = V_flared × IPCC_CH4_FACTOR_TONNES_PER_M3
+// Method B — Combustion efficiency (cross-check):
+//   CH4_unburned = V_flared × ch4Fraction × UNBURNED_FRACTION × CH4_DENSITY_KG_M3 / 1000
+export function calculateCH4(V_flared_m3, ch4Fraction = 0.9) {
+  const ch4_ipcc_tonnes = V_flared_m3 * CONSTANTS.IPCC_CH4_FACTOR_TONNES_PER_M3
 
-  const ch4_ipcc_kg = (V_flared_m3 / 1_000_000) * IPCC_CH4_FACTOR * 1000
+  const ch4_unburned_tonnes =
+    (V_flared_m3 * ch4Fraction * CONSTANTS.UNBURNED_FRACTION * CONSTANTS.CH4_DENSITY_KG_M3) / 1000
 
   return {
-    ch4_unburned_kg,
-    ch4_ipcc_kg,
-    ch4_primary_kg: ch4_ipcc_kg,
-    ch4_primary_tonnes: ch4_ipcc_kg / 1000,
+    primary_tonnes: ch4_ipcc_tonnes,
+    crosscheck_tonnes: ch4_unburned_tonnes,
+    method: 'IPCC 2006 Tier 1',
+    source: 'IPCC 2006 Guidelines Vol.2 Ch.4',
   }
 }
 
-// ─── FORMULA 3: CO2 equivalent ──────────────
+// ─── FORMULA 3: CO₂ equivalent ───────────────
+// CO2e_20yr  = CH4_tonnes × GWP20  (= × 84)
+// CO2e_100yr = CH4_tonnes × GWP100 (= × 29.8)
 export function calculateCO2Equivalent(ch4_tonnes) {
   return {
-    co2e_20yr: ch4_tonnes * GWP20,
-    co2e_100yr: ch4_tonnes * GWP100,
+    co2e_20yr: ch4_tonnes * CONSTANTS.GWP20,
+    co2e_100yr: ch4_tonnes * CONSTANTS.GWP100,
+    gwp20_used: CONSTANTS.GWP20,
+    gwp100_used: CONSTANTS.GWP100,
+    source: 'IPCC AR6 WGI Table 7.SM.7 (2021)',
   }
 }
 
-// ─── FORMULA 4: CO2 from combustion ─────────
+// ─── FORMULA 4: CO₂ from combustion ──────────
+// CO2_combustion = V_flared × IPCC_CO2_FACTOR_TONNES_PER_M3
 export function calculateCO2Combustion(V_flared_m3) {
-  return (V_flared_m3 / 1_000_000) * IPCC_CO2_FACTOR * 1000 // kg
-}
-
-// ─── FORMULA 5: Carbon credit potential ─────
-export function calculateCarbonCreditValue(co2e_100yr_tonnes, carbonPriceUSD = DEFAULT_CARBON_PRICE) {
-  return co2e_100yr_tonnes * carbonPriceUSD
-}
-
-export function runFullCalculation({ baseFlowRate, stackMultiplier, durationHours, ch4Fraction, carbonPrice }) {
-  const V_flared_m3 = estimateFlaredVolume(baseFlowRate, stackMultiplier, durationHours)
-  const ch4 = calculateCH4Emissions(V_flared_m3, ch4Fraction)
-  const co2e = calculateCO2Equivalent(ch4.ch4_primary_tonnes)
-  const co2_combustion_kg = calculateCO2Combustion(V_flared_m3)
-  const carbonCreditValue = calculateCarbonCreditValue(co2e.co2e_100yr, carbonPrice)
-
   return {
-    V_flared_m3,
-    ...ch4,
-    ...co2e,
-    co2_combustion_kg,
-    carbonCreditValue,
+    co2_tonnes: V_flared_m3 * CONSTANTS.IPCC_CO2_FACTOR_TONNES_PER_M3,
+    source: 'IPCC 2006 Guidelines Vol.2 Ch.4',
+  }
+}
+
+// ─── FORMULA 5: Carbon credit value ──────────
+// Value = CO2e_100yr × carbon_price_per_tonne
+export function calculateCarbonValue(co2e_100yr_tonnes, carbonPriceUSD = 15) {
+  return {
+    value_usd: co2e_100yr_tonnes * carbonPriceUSD,
+    carbon_price_used: carbonPriceUSD,
+    co2e_basis: co2e_100yr_tonnes,
+    disclaimer:
+      'Indicative only. Requires independent third-party verification before credits can be issued. Paris Agreement Article 6.4.',
+  }
+}
+
+// ─── FORMULA 6: Context comparisons ──────────
+export function calculateContext(co2e_100yr) {
+  return {
+    car_years: (co2e_100yr / 2.3).toFixed(1),
+    nigerian_households: (co2e_100yr / 0.89).toFixed(0),
+    source_cars: 'IEA (2023): avg car 2.3 tCO₂/year',
+    source_households: 'IEA (2023): avg Nigerian 0.89 tCO₂/year',
   }
 }

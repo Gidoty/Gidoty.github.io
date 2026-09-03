@@ -8,6 +8,18 @@ import LiveHeatmapPanel from '../components/appshell/panels/LiveHeatmapPanel.jsx
 import IncidentFeedPanel from '../components/appshell/panels/IncidentFeedPanel.jsx'
 import CleanupBoardPanel from '../components/appshell/panels/CleanupBoardPanel.jsx'
 import ResponseTimeAnalyticsPanel from '../components/appshell/panels/ResponseTimeAnalyticsPanel.jsx'
+import MethaneEmissionsPanel from '../components/appshell/panels/MethaneEmissionsPanel.jsx'
+import Co2EquivalentPanel from '../components/appshell/panels/Co2EquivalentPanel.jsx'
+import Co2CombustionPanel from '../components/appshell/panels/Co2CombustionPanel.jsx'
+import CarbonCreditPotentialPanel from '../components/appshell/panels/CarbonCreditPotentialPanel.jsx'
+import CommunitySymptomMonitorPanel from '../components/appshell/panels/CommunitySymptomMonitorPanel.jsx'
+import WhoAqgReferencePanel from '../components/appshell/panels/WhoAqgReferencePanel.jsx'
+import AffectedPopulationCounterPanel from '../components/appshell/panels/AffectedPopulationCounterPanel.jsx'
+import NosdraNotificationLetterPanel from '../components/appshell/panels/NosdraNotificationLetterPanel.jsx'
+import FoiRequestDocumentPanel from '../components/appshell/panels/FoiRequestDocumentPanel.jsx'
+import MethaneEmissionReportPanel from '../components/appshell/panels/MethaneEmissionReportPanel.jsx'
+import CsvDataExportPanel from '../components/appshell/panels/CsvDataExportPanel.jsx'
+import CarbonCreditDataPackagePanel from '../components/appshell/panels/CarbonCreditDataPackagePanel.jsx'
 import { DEFAULT_CATEGORY, DEFAULT_PARAMETER, findParameter, getCategory } from '../data/parameters.js'
 import { loadRealReports, exportReportsToCsv } from '../utils/dashboardUtils.js'
 import { exportEscalationCsv, isAwaitingOperatorResponse } from '../utils/trackerUtils.js'
@@ -21,6 +33,18 @@ const PANEL_COMPONENTS = {
   'incident-feed': IncidentFeedPanel,
   'response-time-analytics': ResponseTimeAnalyticsPanel,
   'cleanup-status-board': CleanupBoardPanel,
+  'methane-emissions': MethaneEmissionsPanel,
+  'co2-equivalent': Co2EquivalentPanel,
+  'co2-from-combustion': Co2CombustionPanel,
+  'carbon-credit-potential': CarbonCreditPotentialPanel,
+  'community-symptom-monitor': CommunitySymptomMonitorPanel,
+  'who-aqg-reference-panel': WhoAqgReferencePanel,
+  'affected-population-counter': AffectedPopulationCounterPanel,
+  'nosdra-notification-letter': NosdraNotificationLetterPanel,
+  'foi-request-document': FoiRequestDocumentPanel,
+  'methane-emission-report': MethaneEmissionReportPanel,
+  'csv-data-export': CsvDataExportPanel,
+  'carbon-credit-data-package': CarbonCreditDataPackagePanel,
 }
 
 const FULL_BLEED_PANELS = new Set(['live-heatmap', 'incident-feed'])
@@ -96,7 +120,7 @@ export default function AppShell() {
   const PanelComponent = PANEL_COMPONENTS[activeParameter.panel]
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-bg text-text">
+    <div className="fixed inset-0 flex flex-col bg-bg text-text print:static print:h-auto print:overflow-visible">
       <TopBar
         drawerOpen={drawerOpen}
         onToggleDrawer={() => setDrawerOpen((prev) => !prev)}
@@ -124,13 +148,13 @@ export default function AppShell() {
       )}
 
       <div
-        className={`flex-1 overflow-hidden pt-14 transition-[margin] duration-300 ease-in-out ${
+        className={`flex-1 overflow-hidden pt-14 transition-[margin] duration-300 ease-in-out print:static print:ml-0 print:h-auto print:overflow-visible print:pt-0 ${
           drawerOpen ? 'md:ml-[300px]' : 'ml-0'
         }`}
       >
         <div
           key={activeParameterId}
-          className={`panel-enter h-full ${
+          className={`panel-enter h-full print:h-auto print:overflow-visible ${
             FULL_BLEED_PANELS.has(activeParameter.panel) ? '' : 'overflow-y-auto p-4 sm:p-6'
           }`}
         >

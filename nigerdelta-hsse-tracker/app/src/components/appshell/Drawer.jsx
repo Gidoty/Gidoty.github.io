@@ -46,7 +46,7 @@ export default function Drawer({ open, onClose, activeParameterId, onSelectParam
       aria-label="Parameter Navigation"
       aria-expanded={open}
       onKeyDown={handleKeyDown}
-      className={`fixed bottom-0 left-0 top-14 z-[200] flex w-full flex-col border-r border-border bg-bg transition-transform duration-300 ease-in-out md:w-[300px] ${
+      className={`fixed bottom-0 left-0 top-14 z-[200] flex w-full flex-col border-r border-border bg-bg transition-transform duration-300 ease-in-out print:hidden md:w-[300px] ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
