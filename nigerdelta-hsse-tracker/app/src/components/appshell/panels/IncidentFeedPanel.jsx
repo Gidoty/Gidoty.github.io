@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { SlidersHorizontal, X } from 'lucide-react'
 import FilterPanel from '../../dashboard/FilterPanel.jsx'
 import IncidentFeed from '../../dashboard/IncidentFeed.jsx'
 import ReportDetailModal from '../ReportDetailModal.jsx'
 import { useReportsWithDemo } from '../../../hooks/useReportsWithDemo.js'
 import { defaultFilters, filterReports, sortReports } from '../../../utils/dashboardUtils.js'
+import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
 
 export default function IncidentFeedPanel() {
   const { combinedReports } = useReportsWithDemo()
@@ -17,8 +18,8 @@ export default function IncidentFeedPanel() {
   const sorted = useMemo(() => sortReports(filtered, sortBy), [filtered, sortBy])
   const viewing = combinedReports.find((r) => r.id === viewingId)
 
-  const handleFilterChange = (patch) => setFilters((prev) => ({ ...prev, ...patch }))
-  const handleResetFilters = () => setFilters(defaultFilters())
+  const handleFilterChange = useCallback((patch) => setFilters((prev) => ({ ...prev, ...patch })), [])
+  const handleResetFilters = useCallback(() => setFilters(defaultFilters()), [])
 
   return (
     <div className="flex h-full flex-col lg:flex-row">
@@ -43,6 +44,9 @@ export default function IncidentFeedPanel() {
           onSortChange={setSortBy}
           onSelectReport={setViewingId}
         />
+        <div className="px-4 pb-4">
+          <LegalBasisBadge text="NOSDRA Act 2006" />
+        </div>
       </div>
 
       {mobileFiltersOpen && (

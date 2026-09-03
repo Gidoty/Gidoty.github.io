@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ClipboardList, Camera, Stethoscope, CheckCircle2, RefreshCw } from 'lucide-react'
 import { t } from '../../../data/translations.js'
-import { loadRealReports, sortReports, deriveStatus } from '../../../utils/dashboardUtils.js'
+import { fmt } from '../../../utils/formatters.js'
+import { sortReports, deriveStatus } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { SEVERITY_BADGE_CLASSES, TYPE_MARKER_COLORS } from '../../../data/markerColors.js'
 import ReportDetailModal from '../ReportDetailModal.jsx'
+import PanelHeader from './shared/PanelHeader.jsx'
 
 const SORT_OPTIONS = [
   { id: 'newest', label: 'Newest' },
@@ -48,7 +51,7 @@ function ReportListCard({ report, onView }) {
       <p className="mt-2 text-xs text-muted">
         📍 {[report.location.state, report.location.lga].filter(Boolean).join(' · ') || 'Location not specified'}
       </p>
-      <p className="mt-0.5 text-xs text-muted">📅 {new Date(report.submittedAt).toLocaleString()}</p>
+      <p className="mt-0.5 text-xs text-muted">📅 {fmt.datetime(report.submittedAt)}</p>
       {excerpt && <p className="mt-1.5 text-xs text-text">📝 {excerpt}{report.incident.description?.length > 120 ? '...' : ''}</p>}
 
       <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted">
@@ -97,11 +100,11 @@ function ReportListCard({ report, onView }) {
 }
 
 export default function MySubmittedReportsPanel() {
-  const [reports, setReports] = useState(() => loadRealReports())
+  const [reports, setReports] = useLiveReports()
   const [sortBy, setSortBy] = useState('newest')
   const [viewingId, setViewingId] = useState(null)
 
-  const sorted = sortReports(reports, sortBy)
+  const sorted = useMemo(() => sortReports(reports, sortBy), [reports, sortBy])
   const viewing = sorted.find((r) => r.id === viewingId)
 
   if (reports.length === 0) {
@@ -122,23 +125,21 @@ export default function MySubmittedReportsPanel() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-text">My Submitted Reports</h1>
-        <div className="flex items-center gap-1.5 text-xs">
-          <span className="text-muted">Sort by:</span>
-          {SORT_OPTIONS.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => setSortBy(option.id)}
-              className={`rounded-full px-2.5 py-1 font-medium transition-colors ${
-                sortBy === option.id ? 'bg-teal text-white' : 'text-muted hover:text-text'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+      <PanelHeader icon={ClipboardList} color="#00A8CC" title="My Submitted Reports" />
+      <div className="flex items-center justify-end gap-1.5 text-xs">
+        <span className="text-muted">Sort by:</span>
+        {SORT_OPTIONS.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => setSortBy(option.id)}
+            className={`rounded-full px-2.5 py-1 font-medium transition-colors ${
+              sortBy === option.id ? 'bg-teal text-white' : 'text-muted hover:text-text'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
 
       <div className="mt-5 space-y-3">

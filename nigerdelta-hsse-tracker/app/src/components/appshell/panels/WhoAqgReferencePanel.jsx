@@ -7,7 +7,7 @@ export default function WhoAqgReferencePanel() {
     <div className="mx-auto max-w-4xl">
       <PanelHeader icon={ShieldCheck} color="#00A8CC" title="WHO Air Quality Guidelines" badges={['WHO 2021 AQG', 'Global Update']} />
 
-      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted">
+      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-normal text-muted">
         The World Health Organization's 2021 Global Air Quality Guidelines set science-based limits for
         the pollutants most associated with gas flaring and oil industry activity. The reference cards
         below pair each guideline with documented findings from communities in the Niger Delta.
@@ -33,7 +33,7 @@ export default function WhoAqgReferencePanel() {
         ))}
       </div>
 
-      <div className="mt-6 rounded-lg border border-danger/40 bg-danger/5 p-4 text-sm leading-relaxed text-text">
+      <div className="mt-6 rounded-lg border border-danger/40 bg-danger/5 p-4 text-sm leading-normal text-text">
         <strong className="text-danger">Exceedance summary:</strong> {WHO_EXCEEDANCE_SUMMARY.text}
         <p className="mt-2 text-[11px] italic text-muted">{WHO_EXCEEDANCE_SUMMARY.source}</p>
       </div>

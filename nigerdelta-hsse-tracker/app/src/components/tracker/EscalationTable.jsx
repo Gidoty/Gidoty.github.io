@@ -1,6 +1,7 @@
 import { Download } from 'lucide-react'
 import { t } from '../../data/translations.js'
 import { hoursSince, formatElapsed, exportEscalationCsv, isAwaitingOperatorResponse } from '../../utils/trackerUtils.js'
+import { fmt } from '../../utils/formatters.js'
 
 function rowClass(report) {
   if (report.regulatory?.cleanupStatus === 'completed') return 'bg-safe/10'
@@ -59,7 +60,7 @@ export default function EscalationTable({ reports }) {
                   <td className="px-3 py-2 text-text">
                     {[report.location.state, report.location.lga].filter(Boolean).join(' · ')}
                   </td>
-                  <td className="px-3 py-2 text-muted">{new Date(report.submittedAt).toLocaleDateString()}</td>
+                  <td className="px-3 py-2 text-muted">{fmt.datetime(report.submittedAt)}</td>
                   <td className="px-3 py-2 text-text">{report.regulatory?.nosdraNotified ? 'Yes' : 'No'}</td>
                   <td className="px-3 py-2 text-text">{jivStatus}</td>
                   <td className="px-3 py-2 capitalize text-text">

@@ -118,7 +118,7 @@ export default function FoiGenerator() {
           readOnly
           value={text}
           rows={14}
-          className="mt-4 w-full rounded-lg border border-border bg-bg p-3 font-mono text-[11px] leading-relaxed text-text focus:border-teal focus:outline-none"
+          className="mt-4 w-full rounded-lg border border-border bg-bg p-3 font-mono text-[11px] leading-normal text-text focus:border-teal focus:outline-none"
         />
 
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">

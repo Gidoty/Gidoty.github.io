@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { ScrollText, Copy, Download, CheckCircle2 } from 'lucide-react'
 import PanelHeader from './shared/PanelHeader.jsx'
+import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
 import { NIGER_DELTA_STATES } from '../../../data/incidentTypes.js'
+import { fmt } from '../../../utils/formatters.js'
 
 const INSTITUTIONS = [
   { id: 'nosdra', label: 'NOSDRA', address: 'National Oil Spill Detection and Response Agency\n7 Zambezi Crescent, Maitama, Abuja' },
@@ -36,7 +38,7 @@ function generateFoiText({ institution, otherInstitution, state, dateFrom, dateT
     })
 
   return `FREEDOM OF INFORMATION REQUEST
-Date: ${new Date().toLocaleDateString()}
+Date: ${fmt.datetime(new Date().toISOString())}
 
 To: The Director General / Head of Records
 ${target}
@@ -93,7 +95,7 @@ export default function FoiRequestDocumentPanel() {
     <div className="mx-auto max-w-3xl">
       <PanelHeader icon={ScrollText} color="#06B6D4" title="Freedom of Information Request" badges={['FOI Act 2011, Section 4']} />
 
-      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted">
+      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-normal text-muted">
         Under the Freedom of Information Act 2011, any Nigerian citizen has the right to request records
         held by public institutions, including oil spill data, JIV reports, and operator compliance
         records. Institutions must respond within 7 days. Use this generator to build a ready-to-send
@@ -109,7 +111,7 @@ export default function FoiRequestDocumentPanel() {
               type="button"
               onClick={() => setInstitutionId(inst.id)}
               className={`min-h-[44px] rounded-lg border px-3 text-xs font-bold transition-colors ${
-                institutionId === inst.id ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400' : 'border-border bg-card text-muted'
+                institutionId === inst.id ? 'border-generate bg-generate/10 text-generate' : 'border-border bg-card text-muted'
               }`}
             >
               {inst.label}
@@ -122,7 +124,7 @@ export default function FoiRequestDocumentPanel() {
             value={otherInstitution}
             onChange={(e) => setOtherInstitution(e.target.value)}
             placeholder="Institution name and address"
-            className="mt-2 min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-cyan-400 focus:outline-none"
+            className="mt-2 min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-generate focus:outline-none"
           />
         )}
       </div>
@@ -134,7 +136,7 @@ export default function FoiRequestDocumentPanel() {
             id="foi-state"
             value={state}
             onChange={(e) => setState(e.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-cyan-400 focus:outline-none"
+            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-generate focus:outline-none"
           >
             <option value="">Select a state</option>
             {NIGER_DELTA_STATES.map((s) => (
@@ -149,7 +151,7 @@ export default function FoiRequestDocumentPanel() {
             type="text"
             value={referenceNumber}
             onChange={(e) => setReferenceNumber(e.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-cyan-400 focus:outline-none"
+            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-generate focus:outline-none"
           />
         </div>
         <div>
@@ -159,7 +161,7 @@ export default function FoiRequestDocumentPanel() {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-cyan-400 focus:outline-none"
+            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-generate focus:outline-none"
           />
         </div>
         <div>
@@ -169,7 +171,7 @@ export default function FoiRequestDocumentPanel() {
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-cyan-400 focus:outline-none"
+            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-generate focus:outline-none"
           />
         </div>
         <div>
@@ -179,7 +181,7 @@ export default function FoiRequestDocumentPanel() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-cyan-400 focus:outline-none"
+            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-generate focus:outline-none"
           />
         </div>
         <div>
@@ -189,7 +191,7 @@ export default function FoiRequestDocumentPanel() {
             type="text"
             value={contact}
             onChange={(e) => setContact(e.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-cyan-400 focus:outline-none"
+            className="min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-generate focus:outline-none"
           />
         </div>
       </div>
@@ -203,7 +205,7 @@ export default function FoiRequestDocumentPanel() {
                 type="checkbox"
                 checked={requests.has(item.id)}
                 onChange={() => toggleRequest(item.id)}
-                className="h-4 w-4 accent-cyan-400"
+                className="h-4 w-4 accent-generate"
               />
               <span className="text-sm text-text">{item.label}</span>
             </label>
@@ -215,14 +217,14 @@ export default function FoiRequestDocumentPanel() {
         readOnly
         value={text}
         rows={16}
-        className="mt-5 w-full rounded-lg border border-border bg-bg p-3 font-mono text-[11px] leading-relaxed text-text focus:border-cyan-400 focus:outline-none"
+        className="mt-5 w-full rounded-lg border border-border bg-bg p-3 font-mono text-[11px] leading-normal text-text focus:border-generate focus:outline-none"
       />
 
       <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 print:hidden">
         <button
           type="button"
           onClick={handleCopy}
-          className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-cyan-400 text-xs font-bold text-cyan-400 hover:bg-cyan-400/10"
+          className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-generate text-xs font-bold text-generate hover:bg-generate/10"
         >
           <Copy className="h-3.5 w-3.5" />
           Copy FOI Request
@@ -241,6 +243,8 @@ export default function FoiRequestDocumentPanel() {
           <CheckCircle2 className="h-3.5 w-3.5" /> Copied to clipboard
         </p>
       )}
+
+      <LegalBasisBadge text="Freedom of Information Act 2011, Section 4" />
     </div>
   )
 }

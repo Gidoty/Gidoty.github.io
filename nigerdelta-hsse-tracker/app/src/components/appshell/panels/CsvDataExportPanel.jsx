@@ -1,13 +1,16 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import { FileSpreadsheet, Download } from 'lucide-react'
 import PanelHeader from './shared/PanelHeader.jsx'
-import { loadRealReports, exportReportsToCsv, deriveStatus } from '../../../utils/dashboardUtils.js'
+import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
+import { exportReportsToCsv, deriveStatus } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { t } from '../../../data/translations.js'
 
 const PREVIEW_ROWS = 8
 
 export default function CsvDataExportPanel() {
-  const [reports] = useState(() => loadRealReports().filter((r) => !r.incident?.isDemoData))
+  const [allReports] = useLiveReports()
+  const reports = useMemo(() => allReports.filter((r) => !r.incident?.isDemoData), [allReports])
   const typeLabels = t('en', 'incidentTypes')
 
   if (reports.length === 0) {
@@ -25,7 +28,7 @@ export default function CsvDataExportPanel() {
     <div className="mx-auto max-w-4xl">
       <PanelHeader icon={FileSpreadsheet} color="#06B6D4" title="CSV Data Export" badges={['NDPA 2023 — coarse location only']} />
 
-      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted">
+      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-normal text-muted">
         Exports every community-submitted incident report in the database as a CSV file, suitable for
         analysis in spreadsheet software or GIS tools. In line with the Nigeria Data Protection Act 2023,
         GPS coordinates are rounded to two decimal places (roughly 1 km precision) — never the reporter's
@@ -52,7 +55,7 @@ export default function CsvDataExportPanel() {
         <table className="mt-3 w-full min-w-[700px] text-left text-xs">
           <thead>
             <tr className="text-muted">
-              <th className="pb-2 pr-4 font-medium">Reference</th>
+              <th className="sticky left-0 bg-card pb-2 pr-4 font-medium">Reference</th>
               <th className="pb-2 pr-4 font-medium">Type</th>
               <th className="pb-2 pr-4 font-medium">Severity</th>
               <th className="pb-2 pr-4 font-medium">State</th>
@@ -64,7 +67,7 @@ export default function CsvDataExportPanel() {
           <tbody>
             {reports.slice(0, PREVIEW_ROWS).map((r) => (
               <tr key={r.id} className="border-t border-border">
-                <td className="py-2 pr-4 text-text">{r.referenceNumber}</td>
+                <td className="sticky left-0 bg-card py-2 pr-4 text-text">{r.referenceNumber}</td>
                 <td className="py-2 pr-4 text-muted">{typeLabels[r.incident.type] ?? r.incident.type}</td>
                 <td className="py-2 pr-4 text-muted">{r.incident.severity}</td>
                 <td className="py-2 pr-4 text-muted">{r.location.state ?? '—'}</td>
@@ -80,11 +83,13 @@ export default function CsvDataExportPanel() {
       <button
         type="button"
         onClick={() => exportReportsToCsv(reports)}
-        className="mt-6 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-cyan-400 text-sm font-bold text-bg hover:bg-cyan-400/90"
+        className="mt-6 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-generate text-sm font-bold text-bg hover:bg-generate/90"
       >
         <Download className="h-4 w-4" />
         Download CSV ({reports.length} reports)
       </button>
+
+      <LegalBasisBadge text="Nigeria Data Protection Act 2023" />
     </div>
   )
 }

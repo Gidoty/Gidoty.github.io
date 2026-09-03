@@ -14,6 +14,8 @@
   --color-text: #f0f4f8;
   --color-muted: #8b9eb7;
   --color-border: #1e3a5f;
+  --color-input: #1e3a5f;
+  --color-generate: #06b6d4;
 }
 
 html {
@@ -24,6 +26,16 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
 }
 
 ::selection {
@@ -49,6 +61,16 @@ body {
 
 .leaflet-popup-close-button:hover {
   color: var(--color-text) !important;
+}
+
+@media (max-width: 480px) {
+  .leaflet-popup-content-wrapper {
+    max-width: calc(100vw - 3rem);
+  }
+
+  .leaflet-popup-content {
+    width: calc(100vw - 4.5rem) !important;
+  }
 }
 
 .leaflet-container a.leaflet-popup-close-button {

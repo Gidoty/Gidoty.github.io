@@ -1,142 +1,85 @@
-const CACHE_VERSION = 'hsse-tracker-v1'
+const CACHE_VERSION = 'hsse-v1'
+const STATIC_CACHE = `${CACHE_VERSION}-static`
+const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`
 const SCOPE = self.registration.scope
-const APP_SHELL = [SCOPE, `${SCOPE}manifest.json`, `${SCOPE}icon-192.png`, `${SCOPE}icon-512.png`]
 
-const DB_NAME = 'hsse-tracker-offline'
-const STORE_NAME = 'pending-reports'
+const STATIC_ASSETS = [SCOPE, `${SCOPE}manifest.json`, `${SCOPE}icon-192.png`, `${SCOPE}icon-512.png`]
 
-function openQueueDb() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1)
-    request.onupgradeneeded = () => {
-      request.result.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true })
-    }
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(request.error)
-  })
-}
-
-async function queueRequest(request) {
-  const db = await openQueueDb()
-  const body = await request.clone().text()
-  const entry = {
-    url: request.url,
-    method: request.method,
-    headers: [...request.headers.entries()],
-    body,
-    queuedAt: Date.now(),
-  }
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite')
-    tx.objectStore(STORE_NAME).add(entry)
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error)
-  })
-}
-
-async function replayQueue() {
-  const db = await openQueueDb()
-  const entries = await new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly')
-    const req = tx.objectStore(STORE_NAME).getAll()
-    req.onsuccess = () => resolve(req.result)
-    req.onerror = () => reject(req.error)
-  })
-
-  for (const entry of entries) {
-    try {
-      await fetch(entry.url, {
-        method: entry.method,
-        headers: entry.headers,
-        body: entry.body,
-      })
-      const tx = db.transaction(STORE_NAME, 'readwrite')
-      tx.objectStore(STORE_NAME).delete(entry.id)
-    } catch {
-      // Still offline — leave it queued and try again next time.
-    }
-  }
-}
-
-self.addEventListener('install', (event) => {
-  self.skipWaiting()
-  event.waitUntil(
-    caches.open(CACHE_VERSION).then((cache) => cache.addAll(APP_SHELL)),
+// Install: cache static assets
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches
+      .open(STATIC_CACHE)
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting()),
   )
 })
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
+// Activate: clean old caches
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
     caches
       .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))),
-      )
+      .then((keys) => Promise.all(keys.filter((k) => k !== STATIC_CACHE && k !== DYNAMIC_CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   )
 })
 
-self.addEventListener('fetch', (event) => {
-  const { request } = event
+// Fetch: cache-first for static, network-first for dynamic (navigations, everything else)
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url)
 
-  if (request.method !== 'GET') {
-    if (request.url.includes('/api/')) {
-      event.respondWith(
-        fetch(request.clone()).catch(async () => {
-          await queueRequest(request)
-          return new Response(
-            JSON.stringify({ queued: true, message: 'Saved on-device. Will submit when you are back online.' }),
-            { status: 202, headers: { 'Content-Type': 'application/json' } },
-          )
-        }),
-      )
-    }
-    return
-  }
+  // Skip non-GET requests and cross-origin requests
+  if (e.request.method !== 'GET' || url.origin !== self.location.origin) return
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).catch(() => caches.match(SCOPE)),
-    )
-    return
-  }
+  const isStaticAsset = STATIC_ASSETS.includes(e.request.url) || /\.(js|css|png|svg|ico|woff2?)$/.test(url.pathname)
 
-  if (request.url.includes('/api/')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone()
-          caches.open(CACHE_VERSION).then((cache) => cache.put(request, copy))
-          return response
-        })
-        .catch(() => caches.match(request)),
-    )
-    return
-  }
-
-  if (new URL(request.url).origin === self.location.origin) {
-    event.respondWith(
-      caches.match(request).then(
+  if (isStaticAsset) {
+    e.respondWith(
+      caches.match(e.request).then(
         (cached) =>
           cached ||
-          fetch(request).then((response) => {
-            const copy = response.clone()
-            caches.open(CACHE_VERSION).then((cache) => cache.put(request, copy))
+          fetch(e.request).then((response) => {
+            const clone = response.clone()
+            caches.open(STATIC_CACHE).then((c) => c.put(e.request, clone))
             return response
           }),
       ),
     )
+    return
+  }
+
+  // Network-first for everything else
+  e.respondWith(
+    fetch(e.request)
+      .then((response) => {
+        const clone = response.clone()
+        caches.open(DYNAMIC_CACHE).then((c) => c.put(e.request, clone))
+        return response
+      })
+      .catch(() => caches.match(e.request).then((cached) => cached || caches.match(SCOPE))),
+  )
+})
+
+// Background Sync for queued reports
+self.addEventListener('sync', (e) => {
+  if (e.tag === 'sync-reports') {
+    e.waitUntil(syncQueuedReports())
   }
 })
 
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-reports') {
-    event.waitUntil(replayQueue())
-  }
-})
+async function syncQueuedReports() {
+  // This app stores reports directly in localStorage (no backend API to POST to),
+  // so there is nothing to replay here — just tell open tabs connectivity is back
+  // so they can flip any locally-queued reports to submitted.
+  const clients = await self.clients.matchAll()
+  clients.forEach((client) => {
+    client.postMessage({ type: 'SYNC_COMPLETE', message: 'Queued reports submitted' })
+  })
+}
 
 self.addEventListener('message', (event) => {
   if (event.data === 'SYNC_QUEUE') {
-    event.waitUntil(replayQueue())
+    event.waitUntil(syncQueuedReports())
   }
 })

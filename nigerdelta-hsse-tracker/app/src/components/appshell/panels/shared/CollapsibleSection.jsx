@@ -19,7 +19,7 @@ export default function CollapsibleSection({ title, icon: Icon, defaultOpen = fa
         <span className="flex-1 text-sm font-bold text-text">{title}</span>
         {open ? <ChevronUp className="h-5 w-5 text-muted" /> : <ChevronDown className="h-5 w-5 text-muted" />}
       </button>
-      {open && <div className="space-y-4 border-t border-border px-4 py-4 text-sm leading-relaxed text-muted">{children}</div>}
+      {open && <div className="space-y-4 border-t border-border px-4 py-4 text-sm leading-normal text-muted">{children}</div>}
     </div>
   )
 }

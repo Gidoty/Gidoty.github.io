@@ -1,4 +1,5 @@
 import { t } from '../data/translations.js'
+import { fmt } from './formatters.js'
 
 const HOUR_MS = 60 * 60 * 1000
 
@@ -49,7 +50,7 @@ export function generateNosdraNotificationText(report) {
 
   return `NOSDRA INCIDENT NOTIFICATION
 
-Date: ${new Date().toLocaleString()}
+Date: ${fmt.datetime(new Date().toISOString())}
 Reference: ${report.referenceNumber}
 Incident Type: ${typeLabel}
 Location: ${location}, approximately ${display ? `${display.lat}°N, ${display.lng}°E` : 'location not captured'}
@@ -60,7 +61,7 @@ This notification is submitted pursuant to the NOSDRA Act 2006 and the Oil Spill
 Community Description:
 ${report.incident.description ?? ''}
 
-This incident was reported via the NigerDelta HSSE Tracker (community environmental monitoring platform) at ${new Date(report.submittedAt).toLocaleString()}.
+This incident was reported via the NigerDelta HSSE Tracker (community environmental monitoring platform) at ${fmt.datetime(report.submittedAt)}.
 
 Report Hash (Nigerian Evidence Act 2011, Sections 84–87 audit fingerprint):
 ${report.audit?.reportHash ?? 'not available'}
@@ -72,7 +73,7 @@ Requesting immediate response and Joint Investigation Visit scheduling as requir
 
 export function generateFoiRequestText({ state, dateFrom, dateTo, referenceNumber, name, contact }) {
   return `FREEDOM OF INFORMATION REQUEST
-Date: ${new Date().toLocaleDateString()}
+Date: ${fmt.datetime(new Date().toISOString())}
 
 To: The Director General
 National Oil Spill Detection and Response Agency (NOSDRA)

@@ -3,6 +3,7 @@ import { CheckCircle2, Stethoscope } from 'lucide-react'
 import { t } from '../../data/translations.js'
 import { deriveStatus } from '../../utils/dashboardUtils.js'
 import { TYPE_MARKER_COLORS, SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
+import { fmt } from '../../utils/formatters.js'
 
 const STATUS_LABELS = {
   submitted: 'Submitted',
@@ -39,7 +40,7 @@ export default function IncidentPopup({ report, onCorroborate }) {
       </div>
 
       <div className="mt-2 space-y-1.5 text-xs text-muted">
-        <p>📅 {new Date(report.incident.dateTime).toLocaleString()}</p>
+        <p>📅 {fmt.datetime(report.incident.dateTime)}</p>
         {report.location.display && (
           <p>
             📍 {report.location.display.lat}°N, {report.location.display.lng}°E

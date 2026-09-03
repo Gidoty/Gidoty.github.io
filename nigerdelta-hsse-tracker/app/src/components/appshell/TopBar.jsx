@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Menu, ChevronRight } from 'lucide-react'
+import { Menu, ChevronRight, Zap } from 'lucide-react'
 import NotificationBell from './NotificationBell.jsx'
 
 export default function TopBar({ drawerOpen, onToggleDrawer, category, parameter, quickAction, overdueReports }) {
@@ -15,9 +15,9 @@ export default function TopBar({ drawerOpen, onToggleDrawer, category, parameter
         <Menu className="h-6 w-6" />
       </button>
 
-      <span className="hidden h-6 w-px bg-border sm:block" />
+      <span className="hidden h-6 w-px bg-border min-[480px]:block" />
 
-      <nav className="hidden min-w-0 items-center gap-1.5 text-sm text-muted sm:flex" aria-label="Breadcrumb">
+      <nav className="hidden min-w-0 items-center gap-1.5 text-sm text-muted min-[480px]:flex" aria-label="Breadcrumb">
         <Link to="/" className="shrink-0 font-medium hover:text-text">
           HSSE Tracker
         </Link>
@@ -27,7 +27,7 @@ export default function TopBar({ drawerOpen, onToggleDrawer, category, parameter
         <span className="truncate font-bold text-text">{parameter.label}</span>
       </nav>
 
-      <h1 className="min-w-0 flex-1 truncate text-center text-base font-bold text-text sm:hidden">
+      <h1 className="min-w-0 flex-1 truncate text-center text-base font-bold text-text min-[480px]:hidden">
         {parameter.label}
       </h1>
 
@@ -37,9 +37,11 @@ export default function TopBar({ drawerOpen, onToggleDrawer, category, parameter
             type="button"
             onClick={quickAction.onClick}
             disabled={quickAction.disabled}
-            className="hidden min-h-[40px] items-center rounded-lg bg-teal px-3 text-xs font-bold text-white hover:bg-teal/90 disabled:cursor-not-allowed disabled:opacity-40 sm:flex"
+            aria-label={quickAction.label}
+            className="flex min-h-[40px] items-center gap-1.5 rounded-lg bg-teal px-3 text-xs font-bold text-white hover:bg-teal/90 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {quickAction.label}
+            <Zap className="h-3.5 w-3.5 shrink-0" />
+            <span className="hidden min-[480px]:inline">{quickAction.label}</span>
           </button>
         )}
         <NotificationBell overdueReports={overdueReports} />

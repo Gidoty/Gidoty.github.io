@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, CheckCircle2 } from 'lucide-react'
 import { t } from '../../data/translations.js'
+import { fmt } from '../../utils/formatters.js'
 
 const RELATIONSHIP_OPTIONS = [
   { id: 'resident', label: 'I am a resident of this community' },
@@ -59,7 +60,7 @@ export default function CorroborationModal({ report, onConfirm, onClose }) {
             <div className="mt-4 rounded-lg border border-border bg-panel p-3 text-xs text-muted">
               <p className="font-bold text-text">{typeLabel}</p>
               {location && <p className="mt-1">{location}</p>}
-              <p className="mt-1">{new Date(report.incident.dateTime).toLocaleString()}</p>
+              <p className="mt-1">{fmt.datetime(report.incident.dateTime)}</p>
               {excerpt && <p className="mt-1 text-text">{excerpt}</p>}
             </div>
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, Polygon } from 'react-leaflet'
 import L from 'leaflet'
 import { X } from 'lucide-react'
@@ -34,7 +34,7 @@ const BOUNDARY_STYLE = {
   interactive: false,
 }
 
-export default function MapView({ reports, onCorroborate, selectedReportId, showDemoBanner, onDismissDemoBanner }) {
+function MapView({ reports, onCorroborate, selectedReportId, showDemoBanner, onDismissDemoBanner }) {
   const [layers, setLayers] = useState({ heatmap: true, markers: true, boundary: true })
 
   const heatPoints = useMemo(
@@ -45,7 +45,7 @@ export default function MapView({ reports, onCorroborate, selectedReportId, show
     [reports],
   )
 
-  const toggleLayer = (key) => setLayers((prev) => ({ ...prev, [key]: !prev[key] }))
+  const toggleLayer = useCallback((key) => setLayers((prev) => ({ ...prev, [key]: !prev[key] })), [])
 
   return (
     <div className="relative z-0 h-full w-full overflow-hidden">
@@ -89,3 +89,5 @@ export default function MapView({ reports, onCorroborate, selectedReportId, show
     </div>
   )
 }
+
+export default memo(MapView)

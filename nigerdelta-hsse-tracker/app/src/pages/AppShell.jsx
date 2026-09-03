@@ -1,61 +1,42 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TopBar from '../components/appshell/TopBar.jsx'
 import Drawer from '../components/appshell/Drawer.jsx'
 import PlaceholderPanel from '../components/appshell/PlaceholderPanel.jsx'
-import MySubmittedReportsPanel from '../components/appshell/panels/MySubmittedReportsPanel.jsx'
-import LiveHeatmapPanel from '../components/appshell/panels/LiveHeatmapPanel.jsx'
-import IncidentFeedPanel from '../components/appshell/panels/IncidentFeedPanel.jsx'
-import CleanupBoardPanel from '../components/appshell/panels/CleanupBoardPanel.jsx'
-import ResponseTimeAnalyticsPanel from '../components/appshell/panels/ResponseTimeAnalyticsPanel.jsx'
-import MethaneEmissionsPanel from '../components/appshell/panels/MethaneEmissionsPanel.jsx'
-import Co2EquivalentPanel from '../components/appshell/panels/Co2EquivalentPanel.jsx'
-import Co2CombustionPanel from '../components/appshell/panels/Co2CombustionPanel.jsx'
-import CarbonCreditPotentialPanel from '../components/appshell/panels/CarbonCreditPotentialPanel.jsx'
-import CommunitySymptomMonitorPanel from '../components/appshell/panels/CommunitySymptomMonitorPanel.jsx'
-import WhoAqgReferencePanel from '../components/appshell/panels/WhoAqgReferencePanel.jsx'
-import AffectedPopulationCounterPanel from '../components/appshell/panels/AffectedPopulationCounterPanel.jsx'
-import NosdraNotificationLetterPanel from '../components/appshell/panels/NosdraNotificationLetterPanel.jsx'
-import FoiRequestDocumentPanel from '../components/appshell/panels/FoiRequestDocumentPanel.jsx'
-import MethaneEmissionReportPanel from '../components/appshell/panels/MethaneEmissionReportPanel.jsx'
-import CsvDataExportPanel from '../components/appshell/panels/CsvDataExportPanel.jsx'
-import CarbonCreditDataPackagePanel from '../components/appshell/panels/CarbonCreditDataPackagePanel.jsx'
+import PanelSkeleton from '../components/appshell/panels/shared/PanelSkeleton.jsx'
+import ConnectivityStatus from '../components/ConnectivityStatus.jsx'
 import { DEFAULT_CATEGORY, DEFAULT_PARAMETER, findParameter, getCategory } from '../data/parameters.js'
 import { loadRealReports, exportReportsToCsv } from '../utils/dashboardUtils.js'
 import { exportEscalationCsv, isAwaitingOperatorResponse } from '../utils/trackerUtils.js'
+import { storage } from '../utils/storage.js'
 
-const LAST_PARAM_KEY = 'hsse_last_param'
 const MOBILE_BREAKPOINT = 768
 
 const PANEL_COMPONENTS = {
-  'my-submitted-reports': MySubmittedReportsPanel,
-  'live-heatmap': LiveHeatmapPanel,
-  'incident-feed': IncidentFeedPanel,
-  'response-time-analytics': ResponseTimeAnalyticsPanel,
-  'cleanup-status-board': CleanupBoardPanel,
-  'methane-emissions': MethaneEmissionsPanel,
-  'co2-equivalent': Co2EquivalentPanel,
-  'co2-from-combustion': Co2CombustionPanel,
-  'carbon-credit-potential': CarbonCreditPotentialPanel,
-  'community-symptom-monitor': CommunitySymptomMonitorPanel,
-  'who-aqg-reference-panel': WhoAqgReferencePanel,
-  'affected-population-counter': AffectedPopulationCounterPanel,
-  'nosdra-notification-letter': NosdraNotificationLetterPanel,
-  'foi-request-document': FoiRequestDocumentPanel,
-  'methane-emission-report': MethaneEmissionReportPanel,
-  'csv-data-export': CsvDataExportPanel,
-  'carbon-credit-data-package': CarbonCreditDataPackagePanel,
+  'my-submitted-reports': lazy(() => import('../components/appshell/panels/MySubmittedReportsPanel.jsx')),
+  'live-heatmap': lazy(() => import('../components/appshell/panels/LiveHeatmapPanel.jsx')),
+  'incident-feed': lazy(() => import('../components/appshell/panels/IncidentFeedPanel.jsx')),
+  'response-time-analytics': lazy(() => import('../components/appshell/panels/ResponseTimeAnalyticsPanel.jsx')),
+  'cleanup-status-board': lazy(() => import('../components/appshell/panels/CleanupBoardPanel.jsx')),
+  'methane-emissions': lazy(() => import('../components/appshell/panels/MethaneEmissionsPanel.jsx')),
+  'co2-equivalent': lazy(() => import('../components/appshell/panels/Co2EquivalentPanel.jsx')),
+  'co2-from-combustion': lazy(() => import('../components/appshell/panels/Co2CombustionPanel.jsx')),
+  'carbon-credit-potential': lazy(() => import('../components/appshell/panels/CarbonCreditPotentialPanel.jsx')),
+  'community-symptom-monitor': lazy(() => import('../components/appshell/panels/CommunitySymptomMonitorPanel.jsx')),
+  'who-aqg-reference-panel': lazy(() => import('../components/appshell/panels/WhoAqgReferencePanel.jsx')),
+  'affected-population-counter': lazy(() => import('../components/appshell/panels/AffectedPopulationCounterPanel.jsx')),
+  'nosdra-notification-letter': lazy(() => import('../components/appshell/panels/NosdraNotificationLetterPanel.jsx')),
+  'foi-request-document': lazy(() => import('../components/appshell/panels/FoiRequestDocumentPanel.jsx')),
+  'methane-emission-report': lazy(() => import('../components/appshell/panels/MethaneEmissionReportPanel.jsx')),
+  'csv-data-export': lazy(() => import('../components/appshell/panels/CsvDataExportPanel.jsx')),
+  'carbon-credit-data-package': lazy(() => import('../components/appshell/panels/CarbonCreditDataPackagePanel.jsx')),
 }
 
 const FULL_BLEED_PANELS = new Set(['live-heatmap', 'incident-feed'])
 
 function loadLastParam() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(LAST_PARAM_KEY))
-    if (stored && findParameter(stored.parameter)) return stored
-  } catch {
-    // fall through to defaults
-  }
+  const stored = storage.getLastParam()
+  if (stored && findParameter(stored.parameter)) return stored
   return { category: DEFAULT_CATEGORY, parameter: DEFAULT_PARAMETER }
 }
 
@@ -77,8 +58,15 @@ export default function AppShell() {
   }, [drawerOpen])
 
   useEffect(() => {
+    const handleDataUpdated = (event) => setReports(event.detail.reports)
+    window.addEventListener('hsse-data-updated', handleDataUpdated)
+    // Cross-tab fallback: CustomEvent only fires within this tab, so keep polling
+    // for changes made to hsse_reports from another tab or window.
     const interval = setInterval(() => setReports(loadRealReports()), 30000)
-    return () => clearInterval(interval)
+    return () => {
+      window.removeEventListener('hsse-data-updated', handleDataUpdated)
+      clearInterval(interval)
+    }
   }, [])
 
   const activeCategory = getCategory(activeCategoryId) ?? getCategory(DEFAULT_CATEGORY)
@@ -86,19 +74,25 @@ export default function AppShell() {
   const activeParameter =
     activeParameterEntry?.parameter ?? findParameter(DEFAULT_PARAMETER).parameter
 
-  const handleSelectParameter = (categoryId, parameterId) => {
-    if (parameterId === 'submit-new-incident') {
-      navigate('/report')
-      setDrawerOpen(false)
-      return
-    }
+  const handleSelectParameter = useCallback(
+    (categoryId, parameterId) => {
+      if (parameterId === 'submit-new-incident') {
+        navigate('/report')
+        setDrawerOpen(false)
+        return
+      }
 
-    setActiveCategoryId(categoryId)
-    setActiveParameterId(parameterId)
-    localStorage.setItem(LAST_PARAM_KEY, JSON.stringify({ category: categoryId, parameter: parameterId }))
+      setActiveCategoryId(categoryId)
+      setActiveParameterId(parameterId)
+      storage.setLastParam({ category: categoryId, parameter: parameterId })
 
-    if (window.innerWidth < MOBILE_BREAKPOINT) setDrawerOpen(false)
-  }
+      if (window.innerWidth < MOBILE_BREAKPOINT) setDrawerOpen(false)
+    },
+    [navigate],
+  )
+
+  const handleToggleDrawer = useCallback(() => setDrawerOpen((prev) => !prev), [])
+  const handleCloseDrawer = useCallback(() => setDrawerOpen(false), [])
 
   const overdueReports = reports.filter(isAwaitingOperatorResponse)
   const queuedCount = reports.filter((r) => r.status === 'queued').length
@@ -123,7 +117,7 @@ export default function AppShell() {
     <div className="fixed inset-0 flex flex-col bg-bg text-text print:static print:h-auto print:overflow-visible">
       <TopBar
         drawerOpen={drawerOpen}
-        onToggleDrawer={() => setDrawerOpen((prev) => !prev)}
+        onToggleDrawer={handleToggleDrawer}
         category={activeCategory}
         parameter={activeParameter}
         quickAction={quickAction}
@@ -132,7 +126,7 @@ export default function AppShell() {
 
       <Drawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={handleCloseDrawer}
         activeParameterId={activeParameterId}
         onSelectParameter={handleSelectParameter}
         reportsCount={reports.length}
@@ -141,11 +135,15 @@ export default function AppShell() {
 
       {drawerOpen && (
         <div
-          className="fixed bottom-0 left-0 right-0 top-14 z-[150] bg-black/60 md:hidden"
-          onClick={() => setDrawerOpen(false)}
+          className="fixed bottom-0 left-0 right-0 top-14 z-[150] bg-black/70 md:hidden"
+          onClick={handleCloseDrawer}
           aria-hidden="true"
         />
       )}
+
+      <div className="fixed inset-x-0 top-14 z-[90] print:hidden">
+        <ConnectivityStatus />
+      </div>
 
       <div
         className={`flex-1 overflow-hidden pt-14 transition-[margin] duration-300 ease-in-out print:static print:ml-0 print:h-auto print:overflow-visible print:pt-0 ${
@@ -155,11 +153,13 @@ export default function AppShell() {
         <div
           key={activeParameterId}
           className={`panel-enter h-full print:h-auto print:overflow-visible ${
-            FULL_BLEED_PANELS.has(activeParameter.panel) ? '' : 'overflow-y-auto p-4 sm:p-6'
+            FULL_BLEED_PANELS.has(activeParameter.panel) ? '' : 'overflow-y-auto p-3 sm:p-4 lg:p-6'
           }`}
         >
           {PanelComponent ? (
-            <PanelComponent />
+            <Suspense fallback={<PanelSkeleton />}>
+              <PanelComponent />
+            </Suspense>
           ) : (
             <PlaceholderPanel parameter={activeParameter} category={activeCategory} />
           )}

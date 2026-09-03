@@ -5,7 +5,8 @@ import CollapsibleSection from './shared/CollapsibleSection.jsx'
 import ResultCard from './shared/ResultCard.jsx'
 import FormulaBlock from './shared/FormulaBlock.jsx'
 import { t } from '../../../data/translations.js'
-import { loadRealReports, updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import { updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import {
   CONSTANTS,
   estimateFlaredVolume,
@@ -14,12 +15,13 @@ import {
   calculateCO2Combustion,
   calculateContext,
 } from '../../../utils/methaneCalc.js'
+import { fmt } from '../../../utils/formatters.js'
 
 const FLAME_PRESSURE_OPTIONS = [
-  { id: 'low', label: 'Low pressure flare', hint: `~${CONSTANTS.BASE_FLOW_RATES.low.toLocaleString()} m³/hr` },
-  { id: 'medium', label: 'Medium pressure flare', hint: `~${CONSTANTS.BASE_FLOW_RATES.medium.toLocaleString()} m³/hr` },
-  { id: 'high', label: 'High pressure flare', hint: `~${CONSTANTS.BASE_FLOW_RATES.high.toLocaleString()} m³/hr` },
-  { id: 'unknown', label: 'Unknown / not sure', hint: `default ~${CONSTANTS.BASE_FLOW_RATES.unknown.toLocaleString()} m³/hr` },
+  { id: 'low', label: 'Low pressure flare', hint: `~${fmt.number(CONSTANTS.BASE_FLOW_RATES.low)} m³/hr` },
+  { id: 'medium', label: 'Medium pressure flare', hint: `~${fmt.number(CONSTANTS.BASE_FLOW_RATES.medium)} m³/hr` },
+  { id: 'high', label: 'High pressure flare', hint: `~${fmt.number(CONSTANTS.BASE_FLOW_RATES.high)} m³/hr` },
+  { id: 'unknown', label: 'Unknown / not sure', hint: `default ~${fmt.number(CONSTANTS.BASE_FLOW_RATES.unknown)} m³/hr` },
 ]
 
 const STACK_OPTIONS = [
@@ -36,13 +38,10 @@ const DURATION_PRESETS = [
   { label: '30 days', hours: 720 },
 ]
 
-function n(value, digits = 2) {
-  return Number(value).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: 0 })
-}
-
 export default function MethaneEmissionsPanel() {
   const [tab, setTab] = useState('report')
-  const [reports] = useState(() => loadRealReports().filter((r) => r.incident.type === 'gas_flare'))
+  const [allReports] = useLiveReports()
+  const reports = useMemo(() => allReports.filter((r) => r.incident.type === 'gas_flare'), [allReports])
   const [selectedReportId, setSelectedReportId] = useState(reports[0]?.id ?? '')
   const [flarePressure, setFlarePressure] = useState('medium')
   const [stackHeight, setStackHeight] = useState('medium')
@@ -191,7 +190,7 @@ export default function MethaneEmissionsPanel() {
               {reports.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.referenceNumber} · {r.location.state ?? 'Unknown state'} ·{' '}
-                  {new Date(r.submittedAt).toLocaleDateString()}
+                  {fmt.datetime(r.submittedAt)}
                 </option>
               ))}
             </select>
@@ -200,7 +199,7 @@ export default function MethaneEmissionsPanel() {
             <p className="mt-2 text-xs text-muted">
               {t('en', 'severityLevels')[selectedReport.incident.severity]?.label} severity ·{' '}
               {selectedReport.location.display
-                ? `${selectedReport.location.display.lat}°N, ${selectedReport.location.display.lng}°E`
+                ? fmt.gps(selectedReport.location.display.lat, selectedReport.location.display.lng)
                 : 'location not captured'}
             </p>
           )}
@@ -297,12 +296,13 @@ export default function MethaneEmissionsPanel() {
         <h2 className="text-lg font-bold text-text">Results</h2>
 
         <ResultCard title="Flared Volume" subtitle="Estimated gas volume flared over the observed duration">
-          <p className="text-2xl font-bold text-text">{n(results.V_flared, 0)} m³</p>
+          <p className="text-2xl font-bold text-text">{fmt.volume(results.V_flared)}</p>
           <div className="mt-3">
             <FormulaBlock
+              citation="API Compendium 2009"
               lines={[
                 'V = baseFlowRate × stackMultiplier × durationHours',
-                `V = ${baseFlowRate.toLocaleString()} × ${stackMultiplier} × ${durationHours} = ${n(results.V_flared, 0)} m³`,
+                `V = ${fmt.number(baseFlowRate)} × ${stackMultiplier} × ${durationHours} = ${fmt.volume(results.V_flared)}`,
               ]}
             />
           </div>
@@ -312,21 +312,23 @@ export default function MethaneEmissionsPanel() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-amber/40 bg-bg p-3">
               <p className="text-xs font-bold text-amber">Primary — IPCC Tier 1</p>
-              <p className="mt-1 text-xl font-bold text-text">{n(results.ch4.primary_tonnes, 3)} t CH₄</p>
+              <p className="mt-1 text-xl font-bold text-text">{fmt.tonnes(results.ch4.primary_tonnes)} CH₄</p>
               <FormulaBlock
+                citation="IPCC 2006 Tier 1"
                 lines={[
                   'CH4 = V_flared × 2000 / 1,000,000',
-                  `CH4 = ${n(results.V_flared, 0)} × 0.002 = ${n(results.ch4.primary_tonnes, 3)} t`,
+                  `CH4 = ${fmt.volume(results.V_flared)} × 0.002 = ${fmt.tonnes(results.ch4.primary_tonnes)}`,
                 ]}
               />
             </div>
             <div className="rounded-lg border border-border bg-bg p-3">
               <p className="text-xs font-bold text-muted">Cross-check — Combustion efficiency</p>
-              <p className="mt-1 text-xl font-bold text-text">{n(results.ch4.crosscheck_tonnes, 3)} t CH₄</p>
+              <p className="mt-1 text-xl font-bold text-text">{fmt.tonnes(results.ch4.crosscheck_tonnes)} CH₄</p>
               <FormulaBlock
+                citation="Combustion Efficiency Method"
                 lines={[
                   'CH4 = V × ch4Fraction × 2% unburned × 0.67 kg/m³ / 1000',
-                  `CH4 = ${n(results.V_flared, 0)} × ${ch4Fraction} × 0.02 × 0.67 / 1000 = ${n(results.ch4.crosscheck_tonnes, 3)} t`,
+                  `CH4 = ${fmt.volume(results.V_flared)} × ${ch4Fraction} × 0.02 × 0.67 / 1000 = ${fmt.tonnes(results.ch4.crosscheck_tonnes)}`,
                 ]}
               />
             </div>
@@ -335,12 +337,12 @@ export default function MethaneEmissionsPanel() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <ResultCard title="CO₂ Equivalent (20-yr)" subtitle="GWP₂₀ = 84">
-            <p className="text-2xl font-bold text-teal">{n(results.co2e.co2e_20yr, 1)} t CO₂e</p>
-            <FormulaBlock lines={[`CO2e = ${n(results.ch4.primary_tonnes, 3)} × 84 = ${n(results.co2e.co2e_20yr, 1)} t`]} />
+            <p className="text-2xl font-bold text-teal">{fmt.co2e(results.co2e.co2e_20yr)}</p>
+            <FormulaBlock citation="IPCC AR6 WGI 2021" lines={[`CO2e = ${fmt.tonnes(results.ch4.primary_tonnes)} × 84 = ${fmt.co2e(results.co2e.co2e_20yr)}`]} />
           </ResultCard>
           <ResultCard title="CO₂ Equivalent (100-yr)" subtitle="GWP₁₀₀ = 29.8">
-            <p className="text-2xl font-bold text-teal">{n(results.co2e.co2e_100yr, 1)} t CO₂e</p>
-            <FormulaBlock lines={[`CO2e = ${n(results.ch4.primary_tonnes, 3)} × 29.8 = ${n(results.co2e.co2e_100yr, 1)} t`]} />
+            <p className="text-2xl font-bold text-teal">{fmt.co2e(results.co2e.co2e_100yr)}</p>
+            <FormulaBlock citation="IPCC AR6 WGI 2021" lines={[`CO2e = ${fmt.tonnes(results.ch4.primary_tonnes)} × 29.8 = ${fmt.co2e(results.co2e.co2e_100yr)}`]} />
           </ResultCard>
         </div>
 
@@ -355,8 +357,8 @@ export default function MethaneEmissionsPanel() {
         </div>
 
         <ResultCard title="CO₂ from Combustion" subtitle="Separate from methane — the carbon dioxide produced when the flare burns">
-          <p className="text-2xl font-bold text-text">{n(results.co2Combustion.co2_tonnes, 1)} t CO₂</p>
-          <FormulaBlock lines={[`CO2 = ${n(results.V_flared, 0)} × 0.002 = ${n(results.co2Combustion.co2_tonnes, 1)} t`]} />
+          <p className="text-2xl font-bold text-text">{fmt.tonnes(results.co2Combustion.co2_tonnes)} CO₂</p>
+          <FormulaBlock citation="IPCC 2006 Tier 1" lines={[`CO2 = ${fmt.volume(results.V_flared)} × 0.002 = ${fmt.tonnes(results.co2Combustion.co2_tonnes)}`]} />
         </ResultCard>
       </div>
 

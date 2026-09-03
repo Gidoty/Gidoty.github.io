@@ -20,6 +20,22 @@ export function useReportsWithDemo() {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    let debounceTimer = null
+    const handleDataUpdated = (event) => {
+      clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => {
+        setRealReports(event.detail.reports)
+        setLastUpdated(new Date())
+      }, 300)
+    }
+    window.addEventListener('hsse-data-updated', handleDataUpdated)
+    return () => {
+      clearTimeout(debounceTimer)
+      window.removeEventListener('hsse-data-updated', handleDataUpdated)
+    }
+  }, [])
+
   const usingDemoData = realReports.length < DEMO_THRESHOLD
   const combinedReports = useMemo(
     () => (usingDemoData ? [...realReports, ...demoReports] : realReports),

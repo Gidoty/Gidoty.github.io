@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Users } from 'lucide-react'
 import {
   PieChart,
@@ -16,10 +16,11 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import PanelHeader from './shared/PanelHeader.jsx'
-import { loadRealReports } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { affectedCountValue } from '../../../utils/healthUtils.js'
 import { t } from '../../../data/translations.js'
 import { TYPE_MARKER_COLORS } from '../../../data/markerColors.js'
+import { fmt } from '../../../utils/formatters.js'
 
 const HIGH_IMPACT_THRESHOLD = 20
 
@@ -29,7 +30,7 @@ function monthKey(isoString) {
 }
 
 export default function AffectedPopulationCounterPanel() {
-  const [reports] = useState(() => loadRealReports())
+  const [reports] = useLiveReports()
   const typeLabels = t('en', 'incidentTypes')
   const symptomLabels = t('en', 'symptomsList')
 
@@ -98,7 +99,7 @@ export default function AffectedPopulationCounterPanel() {
       <PanelHeader icon={Users} color="#E63946" title="Affected Population Counter" badges={['Self-reported ranges']} />
 
       <div className="rounded-xl border border-border bg-gradient-to-b from-card to-panel p-6 text-center">
-        <p className="text-4xl font-bold text-danger">{totalAffected.toLocaleString()}</p>
+        <p className="text-4xl font-bold text-danger">{fmt.number(totalAffected)}</p>
         <p className="mt-1 text-sm text-muted">Total estimated people affected across all incidents</p>
         <p className="mt-1 text-[11px] text-muted">
           Midpoint estimates: 1–5 → 3 · 6–20 → 13 · 21–100 → 60 · 100+ → 150 · unknown → 0

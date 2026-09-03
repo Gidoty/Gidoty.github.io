@@ -4,8 +4,9 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import PanelHeader from './shared/PanelHeader.jsx'
 import ResultCard from './shared/ResultCard.jsx'
 import FormulaBlock from './shared/FormulaBlock.jsx'
-import { loadRealReports } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { calculateCarbonValue } from '../../../utils/methaneCalc.js'
+import { fmt } from '../../../utils/formatters.js'
 
 const PRICE_MARKERS = [15, 30, 50, 75]
 const VALIDITY_OPTIONS = [5, 10, 20]
@@ -18,12 +19,9 @@ const MARKET_REFERENCE = [
   { market: 'Nigeria indicative flare-out incentive', range: '$15 – $30 / tCO₂e' },
 ]
 
-function n(value, digits = 0) {
-  return Number(value).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: 0 })
-}
-
 export default function CarbonCreditPotentialPanel() {
-  const [reports] = useState(() => loadRealReports().filter((r) => r.methane?.calculated))
+  const [allReports] = useLiveReports()
+  const reports = useMemo(() => allReports.filter((r) => r.methane?.calculated), [allReports])
   const [source, setSource] = useState('manual')
   const [co2eInput, setCo2eInput] = useState(100)
   const [carbonPrice, setCarbonPrice] = useState(15)
@@ -68,7 +66,7 @@ export default function CarbonCreditPotentialPanel() {
         badges={['Paris Agreement Article 6.4', 'Indicative only']}
       />
 
-      <div className="rounded-lg border border-amber/40 bg-amber/5 p-4 text-sm leading-relaxed text-text">
+      <div className="rounded-lg border border-amber/40 bg-amber/5 p-4 text-sm leading-normal text-text">
         <strong className="text-amber">Legal context:</strong> Carbon credits from flare reduction or
         elimination require independent third-party verification against a recognised methodology
         (e.g. Gold Standard, Verra VCS) and, for use toward Nationally Determined Contributions or
@@ -90,7 +88,7 @@ export default function CarbonCreditPotentialPanel() {
           <option value="manual">Manual entry</option>
           {reports.map((r) => (
             <option key={r.id} value={r.id}>
-              Load from {r.referenceNumber} ({n(r.methane.results.co2e_100yr_tonnes)} t CO₂e/yr)
+              Load from {r.referenceNumber} ({fmt.co2e(r.methane.results.co2e_100yr_tonnes)}/yr)
             </option>
           ))}
         </select>
@@ -166,20 +164,21 @@ export default function CarbonCreditPotentialPanel() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <ResultCard title="Annual Revenue" subtitle="At current CO₂e and price">
-          <p className="text-2xl font-bold text-safe">${n(annualRevenue)}</p>
-          <FormulaBlock lines={[`Value = ${n(co2e)} t × $${carbonPrice} = $${n(annualRevenue)}`]} />
+          <p className="text-2xl font-bold text-safe">{fmt.usd(annualRevenue)}</p>
+          <FormulaBlock citation="Indicative Carbon Pricing" lines={[`Value = ${fmt.tonnes(co2e)} × $${carbonPrice} = ${fmt.usd(annualRevenue)}`]} />
         </ResultCard>
         <ResultCard title="Total Undiscounted" subtitle={`Over ${validity} years`}>
-          <p className="text-2xl font-bold text-text">${n(totalUndiscounted)}</p>
+          <p className="text-2xl font-bold text-text">{fmt.usd(totalUndiscounted)}</p>
         </ResultCard>
       </div>
 
       <ResultCard title="Net Present Value (NPV)" subtitle={`Discounted at ${discountRate}% over ${validity} years`}>
-        <p className="text-2xl font-bold text-teal">${n(npv)}</p>
+        <p className="text-2xl font-bold text-teal">{fmt.usd(npv)}</p>
         <FormulaBlock
+          citation="Discounted Cash Flow"
           lines={[
             'NPV = Σ (annualRevenue / (1 + r)^t) for t = 1..n',
-            `NPV = Σ ($${n(annualRevenue)} / (1 + ${rate})^t) = $${n(npv)}`,
+            `NPV = Σ (${fmt.usd(annualRevenue)} / (1 + ${rate})^t) = ${fmt.usd(npv)}`,
           ]}
         />
       </ResultCard>

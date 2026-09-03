@@ -37,7 +37,7 @@ export default function MapControls({ layers, onToggleLayer }) {
             key={toggle.key}
             type="button"
             onClick={() => onToggleLayer(toggle.key)}
-            className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`flex min-h-[40px] items-center gap-2 rounded-md px-2.5 text-xs font-medium transition-colors ${
               active ? 'bg-teal text-white' : 'bg-card text-muted hover:text-text'
             }`}
           >
@@ -49,7 +49,7 @@ export default function MapControls({ layers, onToggleLayer }) {
       <button
         type="button"
         onClick={() => map.flyToBounds(NIGER_DELTA_BOUNDS, { duration: 0.8 })}
-        className="flex items-center gap-2 rounded-md border border-teal px-2.5 py-1.5 text-xs font-bold text-teal hover:bg-teal/10"
+        className="flex min-h-[40px] items-center gap-2 rounded-md border border-teal px-2.5 text-xs font-bold text-teal hover:bg-teal/10"
       >
         <Target className="h-3.5 w-3.5" />
         Niger Delta

@@ -4,15 +4,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import PanelHeader from './shared/PanelHeader.jsx'
 import ResultCard from './shared/ResultCard.jsx'
 import FormulaBlock from './shared/FormulaBlock.jsx'
-import { loadRealReports } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { CONSTANTS, calculateCO2Equivalent } from '../../../utils/methaneCalc.js'
-
-function n(value, digits = 1) {
-  return Number(value).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: 0 })
-}
+import { fmt } from '../../../utils/formatters.js'
 
 export default function Co2EquivalentPanel() {
-  const [reports] = useState(() => loadRealReports().filter((r) => r.methane?.calculated))
+  const [allReports] = useLiveReports()
+  const reports = useMemo(() => allReports.filter((r) => r.methane?.calculated), [allReports])
   const [source, setSource] = useState('manual')
   const [ch4Mass, setCh4Mass] = useState(1)
 
@@ -40,7 +38,7 @@ export default function Co2EquivalentPanel() {
         badges={[`GWP₂₀ = ${CONSTANTS.GWP20}`, `GWP₁₀₀ = ${CONSTANTS.GWP100}`, 'IPCC AR6 WGI 2021']}
       />
 
-      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted">
+      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-normal text-muted">
         Global Warming Potential (GWP) expresses the warming impact of a mass of methane relative to the
         same mass of CO₂ over a given time horizon. Methane traps far more heat than CO₂ in the short
         term but breaks down in the atmosphere within roughly a decade, so the 20-year horizon captures
@@ -61,7 +59,7 @@ export default function Co2EquivalentPanel() {
           <option value="manual">Manual entry</option>
           {reports.map((r) => (
             <option key={r.id} value={r.id}>
-              Load from {r.referenceNumber} ({n(r.methane.results.ch4_primary_tonnes, 3)} t CH₄)
+              Load from {r.referenceNumber} ({fmt.tonnes(r.methane.results.ch4_primary_tonnes)} CH₄)
             </option>
           ))}
         </select>
@@ -86,18 +84,18 @@ export default function Co2EquivalentPanel() {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <ResultCard title="20-Year CO₂e" subtitle={`GWP₂₀ = ${CONSTANTS.GWP20}`}>
-          <p className="text-2xl font-bold text-amber">{n(result.co2e_20yr)} t CO₂e</p>
-          <FormulaBlock lines={[`CO2e = ${n(effectiveMass, 3)} × ${CONSTANTS.GWP20} = ${n(result.co2e_20yr)} t`]} />
+          <p className="text-2xl font-bold text-amber">{fmt.co2e(result.co2e_20yr)}</p>
+          <FormulaBlock citation="IPCC AR6 WGI 2021" lines={[`CO2e = ${fmt.tonnes(effectiveMass)} × ${CONSTANTS.GWP20} = ${fmt.co2e(result.co2e_20yr)}`]} />
         </ResultCard>
         <ResultCard title="100-Year CO₂e" subtitle={`GWP₁₀₀ = ${CONSTANTS.GWP100}`}>
-          <p className="text-2xl font-bold text-safe">{n(result.co2e_100yr)} t CO₂e</p>
-          <FormulaBlock lines={[`CO2e = ${n(effectiveMass, 3)} × ${CONSTANTS.GWP100} = ${n(result.co2e_100yr)} t`]} />
+          <p className="text-2xl font-bold text-safe">{fmt.co2e(result.co2e_100yr)}</p>
+          <FormulaBlock citation="IPCC AR6 WGI 2021" lines={[`CO2e = ${fmt.tonnes(effectiveMass)} × ${CONSTANTS.GWP100} = ${fmt.co2e(result.co2e_100yr)}`]} />
         </ResultCard>
       </div>
 
       <ResultCard title="Difference Between Horizons" subtitle="Why the time frame you choose matters">
         <p className="text-lg font-bold text-text">
-          {n(difference)} t CO₂e higher over 20 years ({n(ratio, 2)}× the 100-year figure)
+          {fmt.co2e(difference)} higher over 20 years ({ratio.toFixed(2)}× the 100-year figure)
         </p>
       </ResultCard>
 

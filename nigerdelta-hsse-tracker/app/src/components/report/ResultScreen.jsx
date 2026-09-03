@@ -19,7 +19,7 @@ export default function ResultScreen({ language, status, referenceNumber, onSubm
         {t(language, isSuccess ? 'successTitle' : 'offlineTitle')}
       </h1>
 
-      <p className="mt-3 text-sm leading-relaxed text-muted">
+      <p className="mt-3 text-sm leading-normal text-muted">
         {t(language, isSuccess ? 'successText' : 'offlineText')}
       </p>
 

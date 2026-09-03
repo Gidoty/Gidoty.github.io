@@ -17,7 +17,10 @@ import {
   Satellite,
   CheckCircle2,
   XCircle,
+  Smartphone,
+  X,
 } from 'lucide-react'
+import { useInstallPrompt } from '../hooks/useInstallPrompt.js'
 
 const STATS = [
   {
@@ -235,7 +238,7 @@ function FeatureCard({ icon: Icon, title, text, accent, bg }) {
         <Icon className="h-5 w-5" />
       </span>
       <h3 className="mt-4 text-sm font-bold text-text">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
+      <p className="mt-2 text-sm leading-normal text-muted">{text}</p>
     </div>
   )
 }
@@ -249,6 +252,52 @@ function LegalPill({ label, variant }) {
     <span className={`inline-flex items-center rounded-full border px-4 py-2 text-xs font-medium ${styles}`}>
       {label}
     </span>
+  )
+}
+
+function InstallBanner() {
+  const { installPrompt, promptInstall, dismiss } = useInstallPrompt()
+
+  if (!installPrompt) return null
+
+  return (
+    <div className="border-t border-teal bg-bg px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 sm:flex-row sm:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal/15 text-teal">
+            <Smartphone className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="text-sm font-bold text-text">Install NigerDelta HSSE Tracker on your device</p>
+            <p className="mt-0.5 text-xs text-muted">Works offline · No app store required · Free forever</p>
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={dismiss}
+            className="flex min-h-[44px] items-center text-xs font-medium text-muted hover:text-text"
+          >
+            Not now
+          </button>
+          <button
+            type="button"
+            onClick={promptInstall}
+            className="flex min-h-[44px] items-center gap-2 rounded-lg bg-teal px-5 text-sm font-bold text-white hover:bg-teal/90"
+          >
+            Install
+          </button>
+          <button
+            type="button"
+            onClick={dismiss}
+            aria-label="Dismiss install banner"
+            className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted hover:text-text sm:flex"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -276,7 +325,7 @@ export default function Home() {
             for the Niger Delta
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-normal text-muted sm:text-lg">
             The first platform giving Niger Delta communities a structured, timestamped,
             legally-grounded channel to report oil spills, gas flares, and environmental health
             incidents — aligned with the NOSDRA Joint Investigation Visit evidentiary standard.
@@ -376,13 +425,15 @@ export default function Home() {
             University of Port Harcourt
           </p>
           <p className="mt-1 text-sm text-teal">gideon.owhonda@cgrpng.org</p>
-          <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-muted">
+          <p className="mx-auto mt-6 max-w-xl text-sm leading-normal text-muted">
             This platform was developed as part of doctoral research in gas, refining and
             petrochemical engineering, applying engineering and environmental science to
             community accountability and environmental justice in the Niger Delta.
           </p>
         </div>
       </section>
+
+      <InstallBanner />
     </>
   )
 }

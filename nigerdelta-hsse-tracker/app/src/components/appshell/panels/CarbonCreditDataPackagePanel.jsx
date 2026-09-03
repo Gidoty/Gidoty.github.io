@@ -1,11 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Globe2, Download } from 'lucide-react'
 import PanelHeader from './shared/PanelHeader.jsx'
-import { loadRealReports } from '../../../utils/dashboardUtils.js'
-
-function n(value, digits = 1) {
-  return Number(value ?? 0).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: 0 })
-}
+import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
+import { fmt } from '../../../utils/formatters.js'
 
 function downloadBlob(content, mimeType, filename) {
   const blob = new Blob([content], { type: mimeType })
@@ -26,7 +24,11 @@ function csvEscape(value) {
 }
 
 export default function CarbonCreditDataPackagePanel() {
-  const [reports] = useState(() => loadRealReports().filter((r) => r.methane?.calculated && !r.incident?.isDemoData))
+  const [allReports] = useLiveReports()
+  const reports = useMemo(
+    () => allReports.filter((r) => r.methane?.calculated && !r.incident?.isDemoData),
+    [allReports],
+  )
 
   const totals = useMemo(
     () =>
@@ -108,7 +110,7 @@ export default function CarbonCreditDataPackagePanel() {
     <div className="mx-auto max-w-4xl">
       <PanelHeader icon={Globe2} color="#06B6D4" title="Carbon Credit Data Package" badges={['Paris Agreement Article 6.4', 'Gold Standard / Verra VCS format']} />
 
-      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted">
+      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-normal text-muted">
         Bundles every community-observed flare emission calculation into a structured export suitable for
         submission as supporting baseline evidence toward Gold Standard or Verra VCS project documentation.
         This is community-observed Tier 1 data, not operator-metered or third-party verified — it
@@ -121,11 +123,11 @@ export default function CarbonCreditDataPackagePanel() {
           <p className="mt-1 text-xs text-muted">Calculations included</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-2xl font-bold text-amber">{n(totals.co2e20)} t</p>
+          <p className="text-2xl font-bold text-amber">{fmt.co2e(totals.co2e20)}</p>
           <p className="mt-1 text-xs text-muted">Total CO₂e (20-yr)</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-2xl font-bold text-safe">{n(totals.co2e100)} t</p>
+          <p className="text-2xl font-bold text-safe">{fmt.co2e(totals.co2e100)}</p>
           <p className="mt-1 text-xs text-muted">Total CO₂e (100-yr)</p>
         </div>
       </div>
@@ -135,7 +137,7 @@ export default function CarbonCreditDataPackagePanel() {
         <table className="mt-3 w-full min-w-[600px] text-left text-xs">
           <thead>
             <tr className="text-muted">
-              <th className="pb-2 pr-4 font-medium">Reference</th>
+              <th className="sticky left-0 bg-card pb-2 pr-4 font-medium">Reference</th>
               <th className="pb-2 pr-4 font-medium">State</th>
               <th className="pb-2 pr-4 font-medium">Flared Volume (m³)</th>
               <th className="pb-2 font-medium">CO₂e 100yr (t)</th>
@@ -144,10 +146,10 @@ export default function CarbonCreditDataPackagePanel() {
           <tbody>
             {reports.map((r) => (
               <tr key={r.id} className="border-t border-border">
-                <td className="py-2 pr-4 text-text">{r.referenceNumber}</td>
+                <td className="sticky left-0 bg-card py-2 pr-4 text-text">{r.referenceNumber}</td>
                 <td className="py-2 pr-4 text-muted">{r.location.state ?? '—'}</td>
-                <td className="py-2 pr-4 text-muted">{n(r.methane.results.flaredVolume_m3, 0)}</td>
-                <td className="py-2 text-muted">{n(r.methane.results.co2e_100yr_tonnes)}</td>
+                <td className="py-2 pr-4 text-muted">{fmt.volume(r.methane.results.flaredVolume_m3)}</td>
+                <td className="py-2 text-muted">{fmt.co2e(r.methane.results.co2e_100yr_tonnes)}</td>
               </tr>
             ))}
           </tbody>
@@ -158,7 +160,7 @@ export default function CarbonCreditDataPackagePanel() {
         <button
           type="button"
           onClick={handleDownloadJson}
-          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-cyan-400 text-sm font-bold text-bg hover:bg-cyan-400/90"
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-generate text-sm font-bold text-bg hover:bg-generate/90"
         >
           <Download className="h-4 w-4" />
           Download JSON Package
@@ -166,7 +168,7 @@ export default function CarbonCreditDataPackagePanel() {
         <button
           type="button"
           onClick={handleDownloadCsv}
-          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-cyan-400 text-sm font-bold text-cyan-400 hover:bg-cyan-400/10"
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-generate text-sm font-bold text-generate hover:bg-generate/10"
         >
           <Download className="h-4 w-4" />
           Download CSV Summary
@@ -178,6 +180,8 @@ export default function CarbonCreditDataPackagePanel() {
         verification before any internationally transferred mitigation outcome can be issued or sold.
         This package documents a community-observed baseline only.
       </p>
+
+      <LegalBasisBadge text="Paris Agreement, Article 6.4" />
     </div>
   )
 }

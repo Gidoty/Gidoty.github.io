@@ -98,7 +98,7 @@ export default function EvidenceSection({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={value.photos.length >= MAX_PHOTOS || processing}
-          className="flex min-h-[120px] w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-card text-muted transition-colors hover:border-teal/50 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex min-h-[150px] w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-card text-muted transition-colors hover:border-teal/50 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {processing ? (
             <Loader2 className="h-7 w-7 animate-spin text-teal" />

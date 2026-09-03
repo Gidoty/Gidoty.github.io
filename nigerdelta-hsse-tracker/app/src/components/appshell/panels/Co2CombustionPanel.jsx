@@ -4,10 +4,7 @@ import PanelHeader from './shared/PanelHeader.jsx'
 import ResultCard from './shared/ResultCard.jsx'
 import FormulaBlock from './shared/FormulaBlock.jsx'
 import { CONSTANTS, calculateCO2Combustion, calculateCH4 } from '../../../utils/methaneCalc.js'
-
-function n(value, digits = 1) {
-  return Number(value).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: 0 })
-}
+import { fmt } from '../../../utils/formatters.js'
 
 export default function Co2CombustionPanel() {
   const [volume, setVolume] = useState(50000)
@@ -27,7 +24,7 @@ export default function Co2CombustionPanel() {
         badges={['IPCC 2006 Tier 1', `${CONSTANTS.COMBUSTION_EFFICIENCY * 100}% combustion efficiency`]}
       />
 
-      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-muted">
+      <p className="rounded-lg border border-border bg-card p-4 text-sm leading-normal text-muted">
         When flared gas combusts, most of its carbon converts to carbon dioxide (CO₂) rather than
         escaping as raw methane. This calculator estimates that CO₂ output directly from a volume of
         gas flared, independent of any specific report — useful for standalone volume estimates from
@@ -72,19 +69,20 @@ export default function Co2CombustionPanel() {
       <div className="mt-6 rounded-xl border border-teal/40 bg-teal/5 p-4">
         <p className="text-xs font-bold uppercase tracking-wide text-teal">Formula</p>
         <FormulaBlock
+          citation="IPCC 2006 Tier 1"
           lines={[
             'CO2_combustion (tonnes) = V_flared (m³) × 2,000 / 1,000,000',
-            `CO2_combustion = ${n(volume, 0)} × 0.002 = ${n(co2.co2_tonnes, 2)} t`,
+            `CO2_combustion = ${fmt.volume(Number(volume) || 0)} × 0.002 = ${fmt.tonnes(co2.co2_tonnes)}`,
           ]}
         />
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <ResultCard title="CO₂ Produced" subtitle="Tonnes">
-          <p className="text-2xl font-bold text-text">{n(co2.co2_tonnes, 2)} t</p>
+          <p className="text-2xl font-bold text-text">{fmt.tonnes(co2.co2_tonnes)}</p>
         </ResultCard>
         <ResultCard title="CO₂ Produced" subtitle="Kilograms">
-          <p className="text-2xl font-bold text-text">{n(co2Kg, 0)} kg</p>
+          <p className="text-2xl font-bold text-text">{fmt.number(co2Kg)} kg</p>
         </ResultCard>
       </div>
 
@@ -96,11 +94,12 @@ export default function Co2CombustionPanel() {
       </div>
 
       <ResultCard title="Combined Total GHG Impact" subtitle="CO₂ from combustion + methane's CO₂-equivalent (100-yr)">
-        <p className="text-2xl font-bold text-danger">{n(totalGhgCo2e, 1)} t CO₂e</p>
+        <p className="text-2xl font-bold text-danger">{fmt.co2e(totalGhgCo2e)}</p>
         <FormulaBlock
+          citation="IPCC 2006 Tier 1 + AR6 WGI 2021"
           lines={[
             'Total = CO2_combustion + (CH4_tonnes × GWP100)',
-            `Total = ${n(co2.co2_tonnes, 2)} + (${n(ch4.primary_tonnes, 3)} × ${CONSTANTS.GWP100}) = ${n(totalGhgCo2e, 1)} t CO2e`,
+            `Total = ${fmt.tonnes(co2.co2_tonnes)} + (${fmt.tonnes(ch4.primary_tonnes)} × ${CONSTANTS.GWP100}) = ${fmt.co2e(totalGhgCo2e)}`,
           ]}
         />
       </ResultCard>

@@ -1,17 +1,18 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Activity } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
 import PanelHeader from './shared/PanelHeader.jsx'
-import { loadRealReports } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { affectedCountValue, isHealthImpactReport } from '../../../utils/healthUtils.js'
 import { t } from '../../../data/translations.js'
 import { WHO_AQG_POLLUTANTS } from '../../../data/whoAqgData.js'
+import { fmt } from '../../../utils/formatters.js'
 
 const SYMPTOM_COLORS = ['#E63946', '#F4A261', '#FFB703', '#00A8CC', '#2DC653', '#9D4EDD', '#3A86FF', '#D95F02', '#8B9EB7']
 
 export default function CommunitySymptomMonitorPanel() {
-  const [reports] = useState(() => loadRealReports())
+  const [reports] = useLiveReports()
   const healthReports = useMemo(() => reports.filter(isHealthImpactReport), [reports])
 
   const symptomLabels = t('en', 'symptomsList')
@@ -50,7 +51,7 @@ export default function CommunitySymptomMonitorPanel() {
           <p className="mt-1 text-xs text-muted">Health-impact reports</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-2xl font-bold text-danger">{totalAffected.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-danger">{fmt.number(totalAffected)}</p>
           <p className="mt-1 text-xs text-muted">Estimated people affected</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
@@ -112,7 +113,7 @@ export default function CommunitySymptomMonitorPanel() {
         <table className="mt-3 w-full min-w-[500px] text-left text-xs">
           <thead>
             <tr className="text-muted">
-              <th className="pb-2 font-medium">Pollutant</th>
+              <th className="sticky left-0 bg-card pb-2 font-medium">Pollutant</th>
               <th className="pb-2 font-medium">WHO Guideline</th>
               <th className="pb-2 font-medium">Niger Delta Documented Context</th>
             </tr>
@@ -120,7 +121,7 @@ export default function CommunitySymptomMonitorPanel() {
           <tbody>
             {WHO_AQG_POLLUTANTS.map((p) => (
               <tr key={p.id} className="border-t border-border align-top">
-                <td className="py-2 font-bold text-text">{p.name}</td>
+                <td className="sticky left-0 bg-card py-2 font-bold text-text">{p.name}</td>
                 <td className="py-2 text-muted">{p.guideline}</td>
                 <td className="py-2 text-muted">
                   {p.nigerDeltaContext}

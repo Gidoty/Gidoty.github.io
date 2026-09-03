@@ -1,4 +1,5 @@
 import { Database, Droplet, Flame, Clock, Users } from 'lucide-react'
+import { fmt } from '../../utils/formatters.js'
 
 function StatCard({ icon: Icon, label, value, accent }) {
   return (
@@ -36,7 +37,7 @@ export default function StatsBar({ reports, lastUpdated }) {
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-safe opacity-75" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-safe" />
         </span>
-        <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
+        <span>Last updated: {fmt.datetime(lastUpdated)}</span>
         <span>·</span>
         <span>Data source: Community submissions via NigerDelta HSSE Tracker</span>
         <span>·</span>

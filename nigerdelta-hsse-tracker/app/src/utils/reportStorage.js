@@ -1,15 +1,11 @@
-const REPORTS_KEY = 'hsse_reports'
-const CONSENT_KEY = 'hsse_consent'
+import { storage } from './storage.js'
+
 const DRAFT_KEY = 'hsse_report_draft'
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024
 const COMPRESS_TARGET_BYTES = 1 * 1024 * 1024
 
 export function getConsent() {
-  try {
-    return JSON.parse(localStorage.getItem(CONSENT_KEY))
-  } catch {
-    return null
-  }
+  return storage.getConsent()
 }
 
 export function setConsent(anonymousMode) {
@@ -19,7 +15,7 @@ export function setConsent(anonymousMode) {
     timestamp: Date.now(),
     version: 'NDPA-2023-v1',
   }
-  localStorage.setItem(CONSENT_KEY, JSON.stringify(consent))
+  storage.setConsent(consent)
   return consent
 }
 
@@ -118,12 +114,5 @@ export async function hashReport(report) {
 }
 
 export function saveReport(report) {
-  let reports = []
-  try {
-    reports = JSON.parse(localStorage.getItem(REPORTS_KEY)) ?? []
-  } catch {
-    reports = []
-  }
-  reports.push(report)
-  localStorage.setItem(REPORTS_KEY, JSON.stringify(reports))
+  storage.saveReport(report)
 }

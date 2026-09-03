@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import PageLoader from './components/PageLoader.jsx'
+import ConnectivityStatus from './components/ConnectivityStatus.jsx'
 
 const Home = lazy(() => import('./pages/Home.jsx'))
 const Report = lazy(() => import('./pages/Report.jsx'))
@@ -14,6 +15,7 @@ function SiteLayout() {
     <div className="flex min-h-screen flex-col bg-bg text-text">
       <Navbar />
       <main className="flex-1 pt-20 print:pt-0">
+        <ConnectivityStatus />
         <Suspense fallback={<PageLoader />}>
           <Outlet />
         </Suspense>

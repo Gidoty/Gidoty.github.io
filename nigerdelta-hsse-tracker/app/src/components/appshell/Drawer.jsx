@@ -64,7 +64,7 @@ export default function Drawer({ open, onClose, activeParameterId, onSelectParam
           type="button"
           onClick={onClose}
           aria-label="Close drawer"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted hover:text-text"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted hover:text-text"
         >
           <X className="h-5 w-5" />
         </button>

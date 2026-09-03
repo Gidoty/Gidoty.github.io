@@ -85,7 +85,7 @@ export default function HealthSection({ sectionRef, language, value, onChange })
       <div className="mt-6 flex gap-3 rounded-lg border border-border bg-panel px-4 py-3">
         <Info className="h-5 w-5 shrink-0 text-teal" />
         <div>
-          <p className="text-xs leading-relaxed text-muted">{t(language, 'whoNoteText')}</p>
+          <p className="text-xs leading-normal text-muted">{t(language, 'whoNoteText')}</p>
           <p className="mt-1 text-[11px] italic text-muted">{t(language, 'whoNoteSource')}</p>
         </div>
       </div>

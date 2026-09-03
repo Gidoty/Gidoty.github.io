@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { Recycle } from 'lucide-react'
 import { t } from '../../../data/translations.js'
-import { loadRealReports, updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import { updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { SEVERITY_BADGE_CLASSES, TYPE_MARKER_COLORS } from '../../../data/markerColors.js'
+import PanelHeader from './shared/PanelHeader.jsx'
+import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
 
 const COLUMNS = [
   { id: 'pending', label: 'Pending', accent: 'text-muted', border: 'border-border' },
@@ -15,10 +19,17 @@ function daysSince(isoString) {
 }
 
 export default function CleanupBoardPanel() {
-  const [reports, setReports] = useState(() => loadRealReports())
+  const [reports, setReports] = useLiveReports()
   const [selectedId, setSelectedId] = useState(null)
 
-  const columnFor = (status) => reports.filter((r) => (r.regulatory?.cleanupStatus ?? 'pending') === status)
+  const reportsByStatus = useMemo(() => {
+    const groups = { pending: [], in_progress: [], completed: [], disputed: [] }
+    reports.forEach((r) => {
+      const status = r.regulatory?.cleanupStatus ?? 'pending'
+      ;(groups[status] ?? groups.pending).push(r)
+    })
+    return groups
+  }, [reports])
 
   const moveTo = (reportId, status) => {
     const updated = updateReportInStorage(reportId, (r) => ({
@@ -39,14 +50,14 @@ export default function CleanupBoardPanel() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-text">Cleanup Status Board</h1>
-      <p className="mt-1 text-sm text-muted">
+      <PanelHeader icon={Recycle} color="#FFB703" title="Cleanup Status Board" badges={['Oil Spill Recovery Regulations 2011']} />
+      <p className="text-sm text-muted">
         Click a card to select it, then click a column header to move it there.
       </p>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {COLUMNS.map((column) => {
-          const cards = columnFor(column.id)
+          const cards = reportsByStatus[column.id]
           return (
             <div key={column.id} className="rounded-xl border border-border bg-panel">
               <button
@@ -112,6 +123,8 @@ export default function CleanupBoardPanel() {
           )
         })}
       </div>
+
+      <LegalBasisBadge text="Oil Spill Recovery, Clean-up, Remediation and Damage Assessment Regulations 2011, Section 5" />
     </div>
   )
 }

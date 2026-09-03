@@ -1,4 +1,4 @@
-const REPORTS_KEY = 'hsse_reports'
+import { storage } from './storage.js'
 
 export const INCIDENT_TYPE_LIST = [
   'oil_spill',
@@ -23,21 +23,14 @@ export const STATUS_OPTIONS = [
 ]
 
 export function loadRealReports() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(REPORTS_KEY))
-    return Array.isArray(stored) ? stored : []
-  } catch {
-    return []
-  }
+  return storage.getReports()
 }
 
 export function updateReportInStorage(id, updater) {
-  const reports = loadRealReports()
+  const reports = storage.getReports()
   const index = reports.findIndex((r) => r.id === id)
   if (index === -1) return reports
-  reports[index] = updater(reports[index])
-  localStorage.setItem(REPORTS_KEY, JSON.stringify(reports))
-  return reports
+  return storage.saveReport(updater(reports[index]))
 }
 
 export function deriveStatus(report) {

@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts'
 import { Timer, CheckCircle2, AlertTriangle } from 'lucide-react'
-import { loadRealReports } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
+import PanelHeader from './shared/PanelHeader.jsx'
+import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
 
 const LEGAL_THRESHOLD_HOURS = 24
 
@@ -30,20 +32,30 @@ function MetricCard({ icon: Icon, label, value, accent }) {
 }
 
 export default function ResponseTimeAnalyticsPanel() {
-  const [reports] = useState(() => loadRealReports())
+  const [reports] = useLiveReports()
 
-  const notified = reports.filter((r) => r.regulatory?.nosdraNotified)
-  const notificationTimes = notified.map((r) => ({
-    reference: r.referenceNumber,
-    hours: Math.round(notificationHours(r) * 10) / 10,
-  }))
+  const notificationTimes = useMemo(
+    () =>
+      reports
+        .filter((r) => r.regulatory?.nosdraNotified)
+        .map((r) => ({
+          reference: r.referenceNumber,
+          hours: Math.round(notificationHours(r) * 10) / 10,
+        })),
+    [reports],
+  )
 
-  const avgHours =
-    notificationTimes.length > 0
-      ? notificationTimes.reduce((sum, r) => sum + r.hours, 0) / notificationTimes.length
-      : 0
-  const within24h = notificationTimes.filter((r) => r.hours <= LEGAL_THRESHOLD_HOURS).length
-  const overdueCount = reports.filter(isOverdue).length
+  const { avgHours, within24h, overdueCount } = useMemo(
+    () => ({
+      avgHours:
+        notificationTimes.length > 0
+          ? notificationTimes.reduce((sum, r) => sum + r.hours, 0) / notificationTimes.length
+          : 0,
+      within24h: notificationTimes.filter((r) => r.hours <= LEGAL_THRESHOLD_HOURS).length,
+      overdueCount: reports.filter(isOverdue).length,
+    }),
+    [notificationTimes, reports],
+  )
 
   if (reports.length === 0) {
     return (
@@ -55,8 +67,8 @@ export default function ResponseTimeAnalyticsPanel() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-text">Response Time Analytics</h1>
-      <p className="mt-1 text-sm text-muted">
+      <PanelHeader icon={Timer} color="#F4A261" title="Response Time Analytics" badges={['NOSDRA Act 2006']} />
+      <p className="text-sm text-muted">
         Time from report submission to NOSDRA notification, benchmarked against the 24-hour legal
         threshold.
       </p>
@@ -100,6 +112,8 @@ export default function ResponseTimeAnalyticsPanel() {
           </ResponsiveContainer>
         )}
       </div>
+
+      <LegalBasisBadge text="NOSDRA Act 2006 — 24-hour operator response obligation" />
     </div>
   )
 }

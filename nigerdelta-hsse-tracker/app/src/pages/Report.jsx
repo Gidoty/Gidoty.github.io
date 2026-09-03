@@ -20,6 +20,7 @@ import EvidenceSection from '../components/report/EvidenceSection.jsx'
 import HealthSection from '../components/report/HealthSection.jsx'
 import ContactSection from '../components/report/ContactSection.jsx'
 import ResultScreen from '../components/report/ResultScreen.jsx'
+import LegalBasisBadge from '../components/appshell/panels/shared/LegalBasisBadge.jsx'
 
 function nowParts() {
   const now = new Date()
@@ -340,6 +341,8 @@ export default function Report() {
           {submitting && <Loader2 className="h-5 w-5 animate-spin" />}
           {t(language, submitting ? 'submitting' : 'submitReport')}
         </button>
+
+        <LegalBasisBadge text="NOSDRA Act 2006 · African Charter on Human and Peoples' Rights, Article 24" />
       </form>
     </div>
   )

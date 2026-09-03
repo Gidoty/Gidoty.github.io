@@ -3,6 +3,7 @@ import { X, Fingerprint } from 'lucide-react'
 import { t } from '../../data/translations.js'
 import { deriveStatus, updateReportInStorage } from '../../utils/dashboardUtils.js'
 import { hoursSince, formatElapsed, notificationTimerLevel } from '../../utils/trackerUtils.js'
+import { fmt } from '../../utils/formatters.js'
 import { SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
 import NosdraModal from '../tracker/NosdraModal.jsx'
 
@@ -98,12 +99,12 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
               <Row label="Sub-type" value={current.incident.subType ? t('en', 'subTypes')[current.incident.subType] : '—'} />
               <Row label="Severity" value={severityInfo?.label ?? current.incident.severity} />
               <Row label="Duration" value={current.incident.duration ?? '—'} />
-              <Row label="Date/Time" value={new Date(current.incident.dateTime).toLocaleString()} />
+              <Row label="Date/Time" value={fmt.datetime(current.incident.dateTime)} />
               <Row
                 label="Location"
                 value={
                   current.location.display
-                    ? `${current.location.display.lat}°N, ${current.location.display.lng}°E`
+                    ? fmt.gps(current.location.display.lat, current.location.display.lng)
                     : current.location.landmark ?? '—'
                 }
               />
@@ -124,6 +125,7 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
                       key={index}
                       src={photo}
                       alt={`Evidence ${index + 1}`}
+                      loading="lazy"
                       className="h-28 w-full rounded-lg border border-border object-cover"
                     />
                   ))}
@@ -164,7 +166,7 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
               {current.regulatory?.nosdraNotified && (
                 <Row
                   label="Notified at"
-                  value={new Date(current.regulatory.nosdraNotifiedAt).toLocaleString()}
+                  value={fmt.datetime(current.regulatory.nosdraNotifiedAt)}
                 />
               )}
               <Row label="Cleanup status" value={(current.regulatory?.cleanupStatus ?? 'pending').replace('_', ' ')} />
@@ -196,7 +198,7 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
           {tab === 'Audit' && (
             <div className="space-y-3">
               <Row label="Report hash (SHA-256)" value={current.audit?.reportHash ?? 'not available'} mono />
-              <Row label="Submission timestamp" value={new Date(current.submittedAt).toLocaleString()} />
+              <Row label="Submission timestamp" value={fmt.datetime(current.submittedAt)} />
               <Row label="Consent version" value={current.audit?.consentVersion ?? '—'} />
               <Row label="Language used" value={current.audit?.language ?? '—'} />
               <Row label="User agent" value={current.audit?.userAgent ?? '—'} mono />

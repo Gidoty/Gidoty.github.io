@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { Bell, Copy, Download, CheckCircle2 } from 'lucide-react'
 import PanelHeader from './shared/PanelHeader.jsx'
-import { loadRealReports, updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
+import { updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { generateNosdraNotificationText } from '../../../utils/trackerUtils.js'
+import { fmt } from '../../../utils/formatters.js'
 
 function NotificationEditor({ report, onMarkNotified }) {
   const [text, setText] = useState(() => generateNosdraNotificationText(report))
@@ -28,7 +31,7 @@ function NotificationEditor({ report, onMarkNotified }) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={16}
-        className="mt-4 w-full rounded-lg border border-border bg-bg p-3 font-mono text-[11px] leading-relaxed text-text focus:border-amber focus:outline-none"
+        className="mt-4 w-full rounded-lg border border-border bg-bg p-3 font-mono text-[11px] leading-normal text-text focus:border-amber focus:outline-none"
       />
 
       <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3 print:hidden">
@@ -66,7 +69,7 @@ function NotificationEditor({ report, onMarkNotified }) {
 }
 
 export default function NosdraNotificationLetterPanel() {
-  const [reports, setReports] = useState(() => loadRealReports())
+  const [reports, setReports] = useLiveReports()
   const [selectedId, setSelectedId] = useState(reports[0]?.id ?? '')
   const selectedReport = reports.find((r) => r.id === selectedId)
 
@@ -101,7 +104,7 @@ export default function NosdraNotificationLetterPanel() {
       >
         {reports.map((r) => (
           <option key={r.id} value={r.id}>
-            {r.referenceNumber} · {r.location.state ?? 'Unknown'} · {new Date(r.submittedAt).toLocaleDateString()}
+            {r.referenceNumber} · {r.location.state ?? 'Unknown'} · {fmt.datetime(r.submittedAt)}
             {r.regulatory?.nosdraNotified ? ' · already notified' : ''}
           </option>
         ))}
@@ -122,6 +125,8 @@ export default function NosdraNotificationLetterPanel() {
           WhatsApp — check nosdra.gov.ng for the current number for your state.
         </p>
       </div>
+
+      <LegalBasisBadge text="Oil Spill Recovery, Clean-up, Remediation and Damage Assessment Regulations 2011, Section 5" />
     </div>
   )
 }

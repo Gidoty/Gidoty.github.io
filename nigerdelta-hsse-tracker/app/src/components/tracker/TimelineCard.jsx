@@ -12,6 +12,7 @@ import { t } from '../../data/translations.js'
 import { formatTimeAgo } from '../../utils/dashboardUtils.js'
 import { SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
 import { hoursSince, formatElapsed, notificationTimerLevel, isJivOverdue } from '../../utils/trackerUtils.js'
+import { fmt } from '../../utils/formatters.js'
 
 const CLEANUP_OPTIONS = [
   { id: 'pending', label: 'Pending', color: 'text-muted' },
@@ -81,7 +82,7 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
           <StageCircle complete colorClass="text-teal" icon={FilePlus} />
           <div className="md:mt-1">
             <p className="text-xs font-bold text-text">Submitted</p>
-            <p className="text-[11px] text-muted">{new Date(report.submittedAt).toLocaleString()}</p>
+            <p className="text-[11px] text-muted">{fmt.datetime(report.submittedAt)}</p>
           </div>
         </div>
 
@@ -108,7 +109,7 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
           <div className="md:mt-1">
             <p className="text-xs font-bold text-text">NOSDRA Notified</p>
             {notified ? (
-              <p className="text-[11px] text-muted">{new Date(report.regulatory.nosdraNotifiedAt).toLocaleString()}</p>
+              <p className="text-[11px] text-muted">{fmt.datetime(report.regulatory.nosdraNotifiedAt)}</p>
             ) : (
               <button
                 type="button"
@@ -151,7 +152,7 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
             {jivCompleted ? (
               <p className="text-[11px] text-muted">
                 {report.regulatory.jivCompletedAt
-                  ? new Date(report.regulatory.jivCompletedAt).toLocaleDateString()
+                  ? fmt.datetime(report.regulatory.jivCompletedAt)
                   : report.regulatory.jivDate}
               </p>
             ) : (

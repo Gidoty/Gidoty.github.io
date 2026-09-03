@@ -85,7 +85,7 @@ export default function IncidentSection({
           {t(language, 'severity')} <span className="text-danger">*</span>
         </p>
         <div
-          className={`grid grid-cols-2 gap-3 rounded-xl sm:grid-cols-4 ${
+          className={`grid grid-cols-1 gap-3 rounded-xl sm:grid-cols-4 ${
             severityError ? 'ring-2 ring-danger/60 ring-offset-2 ring-offset-bg' : ''
           }`}
         >
