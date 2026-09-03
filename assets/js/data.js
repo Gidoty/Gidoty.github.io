@@ -90,16 +90,32 @@ window.PORTFOLIO_DATA = {
       description:
         "Official website for Metabridge Academy, Africa-focused digital skills academy based in " +
         "Port Harcourt, Nigeria, offering Cybersecurity, Data Analytics, AI, and Blockchain training " +
-        "through a three-belt curriculum with blockchain-verified certificates. Built end-to-end using " +
+        "through a three-belt curriculum with verifiable digital certificates. Built end-to-end using " +
         "Claude Code.",
       highlights: [
         "Over 5,000 graduates",
-        "Blockchain-verified certificates",
+        "QR-verified digital certificates",
         "Three-belt curriculum spanning Cybersecurity, Data Analytics, AI, and Blockchain",
       ],
       link: "https://metabridgeacademy.com",
       linkLabel: "Visit website",
       featured: true,
+    },
+    {
+      title: "Metabridge Academy Certificate Platform",
+      tags: ["Web Development", "Next.js", "Certificate Verification"],
+      period: "2026",
+      description:
+        "A certificate issuance and verification system for Metabridge Academy: admins generate " +
+        "branded completion and achievement certificates with a unique code, and anyone can instantly " +
+        "confirm a certificate's authenticity via its verification link.",
+      highlights: [
+        "Auto-generated certificate codes (e.g. MA/CO1/26/00001) with duplicate-safe serial numbering per cohort",
+        "One-click PDF download of the generated certificate",
+        "Public verification page checks a certificate against the live database and shows a clear valid/not-found result",
+      ],
+      link: "https://cert-ashen.vercel.app",
+      linkLabel: "Visit platform",
     },
     {
       title: "[UI/UX or Design Project]",
