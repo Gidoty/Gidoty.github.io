@@ -80,6 +80,24 @@ window.PORTFOLIO_DATA = {
       linkLabel: "Open live tool",
       featured: true,
     },
+    {
+      title: "NigerDelta HSSE Tracker",
+      tags: ["Environmental Monitoring", "Methane Verification", "PWA"],
+      period: "2026",
+      description:
+        "A free, offline-capable Progressive Web App that lets Niger Delta residents report oil " +
+        "spills, gas flares, and environmental health incidents, and tracks regulatory response and " +
+        "methane emissions in real time — grounded in Nigeria's legal framework (NOSDRA Act, Oil Spill " +
+        "Regulations) and international instruments (Paris Agreement, African Charter).",
+      highlights: [
+        "27 features across 7 categories: Report, Monitor, Calculate, Track, Generate, Health, Data",
+        "Methane estimated via IPCC 2006 Tier 1 methodology, with SHA-256 evidence integrity for submitted reports",
+        "Live incident heatmap and offline PWA support, built with React, Leaflet, and Recharts",
+      ],
+      link: "https://gidoty.github.io/nigerdelta-hsse-tracker/",
+      linkLabel: "Open live app",
+      featured: true,
+    },
   ],
 
   digital: [
