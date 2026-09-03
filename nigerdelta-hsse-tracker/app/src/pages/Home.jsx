@@ -290,7 +290,7 @@ export default function Home() {
               Report an Incident
             </Link>
             <Link
-              to="/dashboard"
+              to="/app"
               className="flex min-h-[44px] w-full items-center justify-center rounded-lg border border-teal px-6 py-3 text-sm font-bold text-text transition-colors hover:bg-teal/10 sm:w-auto"
             >
               View Dashboard

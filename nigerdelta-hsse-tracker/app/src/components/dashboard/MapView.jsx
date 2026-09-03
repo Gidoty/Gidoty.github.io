@@ -48,7 +48,7 @@ export default function MapView({ reports, onCorroborate, selectedReportId, show
   const toggleLayer = (key) => setLayers((prev) => ({ ...prev, [key]: !prev[key] }))
 
   return (
-    <div className="relative z-0 h-[55vh] w-full overflow-hidden lg:h-[calc(100vh-140px)]">
+    <div className="relative z-0 h-full w-full overflow-hidden">
       <MapContainer
         center={[5.5, 6.5]}
         zoom={8}

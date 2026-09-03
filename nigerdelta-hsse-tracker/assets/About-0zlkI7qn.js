@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-DxmMVGVZ.js";import{t}from"./info-N3RbQ2LE.js";import{t as n}from"./Placeholder-C2lAnDok.js";var r=e();function i(){return(0,r.jsx)(n,{title:`About the Platform`,icon:t,accent:`text-safe`})}export{i as default};

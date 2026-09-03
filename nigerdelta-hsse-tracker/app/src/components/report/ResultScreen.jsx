@@ -36,7 +36,7 @@ export default function ResultScreen({ language, status, referenceNumber, onSubm
           {t(language, 'submitAnother')}
         </button>
         <Link
-          to="/dashboard"
+          to="/app"
           className="flex min-h-[56px] w-full items-center justify-center rounded-lg border border-teal px-6 text-sm font-bold text-text transition-colors hover:bg-teal/10"
         >
           {t(language, 'viewDashboard')}

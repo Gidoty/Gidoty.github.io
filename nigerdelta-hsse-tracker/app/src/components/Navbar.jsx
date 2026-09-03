@@ -5,10 +5,7 @@ import { Droplet, Menu, X } from 'lucide-react'
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/report', label: 'Report Incident' },
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/tracker', label: 'Tracker' },
-  { to: '/methane', label: 'Methane Calculator' },
-  { to: '/data', label: 'Open Data' },
+  { to: '/app', label: 'Dashboard' },
   { to: '/about', label: 'About' },
 ]
 
