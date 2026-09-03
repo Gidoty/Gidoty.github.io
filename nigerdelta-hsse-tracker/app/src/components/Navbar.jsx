@@ -4,6 +4,9 @@ import { Droplet, Menu, X, Search } from 'lucide-react'
 import { CATEGORIES, TOTAL_PARAMETER_COUNT } from '../data/parameters.js'
 import { storage } from '../utils/storage.js'
 
+// Top-level pages shown above the full tool list in the menu. The hamburger
+// menu below is the ONE navigation surface for every screen size — desktop
+// included — so every tool is always one click away, no matter the device.
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/app', label: 'Dashboard' },
@@ -28,11 +31,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
-
-  const linkClass = ({ isActive }) =>
-    `text-sm font-medium transition-colors hover:text-teal ${
-      isActive ? 'text-teal' : 'text-muted'
-    }`
 
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -65,20 +63,10 @@ export default function Navbar() {
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
 
-          <ul className="hidden items-center gap-7 lg:flex">
-            {NAV_LINKS.map((link) => (
-              <li key={link.to}>
-                <NavLink to={link.to} end={link.to === '/'} className={linkClass}>
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="flex h-11 w-11 items-center justify-center rounded-lg text-text lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-text hover:bg-card"
             aria-label="Open menu"
           >
             <Menu className="h-6 w-6" />
@@ -87,7 +75,7 @@ export default function Navbar() {
       </header>
 
       <div
-        className={`fixed inset-0 z-50 bg-black/60 transition-opacity lg:hidden ${
+        className={`fixed inset-0 z-50 bg-black/60 transition-opacity ${
           open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={closeMenu}
