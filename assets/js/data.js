@@ -80,6 +80,24 @@ window.PORTFOLIO_DATA = {
       linkLabel: "Open live tool",
       featured: true,
     },
+    {
+      title: "NigerDelta HSSE Tracker",
+      tags: ["Environmental Monitoring", "Methane Verification", "PWA"],
+      period: "2026",
+      description:
+        "A free, offline-capable Progressive Web App that lets Niger Delta residents report oil " +
+        "spills, gas flares, and environmental health incidents, and tracks regulatory response and " +
+        "methane emissions in real time — grounded in Nigeria's legal framework (NOSDRA Act, Oil Spill " +
+        "Regulations) and international instruments (Paris Agreement, African Charter).",
+      highlights: [
+        "27 features across 7 categories: Report, Monitor, Calculate, Track, Generate, Health, Data",
+        "Methane estimated via IPCC 2006 Tier 1 methodology, with SHA-256 evidence integrity for submitted reports",
+        "Live incident heatmap and offline PWA support, built with React, Leaflet, and Recharts",
+      ],
+      link: "https://gidoty.github.io/nigerdelta-hsse-tracker/",
+      linkLabel: "Open live app",
+      featured: true,
+    },
   ],
 
   digital: [
@@ -90,15 +108,50 @@ window.PORTFOLIO_DATA = {
       description:
         "Official website for Metabridge Academy, Africa-focused digital skills academy based in " +
         "Port Harcourt, Nigeria, offering Cybersecurity, Data Analytics, AI, and Blockchain training " +
-        "through a three-belt curriculum with blockchain-verified certificates. Built end-to-end using " +
+        "through a three-belt curriculum with verifiable digital certificates. Built end-to-end using " +
         "Claude Code.",
       highlights: [
         "Over 5,000 graduates",
-        "Blockchain-verified certificates",
+        "QR-verified digital certificates",
         "Three-belt curriculum spanning Cybersecurity, Data Analytics, AI, and Blockchain",
       ],
       link: "https://metabridgeacademy.com",
       linkLabel: "Visit website",
+      featured: true,
+    },
+    {
+      title: "Metabridge Academy Certificate Platform",
+      tags: ["Web Development", "Next.js", "Certificate Verification"],
+      period: "2026",
+      description:
+        "A certificate issuance and verification system for Metabridge Academy: admins generate " +
+        "branded completion and achievement certificates with a unique code, and anyone can instantly " +
+        "confirm a certificate's authenticity via its verification link.",
+      highlights: [
+        "Auto-generated certificate codes (e.g. MA/CO1/26/00001) with duplicate-safe serial numbering per cohort",
+        "One-click PDF download of the generated certificate",
+        "Public verification page checks a certificate against the live database and shows a clear valid/not-found result",
+      ],
+      link: "https://cert-ashen.vercel.app",
+      linkLabel: "Visit platform",
+    },
+    {
+      title: "Metabridge Academy Curriculum",
+      tags: ["Curriculum Design", "Claude Code", "EdTech"],
+      period: "2026",
+      description:
+        "End-to-end instructional design underpinning Metabridge Academy's growing catalogue of " +
+        "15+ courses, spanning domains such as AI & Prompt Engineering, Blockchain & " +
+        "Cryptocurrency, Data Analytics, and Cybersecurity. Each course is authored module-by-" +
+        "module and converted into branded lesson notes, slide decks, and quiz banks, feeding " +
+        "directly into the academy's blockchain-verified certification.",
+      highlights: [
+        "Curriculum architecture designed to scale across Metabridge's growing catalogue of 15+ courses",
+        "Each course structured module-by-module, with learning outcomes and hands-on labs grounded in Nigerian and African context",
+        "Every course ships as four linked documents — curriculum guide, lesson notes, slide deck, and quiz bank — via a branded Word/PowerPoint export pipeline",
+      ],
+      link: "https://metabridgeacademy.com/courses",
+      linkLabel: "View courses",
       featured: true,
     },
     {
