@@ -1,4 +1,4 @@
-import { AlertTriangle, BookOpen, FlaskConical, GraduationCap, Layers, Target } from 'lucide-react'
+import { AlertTriangle, BookOpen, FlaskConical, Layers, Target, User } from 'lucide-react'
 
 export default function About() {
   return (
@@ -117,8 +117,8 @@ export default function About() {
             Research Background
           </h2>
           <p>
-            This tool draws on coursework and methodology from the NLNG Centre for Gas, Refining
-            and Petrochemical Engineering, University of Port Harcourt. It is grounded in:
+            This tool draws on published petroleum refining engineering methodology. It is
+            grounded in:
           </p>
           <ul className="ml-5 list-disc space-y-1.5">
             <li>Published crude assay data (Bonny Light, Forcados)</li>
@@ -135,13 +135,9 @@ export default function About() {
         {/* Credit */}
         <section className="mt-12 flex flex-col items-center gap-4 rounded-2xl border border-white/5 bg-armit-card px-8 py-10 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-armit-amber/10 text-armit-amber">
-            <GraduationCap size={28} />
+            <User size={28} />
           </div>
           <h2 className="text-lg font-semibold text-armit-text">Gideon Owhonda</h2>
-          <p className="max-w-md text-sm text-armit-muted">
-            PhD Candidate, NLNG Centre for Gas, Refining and Petrochemical Engineering, University
-            of Port Harcourt.
-          </p>
         </section>
       </div>
     </div>

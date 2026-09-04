@@ -7,7 +7,6 @@ import {
   Wrench,
   LineChart,
   ArrowRight,
-  GraduationCap,
   Fuel,
   Calculator as CalculatorIcon,
   CheckCircle2,
@@ -15,6 +14,7 @@ import {
   X,
   Link2,
   ExternalLink,
+  User,
 } from 'lucide-react'
 
 const STATS = [
@@ -256,16 +256,9 @@ export default function Home() {
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-2xl border border-white/5 bg-armit-card px-8 py-12 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-armit-amber/10 text-armit-amber">
-            <GraduationCap size={28} />
+            <User size={28} />
           </div>
           <h2 className="text-xl font-semibold text-armit-text">Built by Gideon Owhonda</h2>
-          <p className="text-sm text-armit-muted">
-            PhD Candidate
-            <br />
-            NLNG Centre for Gas, Refining &amp; Petrochemical Engineering
-            <br />
-            University of Port Harcourt
-          </p>
           <p className="max-w-xl text-sm text-armit-muted">
             MarginIQ is a portfolio project demonstrating the application of petroleum engineering
             principles, LP optimisation, and energy management to real-world African refinery

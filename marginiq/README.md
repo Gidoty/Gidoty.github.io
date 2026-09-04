@@ -1,8 +1,6 @@
 # MarginIQ — Refinery Margin Intelligence for African Refineries
 
 **Built by Gideon Owhonda**
-PhD Candidate, NLNG Centre for Gas, Refining & Petrochemical Engineering, University of Port
-Harcourt
 
 ## What is MarginIQ?
 
