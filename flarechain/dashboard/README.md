@@ -1,11 +1,12 @@
 # FlareChain dashboard
 
-A small Next.js + Tailwind CSS dashboard that displays one anchored flaring
-record and lets you re-verify it against Polygon Amoy live, on demand.
+A Next.js + Tailwind CSS dashboard over the full Nigeria flaring dataset
+(6,287 real World Bank records), with live on-chain re-verification for
+whichever of those records has actually been anchored.
 
 **Prototype, not production.** Runs on the Polygon Amoy *testnet*, not
-mainnet, and shows exactly one demo record — see `../docs/methodology.md`
-for the full scope and limitations.
+mainnet, and only one record has been anchored so far — see
+`../docs/methodology.md` for the full scope and limitations.
 
 **Live at:** https://gidoty.github.io/flarechain/site/ — published as a
 static export directly from this repo via GitHub Pages, no separate
@@ -14,25 +15,41 @@ sync with this source.
 
 ## What it shows
 
-- The reported flaring record (site, country, year, volume, source)
-- The hash that was anchored on-chain and when it was anchored
-- A link to the transaction on PolygonScan (Amoy testnet explorer)
-- A **Verify** button that re-hashes the record right now and checks it
-  against the live on-chain transaction — reporting a clear
-  verified/mismatch result, distinct from "couldn't reach the network"
+- **Summary stats** — total records, unique sites, year range, total
+  reported flared volume across the whole dataset
+- **A year-by-year bar chart** of total flared volume (hover a bar for
+  the exact figure)
+- **A searchable, filterable browser** over all 6,287 records — search by
+  site name, filter by year, click any row to select it
+- For the **selected record**: its full detail (site, country, year,
+  volume, source), and — only if that specific record has actually been
+  anchored on-chain — the anchored hash, timestamp, a PolygonScan link,
+  and a **Verify** button that re-hashes it live and checks it against
+  the real transaction. Records that haven't been anchored say so
+  plainly instead of showing a Verify button that has nothing to check.
 
 ## Prerequisites
 
 This dashboard reads (but does not write) two files from the parent
-`flarechain/` project **at build time**:
+`flarechain/` project:
 
-- `../data/anchors.json` — written by `../scripts/anchor_record.js`
-- (indirectly, via the anchor entry) the record that was anchored
+- `../data/processed_flaring_data.json` — the full dataset, read at
+  **build time** by `scripts/build-public-data.js` (an npm `prebuild`
+  step) to generate `public/data.json`, which the browser then fetches
+  client-side to power the search/browse/chart features
+- `../data/anchors.json` — written by `../scripts/anchor_record.js`, read
+  at build time by a Server Component to know which record (if any) has
+  actually been anchored
 
-**If you haven't run the data-acquisition and anchoring steps yet**, the
-dashboard still builds and runs — it just shows an honest "No anchored
-record yet" empty state with the exact command to run, instead of fake
-data. See `../docs/data_sources.md` and `../docs/blockchain_verification.md`
+**If you haven't run the data-acquisition script yet**, there's nothing
+to browse — `npm run build`/`npm run dev` will fail loudly rather than
+ship an empty dashboard silently, telling you to run
+`python scripts/clean_flaring_data.py` (from `flarechain/`) first.
+
+**If you've got the data but haven't anchored anything yet**, the
+dashboard still builds and runs fine — every record shows an honest "not
+yet anchored on-chain" state instead of a Verify button with nothing to
+check. See `../docs/data_sources.md` and `../docs/blockchain_verification.md`
 for those steps.
 
 ## Setup
