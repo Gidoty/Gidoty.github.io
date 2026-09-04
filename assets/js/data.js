@@ -140,14 +140,15 @@ window.PORTFOLIO_DATA = {
       tags: ["Curriculum Design", "Claude Code", "EdTech"],
       period: "2026",
       description:
-        "The full instructional design behind Metabridge Academy's teaching catalogue: four " +
-        "complete courses — AI & Prompt Engineering, Blockchain & Cryptocurrency, Data Analytics, " +
-        "and Cybersecurity — written module-by-module and converted into branded lesson notes, " +
-        "slide decks, and quiz banks ready for delivery and blockchain-verified certification.",
+        "End-to-end instructional design underpinning Metabridge Academy's growing catalogue of " +
+        "15+ courses, spanning domains such as AI & Prompt Engineering, Blockchain & " +
+        "Cryptocurrency, Data Analytics, and Cybersecurity. Each course is authored module-by-" +
+        "module and converted into branded lesson notes, slide decks, and quiz banks, feeding " +
+        "directly into the academy's blockchain-verified certification.",
       highlights: [
-        "Four courses, 8–12 modules each, with learning outcomes and hands-on labs woven into Nigerian and African context",
-        "Every course shipped as four linked documents: curriculum guide, lesson notes, slide deck, and quiz bank",
-        "Programmatic Word/PowerPoint export pipeline reproducing Metabridge's brand styling",
+        "Curriculum architecture designed to scale across Metabridge's growing catalogue of 15+ courses",
+        "Each course structured module-by-module, with learning outcomes and hands-on labs grounded in Nigerian and African context",
+        "Every course ships as four linked documents — curriculum guide, lesson notes, slide deck, and quiz bank — via a branded Word/PowerPoint export pipeline",
       ],
       link: "https://metabridgeacademy.com/courses",
       linkLabel: "View courses",
