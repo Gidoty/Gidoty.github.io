@@ -272,13 +272,8 @@ export default function About() {
       <section className="border-t border-border bg-panel px-4 py-16 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
           <h2 className="text-2xl font-bold text-text">Built by Gideon Owhonda</h2>
-          <p className="mt-2 text-sm text-muted">
-            PhD Candidate, NLNG Centre for Gas, Refining and Petrochemical Engineering, University
-            of Port Harcourt.
-          </p>
           <p className="mx-auto mt-6 max-w-xl text-sm leading-normal text-muted">
-            This platform was developed as part of doctoral research applying petroleum
-            engineering, environmental science, and digital technology to community
+            This platform applies engineering and environmental science to community
             accountability and environmental justice in the Niger Delta.
           </p>
           <p className="mt-4 text-sm text-teal">gideon.owhonda@cgrpng.org</p>

@@ -420,15 +420,10 @@ export default function Home() {
       <section className="px-4 py-20 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
           <h2 className="text-2xl font-bold text-text">Built by Gideon Owhonda</h2>
-          <p className="mt-2 text-sm text-muted">
-            PhD Candidate · NLNG Centre for Gas, Refining and Petrochemical Engineering ·
-            University of Port Harcourt
-          </p>
           <p className="mt-1 text-sm text-teal">gideon.owhonda@cgrpng.org</p>
           <p className="mx-auto mt-6 max-w-xl text-sm leading-normal text-muted">
-            This platform was developed as part of doctoral research in gas, refining and
-            petrochemical engineering, applying engineering and environmental science to
-            community accountability and environmental justice in the Niger Delta.
+            This platform was built to bring engineering and environmental science to community
+            accountability and environmental justice in the Niger Delta.
           </p>
         </div>
       </section>

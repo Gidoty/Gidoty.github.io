@@ -29,7 +29,7 @@ export default function Footer() {
           ))}
         </ul>
 
-        <p className="text-sm text-muted">© 2026 Gideon Owhonda · University of Port Harcourt</p>
+        <p className="text-sm text-muted">© 2026 Gideon Owhonda</p>
       </div>
 
       <div className="border-t border-border py-4">
