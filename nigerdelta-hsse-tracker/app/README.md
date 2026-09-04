@@ -33,5 +33,4 @@ After `npm run build`, commit both `app/` (source) and the sibling files it prod
 `nigerdelta-hsse-tracker/` (index.html, assets/, manifest.json, sw.js, icons) — the parent repo has
 no build step of its own, so the compiled output is what gets served.
 
-Built by Gideon Owhonda — PhD Candidate, NLNG Centre for Gas, Refining and Petrochemical
-Engineering, University of Port Harcourt.
+Built by Gideon Owhonda.

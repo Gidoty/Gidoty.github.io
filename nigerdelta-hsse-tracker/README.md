@@ -3,8 +3,6 @@
 **Community Environmental Monitoring for the Niger Delta**
 
 Built by Gideon Owhonda
-PhD Candidate · NLNG Centre for Gas, Refining and Petrochemical Engineering
-University of Port Harcourt
 gideon.owhonda@cgrpng.org
 
 ---
