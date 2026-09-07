@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
-import { Wind, TrendingUp, Sprout, ShieldCheck, LayoutList, FileDown, Leaf } from 'lucide-react'
+import { Sprout, ShieldCheck, LayoutList, FileDown, Leaf } from 'lucide-react'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import PageLoader from './components/PageLoader.jsx'
@@ -10,6 +10,8 @@ import { BioCredStoreProvider } from './store/BioCredStore.jsx'
 const Home = lazy(() => import('./pages/Home.jsx'))
 const Calculator = lazy(() => import('./pages/Calculator.jsx'))
 const Digester = lazy(() => import('./pages/Digester.jsx'))
+const Emissions = lazy(() => import('./pages/Emissions.jsx'))
+const Carbon = lazy(() => import('./pages/Carbon.jsx'))
 
 function SiteLayout() {
   return (
@@ -33,26 +35,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/calculator" element={<Calculator />} />
           <Route path="/digester" element={<Digester />} />
-          <Route
-            path="/emissions"
-            element={
-              <Placeholder
-                icon={Wind}
-                title="Emissions-Avoided Estimator"
-                description="Estimates methane emissions avoided using IPCC 2006/2019 Tier 1 methodology across three baseline disposal scenarios."
-              />
-            }
-          />
-          <Route
-            path="/carbon"
-            element={
-              <Placeholder
-                icon={TrendingUp}
-                title="Carbon Credit Value Projector"
-                description="Projects verified carbon credit volume and indicative market value under Gold Standard AWMS, CDM AMS-III, and Article 6.4."
-              />
-            }
-          />
+          <Route path="/emissions" element={<Emissions />} />
+          <Route path="/carbon" element={<Carbon />} />
           <Route
             path="/digestate"
             element={

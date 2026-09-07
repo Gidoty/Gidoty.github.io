@@ -1,4 +1,4 @@
-import { ENERGY, IPCC_MANURE } from '../data/constants.js'
+import { ENERGY, IPCC_MANURE, CARBON_MARKET } from '../data/constants.js'
 
 export function calcTotalSolids(freshWeightKg, totalSolidsFraction) {
   return freshWeightKg * totalSolidsFraction
@@ -126,4 +126,135 @@ export function sizingCategory(chamberM3) {
     label: 'Commercial scale',
     description: 'Consider professional engineering assessment',
   }
+}
+
+// --- Emissions-avoided estimator (IPCC 2006/2019 Tier 1) ---
+
+// The IPCC 2006 Vol.4 Ch.10 manure-management methodology only publishes an
+// official maximum methane producing capacity (Bo) for cattle and poultry.
+// For every other substrate we fall back to that substrate's own
+// peer-reviewed specific biogas yield x CH4 content (Prompt 1 data) as its
+// maximum CH4 generation potential — the same physical quantity Bo
+// represents, just sourced from the substrate library instead of the IPCC
+// manure table.
+export function getMaxCH4Potential(substrate, vsKg) {
+  if (substrate.id === 'cowDung') {
+    const { value, label, source } = IPCC_MANURE.cattleBoAfrica
+    return { ch4M3: vsKg * value, bo: value, boLabel: label, boSource: source }
+  }
+  if (substrate.id === 'poultryLitter') {
+    const { value, label, source } = IPCC_MANURE.poultryBo
+    return { ch4M3: vsKg * value, bo: value, boLabel: label, boSource: source }
+  }
+  const bo = substrate.specificBiogasYield * substrate.ch4Content
+  return {
+    ch4M3: vsKg * bo,
+    bo,
+    boLabel: `${substrate.name} SBY × CH₄ content`,
+    boSource: substrate.source,
+  }
+}
+
+// E_baseline = CH4_kg x MCF x GWP100 (kg CO2e), returned in tonnes.
+// Returns null when the scenario has no MCF (e.g. open burning, which uses
+// a combustion-factor formula this tool does not have emission factors for).
+export function calcBaselineEmissions({ ch4PotentialM3, mcf, gwp100 }) {
+  if (mcf === null || mcf === undefined) return null
+  const ch4PotentialKg = ch4PotentialM3 * IPCC_MANURE.ch4DensityKgPerM3.value
+  const tonnesCO2e = (ch4PotentialKg * mcf * gwp100) / 1000
+  return { ch4PotentialKg, mcf, tonnesCO2e }
+}
+
+// Fugitive digester leakage (CDM Tool 14): a fraction of the CH4 actually
+// produced by the project's own digester escapes uncombusted.
+export function calcProjectEmissions({ ch4ProducedM3, leakageFactor, gwp100 }) {
+  const fugitiveM3 = ch4ProducedM3 * leakageFactor
+  const fugitiveKg = fugitiveM3 * IPCC_MANURE.ch4DensityKgPerM3.value
+  const tonnesCO2e = (fugitiveKg * gwp100) / 1000
+  return { fugitiveM3, fugitiveKg, tonnesCO2e }
+}
+
+export function calcEmissionsAvoided({ substrate, vsKg, ch4ProducedM3, mcf, gwp100, leakageFactor }) {
+  const potential = getMaxCH4Potential(substrate, vsKg)
+  const baseline = calcBaselineEmissions({ ch4PotentialM3: potential.ch4M3, mcf, gwp100 })
+  const project = calcProjectEmissions({ ch4ProducedM3, leakageFactor, gwp100 })
+  const avoidedTonnes = baseline ? baseline.tonnesCO2e - project.tonnesCO2e : null
+  const reductionPct =
+    baseline && baseline.tonnesCO2e > 0 ? (avoidedTonnes / baseline.tonnesCO2e) * 100 : null
+  return { potential, baseline, project, avoidedTonnes, reductionPct }
+}
+
+// Standard assumed annual operating-day count for a smallholder biogas
+// project (accounts for downtime, feeding gaps, and maintenance).
+export const OPERATING_DAYS_PER_YEAR = 330
+
+export function classifyProjectScale(annualTonnes) {
+  if (annualTonnes == null) return null
+  if (annualTonnes <= 5) {
+    return {
+      code: 'AMS-III.R',
+      label: 'AMS-III.R (household/small farm scale, ≤5 t CO₂e/system/year)',
+    }
+  }
+  if (annualTonnes <= 60000) {
+    return {
+      code: 'AMS-III.D',
+      label: 'AMS-III.D or Gold Standard AWMS (farm/cooperative scale)',
+    }
+  }
+  return {
+    code: 'large-scale',
+    label: 'Large-scale — Gold Standard combined with Article 6.4 aggregation',
+  }
+}
+
+// Everyday-life comparison factors for avoided-emissions context, derived
+// from the IEA 2023 reference figures the prompt cites (annualised /
+// per-unit rates converted to the per-day or per-hour units used here).
+export const EMISSIONS_CONTEXT_FACTORS = {
+  tonnesPerCarDay: 2.3 / 365, // 2.3 t CO2/car/year
+  tonnesPerTreeYear: 0.02, // ~20 kg CO2/tree/year
+  tonnesPerCoalPlantHour: (4.7 * 100) / 1000, // 4.7 kg CO2/kWh x 100 kW plant, per hour
+}
+
+export function calcEmissionsContext(avoidedTonnes) {
+  if (avoidedTonnes == null || avoidedTonnes <= 0) return null
+  return {
+    carDays: avoidedTonnes / EMISSIONS_CONTEXT_FACTORS.tonnesPerCarDay,
+    treeYears: avoidedTonnes / EMISSIONS_CONTEXT_FACTORS.tonnesPerTreeYear,
+    coalPlantHours: avoidedTonnes / EMISSIONS_CONTEXT_FACTORS.tonnesPerCoalPlantHour,
+  }
+}
+
+// --- Carbon credit value projector ---
+
+export function calcCreditRevenue({ annualTonnes, usdPerTonne, ngnPerUsd = CARBON_MARKET.ngnPerUsd }) {
+  const annualUsd = annualTonnes * usdPerTonne
+  return {
+    annualUsd,
+    annualNgn: annualUsd * ngnPerUsd,
+    year5Usd: annualUsd * 5,
+    year10Usd: annualUsd * 10,
+    year20Usd: annualUsd * 20,
+  }
+}
+
+export function calcNPV({ annualUsd, years = 10, discountRate = 0.1 }) {
+  return (annualUsd * (1 - Math.pow(1 + discountRate, -years))) / discountRate
+}
+
+export function recommendMethodologies(annualTonnes) {
+  if (annualTonnes == null) return []
+  if (annualTonnes < 5) return ['amsIIIR']
+  if (annualTonnes <= 1000) return ['amsIIID', 'goldStandard']
+  return ['goldStandard', 'article64']
+}
+
+// Assumed annual verification cost (USD) used only for the PoA breakeven
+// illustration — the figure the prompt itself specifies for this estimate.
+export const POA_ANNUAL_VERIFICATION_COST_USD = 8000
+
+export function calcPoaBreakeven(singleAnnualTonnes, usdPerTonne) {
+  if (!singleAnnualTonnes || singleAnnualTonnes <= 0) return null
+  return POA_ANNUAL_VERIFICATION_COST_USD / (singleAnnualTonnes * usdPerTonne)
 }

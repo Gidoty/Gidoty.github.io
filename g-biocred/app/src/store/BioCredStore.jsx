@@ -5,6 +5,9 @@ const STORAGE_KEY = 'gbiocred:store:v1'
 const initialState = {
   yieldResult: null,
   digesterPrefill: null,
+  emissionsResult: null,
+  gwpKey: 'AR6_BIOGENIC',
+  leakageFactor: null,
   scenarios: [],
   auditLog: [],
 }
@@ -26,6 +29,12 @@ function reducer(state, action) {
       return { ...state, yieldResult: action.payload }
     case 'SET_DIGESTER_PREFILL':
       return { ...state, digesterPrefill: action.payload }
+    case 'SET_EMISSIONS_RESULT':
+      return { ...state, emissionsResult: action.payload }
+    case 'SET_GWP_KEY':
+      return { ...state, gwpKey: action.payload }
+    case 'SET_LEAKAGE_FACTOR':
+      return { ...state, leakageFactor: action.payload }
     case 'ADD_SCENARIO':
       return { ...state, scenarios: [...state.scenarios, action.payload] }
     case 'REMOVE_SCENARIO':
@@ -54,6 +63,9 @@ export function BioCredStoreProvider({ children }) {
     () => ({
       setYieldResult: (payload) => dispatch({ type: 'SET_YIELD_RESULT', payload }),
       setDigesterPrefill: (payload) => dispatch({ type: 'SET_DIGESTER_PREFILL', payload }),
+      setEmissionsResult: (payload) => dispatch({ type: 'SET_EMISSIONS_RESULT', payload }),
+      setGwpKey: (payload) => dispatch({ type: 'SET_GWP_KEY', payload }),
+      setLeakageFactor: (payload) => dispatch({ type: 'SET_LEAKAGE_FACTOR', payload }),
       addScenario: (payload) => dispatch({ type: 'ADD_SCENARIO', payload }),
       removeScenario: (id) => dispatch({ type: 'REMOVE_SCENARIO', payload: id }),
       addAuditEntry: (payload) => dispatch({ type: 'ADD_AUDIT_ENTRY', payload }),
