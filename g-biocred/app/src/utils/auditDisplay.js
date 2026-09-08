@@ -7,7 +7,7 @@ const TYPE_META = {
   emissions: { label: 'Emissions Calculation', badgeClass: 'bg-cyan text-black' },
   carbon: { label: 'Carbon Credit Calculation', badgeClass: 'bg-amber text-black' },
   digestate: { label: 'Digestate Calculation', badgeClass: 'bg-accent text-white' },
-  comparison: { label: 'Comparison', badgeClass: 'bg-purple-500 text-white' },
+  comparison: { label: 'Comparison', badgeClass: 'bg-warning text-black' },
 }
 
 export function normalizeAuditEntry(entry) {

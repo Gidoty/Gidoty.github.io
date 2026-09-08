@@ -10,13 +10,14 @@ import DigesterChart from '../components/digester/DigesterChart.jsx'
 import DigesterComparisonTable from '../components/digester/DigesterComparisonTable.jsx'
 import DailyGasOutput from '../components/digester/DailyGasOutput.jsx'
 import EmptyState from '../components/shared/EmptyState.jsx'
+import ProgressSteps from '../components/shared/ProgressSteps.jsx'
 import { SUBSTRATES } from '../data/substrates.js'
 import { DIGESTER_TYPES } from '../data/constants.js'
 import { calcSlurry, calcDigesterVolume } from '../utils/calcEngine.js'
 import { useBioCredStore } from '../store/BioCredStore.jsx'
 
 export default function Digester() {
-  const { state } = useBioCredStore()
+  const { state, markStepComplete } = useBioCredStore()
   const prefill = state.digesterPrefill
 
   const [manualOverride, setManualOverride] = useState(false)
@@ -67,9 +68,15 @@ export default function Digester() {
 
   const canCalculate = Boolean(substrate) && dailyWasteKg > 0
 
+  const handleCalculate = useCallback(() => {
+    setHasCalculated(true)
+    markStepComplete('digester')
+  }, [markStepComplete])
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
+        <ProgressSteps currentStep="digester" />
         <span className="inline-block rounded-full border border-border bg-panel px-4 py-1.5 text-xs text-muted">
           Formula: Volume = (Daily Input × HRT) × Safety Factor · Fixed dome, floating drum, and
           tubular bag configurations
@@ -153,7 +160,7 @@ export default function Digester() {
 
           <button
             type="button"
-            onClick={() => setHasCalculated(true)}
+            onClick={handleCalculate}
             disabled={!canCalculate}
             className="h-14 w-full rounded-lg bg-accent text-lg font-semibold text-white transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
           >

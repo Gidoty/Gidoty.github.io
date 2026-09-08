@@ -5,6 +5,7 @@ import ComparisonTable from '../components/compare/ComparisonTable.jsx'
 import ComparisonCharts from '../components/compare/ComparisonCharts.jsx'
 import WinnerSummary from '../components/compare/WinnerSummary.jsx'
 import CollapsibleSection from '../components/shared/CollapsibleSection.jsx'
+import ProgressSteps from '../components/shared/ProgressSteps.jsx'
 import AuditSnapshot from '../components/calculator/AuditSnapshot.jsx'
 import { DEFAULT_SCENARIO_INPUTS, isScenarioReady, calcScenarioResult } from '../utils/scenarioEngine.js'
 import { sha256Hex, formatWATTimestamp } from '../utils/audit.js'
@@ -33,7 +34,7 @@ const EXAMPLE = {
 
 export default function Compare() {
   const navigate = useNavigate()
-  const { setYieldResult, setComparisonResult, addAuditEntry } = useBioCredStore()
+  const { setYieldResult, setComparisonResult, addAuditEntry, markStepComplete } = useBioCredStore()
 
   const [inputs, setInputs] = useState(() => ({ A: makeDefaultInputs('A'), B: makeDefaultInputs('B'), C: makeDefaultInputs('C') }))
   const [results, setResults] = useState({ A: null, B: null, C: null })
@@ -68,7 +69,8 @@ export default function Compare() {
     })
     setResults(next)
     setHasCompared(true)
-  }, [inputs])
+    markStepComplete('compare')
+  }, [inputs, markStepComplete])
 
   const handleLoadExample = useCallback(() => {
     setInputs(EXAMPLE)
@@ -78,7 +80,8 @@ export default function Compare() {
     })
     setResults(next)
     setHasCompared(true)
-  }, [])
+    markStepComplete('compare')
+  }, [markStepComplete])
 
   const scenarios = useMemo(
     () =>
@@ -133,6 +136,7 @@ export default function Compare() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
+        <ProgressSteps currentStep="compare" />
         <span className="inline-block rounded-full border border-border bg-panel px-4 py-1.5 text-xs text-muted">
           All calculations use the same methodology as the core calculator · IPCC 2006/2019 · Gold
           Standard AWMS

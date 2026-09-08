@@ -6,6 +6,7 @@ import WasteInputSection from '../components/calculator/WasteInputSection.jsx'
 import AdvancedOptions from '../components/calculator/AdvancedOptions.jsx'
 import ResultsPanel from '../components/calculator/ResultsPanel.jsx'
 import EmptyState from '../components/shared/EmptyState.jsx'
+import ProgressSteps from '../components/shared/ProgressSteps.jsx'
 import { fullYieldCalc, CONDITION_MULTIPLIERS, TEMPERATURE_MULTIPLIERS } from '../utils/calcEngine.js'
 import { sha256Hex, formatWATTimestamp } from '../utils/audit.js'
 import { useBioCredStore } from '../store/BioCredStore.jsx'
@@ -14,7 +15,7 @@ const UNIT_TO_KG = { kg: 1, tonnes: 1000, bags: 50 }
 
 export default function Calculator() {
   const navigate = useNavigate()
-  const { setYieldResult, setDigesterPrefill, addScenario, addAuditEntry } = useBioCredStore()
+  const { setYieldResult, setDigesterPrefill, addScenario, addAuditEntry, markStepComplete } = useBioCredStore()
 
   const [substrate, setSubstrate] = useState(null)
   const [mode, setMode] = useState('single')
@@ -120,6 +121,7 @@ export default function Calculator() {
       setAuditEntry(entry)
       addAuditEntry(entry)
       setYieldResult({ substrateId: substrate.id, freshWeightKg, dailyWasteKg, results: yieldResult })
+      markStepComplete('calculator')
     }, 400)
     return () => {
       cancelled = true
@@ -131,6 +133,7 @@ export default function Calculator() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
+        <ProgressSteps currentStep="calculator" />
         <span className="inline-block rounded-full border border-border bg-panel px-4 py-1.5 text-xs text-muted">
           Methodology: 5-Step Anaerobic Digestion Chain · Peer-reviewed SBY coefficients · 1 m³
           CH₄ = 9.97 kWh LHV (Clarke Energy / TU Delft)

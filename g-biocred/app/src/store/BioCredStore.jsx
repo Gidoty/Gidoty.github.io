@@ -12,6 +12,7 @@ const initialState = {
   leakageFactor: null,
   scenarios: [],
   auditLog: [],
+  completedSteps: [],
 }
 
 function loadInitialState() {
@@ -51,6 +52,10 @@ function reducer(state, action) {
       return { ...state, auditLog: state.auditLog.filter((e) => e.id !== action.payload) }
     case 'CLEAR_AUDIT_LOG':
       return { ...state, auditLog: [] }
+    case 'MARK_STEP_COMPLETE':
+      return state.completedSteps.includes(action.payload)
+        ? state
+        : { ...state, completedSteps: [...state.completedSteps, action.payload] }
     default:
       return state
   }
@@ -83,6 +88,7 @@ export function BioCredStoreProvider({ children }) {
       addAuditEntry: (payload) => dispatch({ type: 'ADD_AUDIT_ENTRY', payload }),
       removeAuditEntry: (id) => dispatch({ type: 'REMOVE_AUDIT_ENTRY', payload: id }),
       clearAuditLog: () => dispatch({ type: 'CLEAR_AUDIT_LOG' }),
+      markStepComplete: (payload) => dispatch({ type: 'MARK_STEP_COMPLETE', payload }),
     }),
     [],
   )

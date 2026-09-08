@@ -6,6 +6,7 @@ import PriceScenarioCards from '../components/carbon/PriceScenarioCards.jsx'
 import PoaSection from '../components/carbon/PoaSection.jsx'
 import CarbonResultsPanel from '../components/carbon/CarbonResultsPanel.jsx'
 import EmptyState from '../components/shared/EmptyState.jsx'
+import ProgressSteps from '../components/shared/ProgressSteps.jsx'
 import { SUBSTRATES } from '../data/substrates.js'
 import { GWP_OPTIONS, CARBON_MARKET } from '../data/constants.js'
 import { METHODOLOGIES } from '../data/methodologies.js'
@@ -14,7 +15,7 @@ import { sha256Hex, formatWATTimestamp } from '../utils/audit.js'
 import { useBioCredStore } from '../store/BioCredStore.jsx'
 
 export default function Carbon() {
-  const { state, setGwpKey, addAuditEntry } = useBioCredStore()
+  const { state, setGwpKey, addAuditEntry, markStepComplete } = useBioCredStore()
 
   const storedResult = state.emissionsResult
   const [manualOverride, setManualOverride] = useState(false)
@@ -80,6 +81,7 @@ export default function Carbon() {
       }
       setAuditEntry(entry)
       addAuditEntry(entry)
+      markStepComplete('carbon')
     }, 400)
     return () => {
       cancelled = true
@@ -93,6 +95,7 @@ export default function Carbon() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
+        <ProgressSteps currentStep="carbon" />
         <span className="inline-block rounded-full border border-border bg-panel px-4 py-1.5 text-xs text-muted">
           Gold Standard AWMS v2.0 · CDM AMS-III.D · CDM AMS-III.R · Paris Agreement Article 6.4 ·
           Ecosystem Marketplace SOVCM 2025

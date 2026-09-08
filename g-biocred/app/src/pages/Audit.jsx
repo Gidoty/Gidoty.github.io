@@ -26,6 +26,15 @@ export default function Audit() {
       <div className="space-y-8">
         <LegalContextPanel />
 
+        {auditLog.length > 0 && (
+          <Link
+            to="/report"
+            className="inline-block rounded-lg bg-accent px-5 py-3 text-center text-sm font-semibold text-white hover:scale-[1.02]"
+          >
+            Generate Feasibility Report →
+          </Link>
+        )}
+
         {auditLog.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/50 p-12 text-center">
             <ShieldX className="h-[60px] w-[60px] text-amber" strokeWidth={1.5} />

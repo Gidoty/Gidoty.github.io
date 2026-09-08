@@ -1,5 +1,6 @@
 import { formatDecimal, formatM3, formatNGN, formatUSD } from '../../utils/format.js'
 import { CARBON_MARKET } from '../../data/constants.js'
+import FormulaBlock from '../shared/FormulaBlock.jsx'
 
 export default function VolumeBreakdown({ slurry, volumes, digesterType, dailyWasteKg, hrtDays }) {
   const costUsd = volumes.totalM3 * digesterType.cost_usd_per_m3
@@ -8,7 +9,7 @@ export default function VolumeBreakdown({ slurry, volumes, digesterType, dailyWa
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <p className="mb-3 font-medium text-text">Calculation Breakdown</p>
-      <div className="space-y-1.5 font-mono text-sm text-muted">
+      <FormulaBlock>
         <p>Daily fresh waste: {formatDecimal(dailyWasteKg, 1)} kg/day</p>
         <p>Water addition: {formatDecimal(slurry.waterLitres, 1)} litres/day</p>
         <p>Total daily slurry: {formatDecimal(slurry.totalSlurryLitres, 1)} litres/day</p>
@@ -24,7 +25,7 @@ export default function VolumeBreakdown({ slurry, volumes, digesterType, dailyWa
         <p className="text-text">Digestion chamber = {formatM3(volumes.chamberM3)}</p>
         <p>Gas storage (30% of chamber): {formatM3(volumes.gasStorageM3)}</p>
         <p className="pt-2 text-text">Total plant volume: {formatM3(volumes.totalM3)}</p>
-      </div>
+      </FormulaBlock>
 
       <div className="mt-4 border-t border-border pt-4 text-sm">
         <p className="text-text">

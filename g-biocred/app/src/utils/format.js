@@ -32,3 +32,7 @@ export function formatNGN(value) {
 export function formatUSD(value) {
   return `USD ${formatDecimal(value, 2)}`
 }
+
+export function formatCO2e(value) {
+  return `${formatDecimal(value, 3)} t CO₂e`
+}

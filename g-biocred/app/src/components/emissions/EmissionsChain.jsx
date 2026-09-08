@@ -1,13 +1,9 @@
 import { formatDecimal, formatKg, formatM3 } from '../../utils/format.js'
 import { IPCC_MANURE } from '../../data/constants.js'
+import FormulaBlock from '../shared/FormulaBlock.jsx'
 
 function Step({ title, children }) {
-  return (
-    <div className="rounded-lg border-l-4 border-accent bg-panel p-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted">{title}</p>
-      <div className="mt-2 space-y-1 font-mono text-sm text-text">{children}</div>
-    </div>
-  )
+  return <FormulaBlock title={title}>{children}</FormulaBlock>
 }
 
 export default function EmissionsChain({ substrate, tsKg, vsKg, ch4ProducedM3, scenario, gwpOption, leakageFactor, result }) {

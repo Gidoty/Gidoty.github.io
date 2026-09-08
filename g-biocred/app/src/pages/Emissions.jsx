@@ -5,6 +5,7 @@ import DisposalScenarioCards from '../components/emissions/DisposalScenarioCards
 import LeakagePanel from '../components/emissions/LeakagePanel.jsx'
 import EmissionsResultsPanel from '../components/emissions/EmissionsResultsPanel.jsx'
 import EmptyState from '../components/shared/EmptyState.jsx'
+import ProgressSteps from '../components/shared/ProgressSteps.jsx'
 import { SUBSTRATES } from '../data/substrates.js'
 import { GWP_OPTIONS, IPCC_MANURE } from '../data/constants.js'
 import { DISPOSAL_SCENARIOS } from '../data/disposalScenarios.js'
@@ -18,7 +19,7 @@ import { sha256Hex, formatWATTimestamp } from '../utils/audit.js'
 import { useBioCredStore } from '../store/BioCredStore.jsx'
 
 export default function Emissions() {
-  const { state, setGwpKey, setLeakageFactor, setEmissionsResult, addAuditEntry, addScenario } =
+  const { state, setGwpKey, setLeakageFactor, setEmissionsResult, addAuditEntry, addScenario, markStepComplete } =
     useBioCredStore()
 
   const storedYield = state.yieldResult
@@ -130,6 +131,7 @@ export default function Emissions() {
         gwpKey,
         leakageFactor,
       })
+      markStepComplete('emissions')
     }, 400)
     return () => {
       cancelled = true
@@ -141,6 +143,7 @@ export default function Emissions() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
+        <ProgressSteps currentStep="emissions" />
         <span className="inline-block rounded-full border border-border bg-panel px-4 py-1.5 text-xs text-muted">
           IPCC 2006 Guidelines Vol.4 Ch.10 (Manure Management) · Vol.5 Ch.3 (Waste Disposal) · AR6
           GWP values · CDM Tool 14 (Digester Leakage)

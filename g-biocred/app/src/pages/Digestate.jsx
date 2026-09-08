@@ -4,6 +4,7 @@ import PriceBasisPanel from '../components/digestate/PriceBasisPanel.jsx'
 import ChemicalFertiliserPanel from '../components/digestate/ChemicalFertiliserPanel.jsx'
 import DigestateResultsPanel from '../components/digestate/DigestateResultsPanel.jsx'
 import EmptyState from '../components/shared/EmptyState.jsx'
+import ProgressSteps from '../components/shared/ProgressSteps.jsx'
 import { SUBSTRATES } from '../data/substrates.js'
 import { DIGESTATE_NPK } from '../data/constants.js'
 import { DIGESTATE_RECOVERY_RATES, FERTILIZER_PRICES } from '../data/digestateEconomics.js'
@@ -12,7 +13,7 @@ import { sha256Hex, formatWATTimestamp } from '../utils/audit.js'
 import { useBioCredStore } from '../store/BioCredStore.jsx'
 
 export default function Digestate() {
-  const { state, setDigestateResult, addAuditEntry } = useBioCredStore()
+  const { state, setDigestateResult, addAuditEntry, markStepComplete } = useBioCredStore()
 
   const storedYield = state.yieldResult
   const [manualOverride, setManualOverride] = useState(false)
@@ -101,6 +102,7 @@ export default function Digestate() {
         value,
         priceBasis,
       })
+      markStepComplete('digestate')
     }, 400)
     return () => {
       cancelled = true
@@ -116,6 +118,7 @@ export default function Digestate() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <div className="mb-8">
+        <ProgressSteps currentStep="digestate" />
         <span className="inline-block rounded-full border border-border bg-panel px-4 py-1.5 text-xs text-muted">
           NPK fractions: Tambone et al. (2010); Nkoa (2014) · Nigerian fertiliser market prices
           2025 · World Bank commodity reference

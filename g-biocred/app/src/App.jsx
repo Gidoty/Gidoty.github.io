@@ -1,10 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
-import { FileDown, Leaf } from 'lucide-react'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import PageLoader from './components/PageLoader.jsx'
-import Placeholder from './components/Placeholder.jsx'
 import { BioCredStoreProvider } from './store/BioCredStore.jsx'
 
 const Home = lazy(() => import('./pages/Home.jsx'))
@@ -15,6 +13,8 @@ const Carbon = lazy(() => import('./pages/Carbon.jsx'))
 const Digestate = lazy(() => import('./pages/Digestate.jsx'))
 const Compare = lazy(() => import('./pages/Compare.jsx'))
 const Audit = lazy(() => import('./pages/Audit.jsx'))
+const Report = lazy(() => import('./pages/Report.jsx'))
+const About = lazy(() => import('./pages/About.jsx'))
 
 function SiteLayout() {
   return (
@@ -43,26 +43,8 @@ export default function App() {
           <Route path="/digestate" element={<Digestate />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/audit" element={<Audit />} />
-          <Route
-            path="/report"
-            element={
-              <Placeholder
-                icon={FileDown}
-                title="Exportable Feasibility Report"
-                description="Generates a downloadable PDF and CSV report suitable for grant applications, investor pitches, and regulatory submissions."
-              />
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <Placeholder
-                icon={Leaf}
-                title="About G-BioCred"
-                description="The research, methodology, and people behind G-BioCred."
-              />
-            }
-          />
+          <Route path="/report" element={<Report />} />
+          <Route path="/about" element={<About />} />
         </Route>
       </Routes>
     </BioCredStoreProvider>

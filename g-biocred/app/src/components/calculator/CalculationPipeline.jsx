@@ -1,17 +1,16 @@
 import { ArrowRight, ArrowDown } from 'lucide-react'
 import { formatDecimal, formatKg, formatM3, formatKwh } from '../../utils/format.js'
 import { ENERGY } from '../../data/constants.js'
+import FormulaBlock from '../shared/FormulaBlock.jsx'
 
 function StepBox({ title, from, to, formula, note }) {
   return (
-    <div className="flex-1 rounded-xl border-t-2 border-accent bg-card p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{title}</p>
-      <p className="mt-2 text-sm text-text">
+    <FormulaBlock title={title} note={note} className="flex-1">
+      <p className="font-sans text-sm text-text">
         {from} <span className="text-muted">→</span> <span className="font-semibold">{to}</span>
       </p>
-      <p className="mt-2 break-words font-mono text-xs text-muted">{formula}</p>
-      {note && <p className="mt-1 text-xs text-cyan">{note}</p>}
-    </div>
+      <p className="break-words">{formula}</p>
+    </FormulaBlock>
   )
 }
 
