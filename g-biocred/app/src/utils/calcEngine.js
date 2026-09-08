@@ -258,3 +258,29 @@ export function calcPoaBreakeven(singleAnnualTonnes, usdPerTonne) {
   if (!singleAnnualTonnes || singleAnnualTonnes <= 0) return null
   return POA_ANNUAL_VERIFICATION_COST_USD / (singleAnnualTonnes * usdPerTonne)
 }
+
+// --- Digestate nutrient value estimator ---
+
+export function calcDigestateNPK({ digestateKg, npkFractions }) {
+  return {
+    nKg: digestateKg * npkFractions.N,
+    pKg: digestateKg * npkFractions.P,
+    kKg: digestateKg * npkFractions.K,
+  }
+}
+
+export function calcFertiliserValue({ nKg, pKg, kKg, prices }) {
+  const nValue = nKg * prices.N
+  const pValue = pKg * prices.P
+  const kValue = kKg * prices.K
+  return { nValue, pValue, kValue, totalValue: nValue + pValue + kValue }
+}
+
+export function calcCropCoverage({ nKg, kKg, rates }) {
+  return {
+    maizeHa: nKg / rates.maize.rateKgPerHa,
+    riceHa: nKg / rates.rice.rateKgPerHa,
+    cassavaHa: kKg / rates.cassava.rateKgPerHa,
+    vegetablesHa: nKg / rates.vegetables.rateKgPerHa,
+  }
+}

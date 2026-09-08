@@ -7,9 +7,9 @@ import PoaSection from '../components/carbon/PoaSection.jsx'
 import CarbonResultsPanel from '../components/carbon/CarbonResultsPanel.jsx'
 import EmptyState from '../components/shared/EmptyState.jsx'
 import { SUBSTRATES } from '../data/substrates.js'
-import { GWP_OPTIONS } from '../data/constants.js'
+import { GWP_OPTIONS, CARBON_MARKET } from '../data/constants.js'
 import { METHODOLOGIES } from '../data/methodologies.js'
-import { classifyProjectScale, recommendMethodologies } from '../utils/calcEngine.js'
+import { classifyProjectScale, recommendMethodologies, calcCreditRevenue } from '../utils/calcEngine.js'
 import { sha256Hex, formatWATTimestamp } from '../utils/audit.js'
 import { useBioCredStore } from '../store/BioCredStore.jsx'
 
@@ -64,7 +64,11 @@ export default function Carbon() {
         isPoa,
         cpaCount,
       }
-      const hash = await sha256Hex(inputsSnapshot)
+      const result = calcCreditRevenue({
+        annualTonnes,
+        usdPerTonne: CARBON_MARKET[priceKey].usdPerTonne,
+      })
+      const hash = await sha256Hex({ inputs: inputsSnapshot, result })
       if (cancelled) return
       const entry = {
         id: `${hash}-${Date.now()}`,
@@ -72,6 +76,7 @@ export default function Carbon() {
         hash,
         timestamp: formatWATTimestamp(),
         inputs: inputsSnapshot,
+        result,
       }
       setAuditEntry(entry)
       addAuditEntry(entry)

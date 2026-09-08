@@ -6,6 +6,8 @@ const initialState = {
   yieldResult: null,
   digesterPrefill: null,
   emissionsResult: null,
+  digestateResult: null,
+  comparisonResult: null,
   gwpKey: 'AR6_BIOGENIC',
   leakageFactor: null,
   scenarios: [],
@@ -31,6 +33,10 @@ function reducer(state, action) {
       return { ...state, digesterPrefill: action.payload }
     case 'SET_EMISSIONS_RESULT':
       return { ...state, emissionsResult: action.payload }
+    case 'SET_DIGESTATE_RESULT':
+      return { ...state, digestateResult: action.payload }
+    case 'SET_COMPARISON_RESULT':
+      return { ...state, comparisonResult: action.payload }
     case 'SET_GWP_KEY':
       return { ...state, gwpKey: action.payload }
     case 'SET_LEAKAGE_FACTOR':
@@ -41,6 +47,10 @@ function reducer(state, action) {
       return { ...state, scenarios: state.scenarios.filter((s) => s.id !== action.payload) }
     case 'ADD_AUDIT_ENTRY':
       return { ...state, auditLog: [action.payload, ...state.auditLog] }
+    case 'REMOVE_AUDIT_ENTRY':
+      return { ...state, auditLog: state.auditLog.filter((e) => e.id !== action.payload) }
+    case 'CLEAR_AUDIT_LOG':
+      return { ...state, auditLog: [] }
     default:
       return state
   }
@@ -64,11 +74,15 @@ export function BioCredStoreProvider({ children }) {
       setYieldResult: (payload) => dispatch({ type: 'SET_YIELD_RESULT', payload }),
       setDigesterPrefill: (payload) => dispatch({ type: 'SET_DIGESTER_PREFILL', payload }),
       setEmissionsResult: (payload) => dispatch({ type: 'SET_EMISSIONS_RESULT', payload }),
+      setDigestateResult: (payload) => dispatch({ type: 'SET_DIGESTATE_RESULT', payload }),
+      setComparisonResult: (payload) => dispatch({ type: 'SET_COMPARISON_RESULT', payload }),
       setGwpKey: (payload) => dispatch({ type: 'SET_GWP_KEY', payload }),
       setLeakageFactor: (payload) => dispatch({ type: 'SET_LEAKAGE_FACTOR', payload }),
       addScenario: (payload) => dispatch({ type: 'ADD_SCENARIO', payload }),
       removeScenario: (id) => dispatch({ type: 'REMOVE_SCENARIO', payload: id }),
       addAuditEntry: (payload) => dispatch({ type: 'ADD_AUDIT_ENTRY', payload }),
+      removeAuditEntry: (id) => dispatch({ type: 'REMOVE_AUDIT_ENTRY', payload: id }),
+      clearAuditLog: () => dispatch({ type: 'CLEAR_AUDIT_LOG' }),
     }),
     [],
   )
