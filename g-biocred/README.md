@@ -13,7 +13,7 @@ https://gidoty.github.io/g-biocred
 ## Built by
 
 Gideon Owhonda
-PhD Candidate · NLNG Centre for Gas, Refining and Petrochemical Engineering
+NLNG Centre for Gas, Refining and Petrochemical Engineering
 University of Port Harcourt
 MSc: Production and Analysis of Biogas from Cow Dung, UNIPORT 2024
 gideon.owhonda@cgrpng.org

@@ -48,7 +48,7 @@ export function buildAuditJson(auditLog) {
     {
       export_generated: new Date().toISOString(),
       tool: 'G-BioCred v1.0',
-      built_by: 'Gideon Owhonda, PhD',
+      built_by: 'Gideon Owhonda',
       institution:
         'NLNG Centre for Gas, Refining and Petrochemical Engineering, University of Port Harcourt',
       methodology_references: [

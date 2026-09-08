@@ -4,7 +4,7 @@ export default function BuiltBySection() {
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-3xl font-bold text-text sm:text-4xl">Built by Gideon Owhonda</h2>
         <p className="mt-4 text-muted">
-          PhD Candidate · NLNG Centre for Gas, Refining and Petrochemical Engineering
+          NLNG Centre for Gas, Refining and Petrochemical Engineering
           <br />
           University of Port Harcourt
           <br />

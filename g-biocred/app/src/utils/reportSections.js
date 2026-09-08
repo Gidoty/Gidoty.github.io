@@ -275,7 +275,7 @@ export function buildReportSections(data, meta, included) {
   push('disclaimer', 'Disclaimer', [
     'This report was generated using G-BioCred v1.0, an open-access planning tool developed at the NLNG Centre for Gas, Refining and Petrochemical Engineering, University of Port Harcourt. All calculations use published IPCC methodology and peer-reviewed substrate yield coefficients.',
     'Results are indicative planning estimates and do not constitute a certified carbon credit calculation, an engineering design, or investment advice. Independent verification by an accredited body is required before carbon credits can be issued or traded.',
-    'Built by: Gideon Owhonda, PhD Candidate, NLNG Centre for Gas, Refining and Petrochemical Engineering, University of Port Harcourt. gideon.owhonda@cgrpng.org',
+    'Built by: Gideon Owhonda, NLNG Centre for Gas, Refining and Petrochemical Engineering, University of Port Harcourt. gideon.owhonda@cgrpng.org',
     'Tool: https://gidoty.github.io/g-biocred',
   ])
 

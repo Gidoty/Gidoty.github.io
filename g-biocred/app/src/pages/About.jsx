@@ -118,8 +118,7 @@ export default function About() {
         <Section title="Built By">
           <div className="rounded-xl border border-border bg-card p-6 text-text">
             <p className="text-lg font-semibold">Gideon Owhonda</p>
-            <p className="mt-1 text-sm text-muted">PhD Candidate</p>
-            <p className="text-sm text-muted">
+            <p className="mt-1 text-sm text-muted">
               NLNG Centre for Gas, Refining and Petrochemical Engineering
             </p>
             <p className="text-sm text-muted">University of Port Harcourt</p>
