@@ -98,6 +98,25 @@ window.PORTFOLIO_DATA = {
       linkLabel: "Open live app",
       featured: true,
     },
+    {
+      title: "G-BioCred",
+      tags: ["Bioenergy", "Carbon Verification", "React"],
+      period: "2026",
+      description:
+        "A free, browser-based tool combining validated biogas yield modelling for Nigerian and West " +
+        "African agricultural waste streams with IPCC-compliant emissions-avoided estimation and " +
+        "voluntary carbon credit valuation — the first tool to bring all three into a single, " +
+        "auditable, exportable workflow. Built on my MSc research (Production and Analysis of Biogas " +
+        "from Cow Dung, UNIPORT 2024) and peer-reviewed Nigerian substrate yield data.",
+      highlights: [
+        "9-substrate biogas yield and digester sizing calculator (fixed dome, floating drum, tubular bag) across a 5-step anaerobic digestion chain",
+        "IPCC Tier 1 emissions-avoided estimator and Gold Standard / CDM / Article 6.4 carbon credit value projector, with AR6/AR5 GWP alignment",
+        "SHA-256 tamper-evident audit trail with exportable PDF/CSV feasibility reports",
+      ],
+      link: "https://gidoty.github.io/g-biocred/",
+      linkLabel: "Open live tool",
+      featured: true,
+    },
   ],
 
   digital: [
