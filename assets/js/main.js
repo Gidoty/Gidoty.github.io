@@ -149,6 +149,33 @@ function initHomePage() {
   setText("profile-bio", profile.bio);
   setText("profile-location", profile.location);
 
+  const statsEl = document.getElementById("about-stats");
+  if (statsEl && (profile.stats || []).length) {
+    statsEl.innerHTML = profile.stats
+      .map((s) => `<div class="stat-tile"><div class="num">${s.number}</div><div class="label">${s.label}</div></div>`)
+      .join("");
+  }
+
+  const eduEl = document.getElementById("about-education");
+  if (eduEl && (profile.education || []).length) {
+    eduEl.innerHTML = profile.education
+      .map(
+        (e) => `
+          <li class="edu-item">
+            <div class="degree">${e.degree}</div>
+            <div class="edu-meta">${e.institution}${e.period ? ` · ${e.period}` : ""}</div>
+            ${e.detail ? `<div class="detail">${e.detail}</div>` : ""}
+          </li>
+        `
+      )
+      .join("");
+  }
+
+  const skillsEl = document.getElementById("about-skills");
+  if (skillsEl && (profile.focusAreas || []).length) {
+    skillsEl.innerHTML = profile.focusAreas.map((s) => `<span class="skill-tag">${s}</span>`).join("");
+  }
+
   document.title = profile.name && profile.name !== "[Your Name]" ? `${profile.name} — Portfolio` : document.title;
 }
 

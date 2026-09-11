@@ -11,6 +11,10 @@
  *   link         (optional) — URL to the live project, repo, PDF, or write-up
  *   linkLabel    (optional) — text for the link button, defaults to "View more"
  *   featured     (optional) — set true to surface it on the homepage "Featured work" section
+ *
+ * profile.stats       (optional) — array of { number, label } shown as a quick-fact row
+ * profile.education   (optional) — array of { degree, institution, period, detail } shown as a timeline
+ * profile.focusAreas  (optional) — array of short strings shown as skill/focus tags
  */
 
 window.PORTFOLIO_DATA = {
@@ -38,6 +42,36 @@ window.PORTFOLIO_DATA = {
       linkedin: "https://www.linkedin.com/in/gidotyo",
       twitter: "",
     },
+    stats: [
+      { number: "5,000+", label: "People trained through Metabridge Academy" },
+      { number: "4", label: "Live engineering tools shipped" },
+      { number: "10,000+", label: "Students represented as Hall President" },
+      { number: "2023", label: "Tony Elumelu Foundation Fellow" },
+    ],
+    education: [
+      {
+        degree: "MSc, Chemical Engineering",
+        institution: "University of Port Harcourt",
+        period: "2024",
+        detail: "Thesis: Production and Analysis of Biogas from Cow Dung",
+      },
+      {
+        degree: "BSc, Petrochemical Engineering",
+        institution: "University of Port Harcourt",
+        period: "2014 – 2019",
+        detail: "Agip Oil Company Undergraduate Scholar",
+      },
+    ],
+    focusAreas: [
+      "Process & Refinery Simulation",
+      "Methane & Carbon Verification",
+      "Blockchain Development",
+      "AI & Prompt Engineering",
+      "Cybersecurity",
+      "Curriculum Design",
+      "Full-Stack Web Development",
+      "Environmental Policy & Compliance",
+    ],
   },
 
   engineering: [
