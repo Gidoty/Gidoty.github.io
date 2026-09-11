@@ -17,18 +17,20 @@ window.PORTFOLIO_DATA = {
   profile: {
     name: "Gideon Owhonda",
     title: "Scholar",
-    tagline: "Chemical Engineer | AI Educator | Cybersecurity Educator | Academic Researcher | Software Developer | Entrepreneur",
+    tagline: "Chemical Engineer | AI Educator | Cybersecurity Educator | Academic Researcher | Software Developer | Digital Consultant | Entrepreneur",
     bio:
-      "Gideon Owhonda is a Chemical Engineer, researcher, and entrepreneur based in Port Harcourt, " +
-      "Nigeria. He holds a Master's degree in Chemical Engineering and works at the intersection of " +
-      "sustainable energy, gas processing, methane emission reduction, and carbon management, alongside " +
-      "emerging fields such as artificial intelligence, cybersecurity, and blockchain. A Tony Elumelu " +
-      "Foundation and Agip Scholarship alumnus, he is also an award-winning leader and international " +
-      "youth advocate. He founded Metabridge Academy, which has trained over 5,000 young people in " +
-      "technology skills, and DefiLab, a decentralised finance platform, alongside leading several other " +
-      "technology and innovation initiatives across Africa. His work brings together engineering, " +
-      "research, education, leadership, and entrepreneurship to build practical solutions and expand " +
-      "opportunities for young people.",
+      "Gideon Owhonda is a Chemical Engineer, researcher, entrepreneur, and digital consultant based " +
+      "in Port Harcourt, Nigeria. He holds a Master's degree in Chemical Engineering and works at the " +
+      "intersection of sustainable energy, gas processing, methane emission reduction, and carbon " +
+      "management, alongside emerging fields such as artificial intelligence, cybersecurity, and " +
+      "blockchain. A Tony Elumelu Foundation and Agip Scholarship alumnus, he is also an award-winning " +
+      "leader and international youth advocate — in 2019, he represented Nigeria at the Model United " +
+      "Nations at the University of Ghana, Legon, presenting a paper on leadership for African youth. " +
+      "He founded Metabridge Academy, which has trained over 5,000 young people in technology skills, " +
+      "and DefiLab, a decentralised finance platform, alongside leading several other technology and " +
+      "innovation initiatives across Africa. His work brings together engineering, research, education, " +
+      "leadership, and entrepreneurship to build practical solutions and expand opportunities for young " +
+      "people.",
     location: "Port Harcourt, Nigeria",
     email: "gideonowhonda@gmail.com",
     secondaryEmail: "gideon.owhonda@cgrpng.org",
