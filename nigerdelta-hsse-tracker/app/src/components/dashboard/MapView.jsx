@@ -34,7 +34,7 @@ const BOUNDARY_STYLE = {
   interactive: false,
 }
 
-function MapView({ reports, onCorroborate, selectedReportId, showDemoBanner, onDismissDemoBanner }) {
+function MapView({ reports, selectedReportId, showDemoBanner, onDismissDemoBanner }) {
   const [layers, setLayers] = useState({ heatmap: true, markers: true, boundary: true })
 
   const heatPoints = useMemo(
@@ -64,12 +64,16 @@ function MapView({ reports, onCorroborate, selectedReportId, showDemoBanner, onD
 
         {layers.boundary && <Polygon positions={NIGER_DELTA_BOUNDARY} pathOptions={BOUNDARY_STYLE} />}
         {layers.heatmap && <HeatmapLayer points={heatPoints} />}
-        {layers.markers && (
-          <IncidentMarkers reports={reports} onCorroborate={onCorroborate} selectedReportId={selectedReportId} />
-        )}
+        {layers.markers && <IncidentMarkers reports={reports} selectedReportId={selectedReportId} />}
 
         <MapControls layers={layers} onToggleLayer={toggleLayer} />
       </MapContainer>
+
+      {layers.heatmap && (
+        <div className="pointer-events-none absolute left-3 top-3 z-[1000] max-w-[220px] rounded-lg border border-border bg-panel/90 px-3 py-2 text-[10px] leading-normal text-muted backdrop-blur">
+          Reporting hotspot — density reflects where people reported, not measured pollution levels.
+        </div>
+      )}
 
       {showDemoBanner && (
         <div className="absolute bottom-3 left-1/2 z-[1000] flex w-[92%] max-w-md -translate-x-1/2 items-center gap-3 rounded-lg border border-amber/40 bg-panel/95 px-4 py-2.5 text-xs text-text shadow-lg backdrop-blur">

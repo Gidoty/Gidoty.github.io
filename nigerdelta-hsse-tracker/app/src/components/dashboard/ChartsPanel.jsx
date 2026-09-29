@@ -105,10 +105,10 @@ export default function ChartsPanel({ reports }) {
       </div>
 
       <p className="mx-auto mt-6 max-w-6xl text-xs leading-normal text-muted">
-        All data sourced from community submissions. Reports marked ✓ Corroborated have been
-        independently confirmed by two or more community witnesses. Unverified reports are
-        labelled as such. This data does not constitute legal proof without formal JIV
-        verification under NOSDRA Act 2006.
+        All data sourced from community submissions. Each report carries an evidence status —
+        community observed, externally referenced, or independently verified — shown on the
+        report itself. This data does not constitute legal proof without formal JIV verification
+        under NOSDRA Act 2006.
       </p>
     </div>
   )

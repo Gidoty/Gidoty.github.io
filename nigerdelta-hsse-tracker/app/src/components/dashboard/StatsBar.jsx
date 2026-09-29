@@ -1,5 +1,6 @@
-import { Database, Droplet, Flame, Clock, Users } from 'lucide-react'
+import { Database, Droplet, Flame, Clock, ShieldCheck } from 'lucide-react'
 import { fmt } from '../../utils/formatters.js'
+import { evidenceStatusLevel, EVIDENCE_STATUS } from '../../utils/evidenceStatus.js'
 
 function StatCard({ icon: Icon, label, value, accent }) {
   return (
@@ -20,7 +21,7 @@ export default function StatsBar({ reports, lastUpdated }) {
   const oilSpills = reports.filter((r) => r.incident.type === 'oil_spill').length
   const gasFlares = reports.filter((r) => r.incident.type === 'gas_flare').length
   const awaitingResponse = reports.filter((r) => r.regulatory?.operatorResponse === null).length
-  const corroborated = reports.filter((r) => (r.corroboration?.count ?? 0) >= 2).length
+  const evidenceUpgraded = reports.filter((r) => evidenceStatusLevel(r) !== EVIDENCE_STATUS.COMMUNITY_OBSERVED).length
 
   return (
     <div className="border-b border-border bg-panel px-4 py-5 sm:px-6 lg:px-8">
@@ -29,7 +30,7 @@ export default function StatsBar({ reports, lastUpdated }) {
         <StatCard icon={Droplet} label="Oil Spills" value={oilSpills} accent="text-danger" />
         <StatCard icon={Flame} label="Gas Flares" value={gasFlares} accent="text-amber" />
         <StatCard icon={Clock} label="Awaiting Response" value={awaitingResponse} accent="text-warning" />
-        <StatCard icon={Users} label="Corroborated Reports" value={corroborated} accent="text-safe" />
+        <StatCard icon={ShieldCheck} label="Evidence Status Upgraded" value={evidenceUpgraded} accent="text-safe" />
       </div>
 
       <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
@@ -41,7 +42,7 @@ export default function StatsBar({ reports, lastUpdated }) {
         <span>·</span>
         <span>Data source: Community submissions via NigerDelta HSSE Tracker</span>
         <span>·</span>
-        <span>All reports unverified unless marked ✓ Corroborated</span>
+        <span>All reports labelled by evidence status — community observed by default</span>
       </p>
     </div>
   )

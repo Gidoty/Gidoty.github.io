@@ -300,7 +300,7 @@ export default function About() {
             The NigerDelta HSSE Tracker is a community monitoring tool. Data submitted through
             this platform constitutes community observations and does not replace formal
             regulatory investigation. All reports are labelled as community-submitted and
-            unverified unless independently corroborated. The platform does not transmit data to
+            unverified unless independently verified against a stated external source. The platform does not transmit data to
             NOSDRA or any regulatory body directly — community members are responsible for formal
             submissions through official channels.
           </p>

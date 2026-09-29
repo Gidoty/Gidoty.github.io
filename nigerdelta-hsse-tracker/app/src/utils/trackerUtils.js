@@ -1,5 +1,6 @@
 import { t } from '../data/translations.js'
 import { fmt } from './formatters.js'
+import { evidenceStatusLabel } from './evidenceStatus.js'
 
 const HOUR_MS = 60 * 60 * 1000
 
@@ -66,7 +67,7 @@ This incident was reported via the NigerDelta HSSE Tracker (community environmen
 Report Fingerprint (SHA-256, tamper-evident only — does not establish admissibility):
 ${report.integrity?.payloadHash ?? report.audit?.reportHash ?? 'not available'}
 
-Corroboration Status: ${report.corroboration?.count ?? 0} community witness(es)
+Evidence Status: ${evidenceStatusLabel(report)}
 
 Requesting immediate response and Joint Investigation Visit scheduling as required under NOSDRA Act 2006.`
 }

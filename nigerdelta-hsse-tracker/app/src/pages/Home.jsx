@@ -73,9 +73,9 @@ const GAP_COLUMNS = [
     icon: ShieldCheck,
     highlight: true,
     items: [
-      'Community-submitted and corroborated',
+      'Community-submitted, evidence-status tracked',
       'GPS + photo evidence chain',
-      'IPCC methane estimation',
+      'Mass-balance methane estimation',
       'NOSDRA notification log',
       'Article 24 African Charter grounded',
       'NDPA 2023 compliant',
@@ -93,17 +93,17 @@ const FEATURES = [
   },
   {
     icon: Users,
-    title: 'Community Corroboration',
+    title: 'Evidence Status Tracking',
     accent: 'text-safe',
     bg: 'bg-safe/10',
-    text: 'Multiple community members verify the same incident. Crowd-weighted evidence chain under Oil Spill Regulations 2011 Section 5.',
+    text: 'Every report starts as community-observed. Status can be raised only by linking a specific external public record or citing a stated independent verification source — never by another submission from the same device.',
   },
   {
     icon: Flame,
     title: 'Methane Emission Estimator',
     accent: 'text-amber',
     bg: 'bg-amber/10',
-    text: 'IPCC 2006 Tier 1 methodology. Nigerian associated gas composition. Converts flare observations to CH₄ emission estimates.',
+    text: 'Mass-balance calculation from a user-supplied flared gas volume, CH₄ density from the ideal gas law, and a cited combustion efficiency.',
   },
   {
     icon: Bell,
@@ -171,7 +171,7 @@ const NIGERIAN_LAW = [
 
 const INTERNATIONAL_LAW = [
   'African Charter Art. 24',
-  'IPCC 2006 Tier 1',
+  'IPCC AR6 WGI',
   'Ruggie Principles 2011',
   'Paris Agreement Art. 6.4',
   'UN HRD Declaration 1998',

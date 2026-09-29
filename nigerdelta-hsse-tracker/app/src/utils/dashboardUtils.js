@@ -1,5 +1,6 @@
 import { storage } from './storage.js'
 import { appendEvent } from './integrity.js'
+import { evidenceStatusLabel } from './evidenceStatus.js'
 
 export const INCIDENT_TYPE_LIST = [
   'oil_spill',
@@ -18,7 +19,6 @@ const SEVERITY_RANK = { critical: 4, serious: 3, moderate: 2, minor: 1 }
 export const STATUS_OPTIONS = [
   { id: 'all', label: 'All' },
   { id: 'submitted', label: 'Submitted' },
-  { id: 'corroborated', label: 'Corroborated' },
   { id: 'nosdra_notified', label: 'NOSDRA Notified' },
   { id: 'resolved', label: 'Resolved' },
 ]
@@ -51,7 +51,6 @@ export async function updateReportWithEvent(id, eventType, eventData, updater) {
 export function deriveStatus(report) {
   if (report.regulatory?.cleanupStatus === 'completed') return 'resolved'
   if (report.regulatory?.nosdraNotified) return 'nosdra_notified'
-  if ((report.corroboration?.count ?? 0) >= 2) return 'corroborated'
   return 'submitted'
 }
 
@@ -121,13 +120,6 @@ export function sortReports(reports, sortBy) {
         new Date(b.submittedAt) - new Date(a.submittedAt),
     )
   }
-  if (sortBy === 'corroborations') {
-    return copy.sort(
-      (a, b) =>
-        (b.corroboration?.count ?? 0) - (a.corroboration?.count ?? 0) ||
-        new Date(b.submittedAt) - new Date(a.submittedAt),
-    )
-  }
   return copy.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
 }
 
@@ -149,7 +141,7 @@ const CSV_HEADERS = [
   'Display Lng (2dp)',
   'Description (first 200 chars)',
   'Health Impact',
-  'Corroboration Count',
+  'Evidence Status',
   'Status',
   'NOSDRA Notified',
 ]
@@ -169,7 +161,7 @@ export function exportReportsToCsv(reports) {
       report.location.display?.lng ?? '',
       (report.incident.description ?? '').slice(0, 200),
       report.health?.healthImpact ? 'yes' : 'no',
-      report.corroboration?.count ?? 0,
+      evidenceStatusLabel(report),
       deriveStatus(report),
       report.regulatory?.nosdraNotified ? 'yes' : 'no',
     ])

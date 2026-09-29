@@ -89,4 +89,29 @@ work.
   independent Python re-implementation (`validation/verify_export.py`,
   Phase 8) exists for verifying exported records outside the app.
 
-*(Further entries will be added as Phases 4–8 are completed.)*
+## Phase 4 — Corroboration replaced with an evidence-status enum
+
+- The manuscript must not describe "community corroboration" as multiple
+  independent community members confirming the same incident. With no
+  server, a second confirmation can only come from the same browser as the
+  original report, so it cannot demonstrate independent agreement. The
+  self-corroboration feature (and its UI, `CorroborationModal.jsx`) has
+  been **removed entirely** — not reworked, removed.
+- In its place: every report starts at evidence status **Community
+  Observed**. It can be raised to **Externally Referenced** only by linking
+  a specific external record (a NOSDRA Oil Spill Monitor incident ID, or a
+  Gas Flare Tracker site) with a URL and access date, or to **Independently
+  Verified** only by citing a specific verification source (e.g. a JIV
+  report reference). The app never sets either upgraded level
+  automatically. This is shown on every report — map popups, cards, the
+  submitted-reports list, CSV exports, and generated NOSDRA letters.
+- Drop hypothesis H1 (structured vs. free-text corroboration comparison) —
+  already noted under Scope above, restated here because it is this
+  feature specifically that made H1 impossible to test as originally
+  conceived.
+- The map's "Live Heatmap" is relabelled "Reporting Hotspot Map" with an
+  on-map note that density reflects where people reported, not measured
+  pollution levels. If the manuscript describes the heatmap as measuring
+  pollution intensity, correct that.
+
+*(Further entries will be added as Phases 5–8 are completed.)*

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ClipboardList, Camera, Stethoscope, CheckCircle2, RefreshCw } from 'lucide-react'
+import { ClipboardList, Camera, Stethoscope, ShieldCheck, RefreshCw } from 'lucide-react'
 import { t } from '../../../data/translations.js'
 import { fmt } from '../../../utils/formatters.js'
 import { sortReports, deriveStatus } from '../../../utils/dashboardUtils.js'
+import { evidenceStatusLabel, evidenceStatusLevel, EVIDENCE_STATUS } from '../../../utils/evidenceStatus.js'
 import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { SEVERITY_BADGE_CLASSES, TYPE_MARKER_COLORS } from '../../../data/markerColors.js'
 import ReportDetailModal from '../ReportDetailModal.jsx'
@@ -12,15 +13,14 @@ import PanelHeader from './shared/PanelHeader.jsx'
 const SORT_OPTIONS = [
   { id: 'newest', label: 'Newest' },
   { id: 'severity', label: 'Severity' },
-  { id: 'corroborations', label: 'Corroborations' },
 ]
 
-const PIPELINE_STAGES = ['Submitted', 'Corroborated', 'Notified', 'JIV', 'Resolved']
+const PIPELINE_STAGES = ['Submitted', 'Notified', 'JIV', 'Resolved']
 
 function pipelineFilledCount(report) {
   const status = deriveStatus(report)
-  const order = { submitted: 1, corroborated: 2, nosdra_notified: 3, resolved: 5 }
-  if (report.regulatory?.jivCompleted) return 4
+  const order = { submitted: 1, nosdra_notified: 2, resolved: 4 }
+  if (report.regulatory?.jivCompleted) return 3
   return order[status] ?? 1
 }
 
@@ -65,9 +65,9 @@ function ReportListCard({ report, onView }) {
             <Stethoscope className="h-3 w-3" /> Health impact
           </span>
         )}
-        {report.corroboration?.count > 0 && (
+        {evidenceStatusLevel(report) !== EVIDENCE_STATUS.COMMUNITY_OBSERVED && (
           <span className="flex items-center gap-1 text-safe">
-            <CheckCircle2 className="h-3 w-3" /> {report.corroboration.count} witnesses
+            <ShieldCheck className="h-3 w-3" /> {evidenceStatusLabel(report)}
           </span>
         )}
         {report.status === 'queued' && (

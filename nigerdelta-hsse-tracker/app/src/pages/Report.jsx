@@ -11,6 +11,7 @@ import {
   saveReport,
 } from '../utils/reportStorage.js'
 import { sealReport } from '../utils/integrity.js'
+import { defaultEvidenceStatus } from '../utils/evidenceStatus.js'
 import ConsentScreen from '../components/report/ConsentScreen.jsx'
 import LanguageToggle from '../components/report/LanguageToggle.jsx'
 import StepProgress from '../components/report/StepProgress.jsx'
@@ -213,7 +214,7 @@ export default function Report() {
         willingToWitness: anonymousMode ? false : contact.willingToWitness,
         wantsNotification: anonymousMode ? false : contact.wantsNotification,
       },
-      corroboration: { count: 0, corroborators: [] },
+      evidenceStatus: defaultEvidenceStatus(),
       regulatory: {
         nosdraNotified: false,
         nosdraNotifiedAt: null,

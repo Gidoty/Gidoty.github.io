@@ -8,15 +8,24 @@ explicit user input with no default, or flagged inline where it appears.
 ## General finding — unwired components
 
 `src/components/tracker/TimelineCard.jsx`, `EscalationStats.jsx`,
-`EscalationTable.jsx`, and `FoiGenerator.jsx` are not imported or rendered
-anywhere in the live app — `parameters.js` marks the TRACK-category features
-they were presumably built for ("Incident Response Timeline", "Operator
-Response Timer", "JIV Status Tracker") as `status: 'placeholder'`, served by
-a generic placeholder panel instead. If the manuscript describes these as
-implemented features, that is incorrect and needs correcting. This audit
-still fixed the wording inside `TimelineCard.jsx` (Phases 4–5) since it is
-real source code in the repository, but it remains unreachable from the UI
-as shipped.
+`EscalationTable.jsx`, `FoiGenerator.jsx`, and
+`src/components/dashboard/StatsBar.jsx` / `ChartsPanel.jsx` are not imported
+or rendered anywhere in the live app — `parameters.js` marks the
+TRACK-category features they were presumably built for ("Incident Response
+Timeline", "Operator Response Timer", "JIV Status Tracker") as
+`status: 'placeholder'`, served by a generic placeholder panel instead. If
+the manuscript describes these as implemented features, that is incorrect
+and needs correcting. This audit still fixed the wording inside these files
+(Phases 4–5) since they are real source code in the repository, but they
+remain unreachable from the UI as shipped.
+
+## Phase 5 (applied early) — unverified penalty figure
+
+`TimelineCard.jsx` previously stated operators "face daily fines of
+₦500,000" under the NOSDRA Act 2006. No such figure could be verified
+against the Act's text during this audit, so it was softened to "subject to
+penalties" without a number. If you can cite the specific provision and
+amount, it can be restored with that citation.
 
 ## Phase 1 — Emission calculations
 

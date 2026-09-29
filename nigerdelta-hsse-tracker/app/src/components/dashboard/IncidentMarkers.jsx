@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef } from 'react'
 import { CircleMarker, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { TYPE_MARKER_COLORS, SEVERITY_RADIUS } from '../../data/markerColors.js'
+import { evidenceStatusLevel, EVIDENCE_STATUS } from '../../utils/evidenceStatus.js'
 import IncidentPopup from './IncidentPopup.jsx'
 
 function checkmarkBadgeIcon(radius) {
@@ -15,7 +16,7 @@ function checkmarkBadgeIcon(radius) {
   })
 }
 
-export default function IncidentMarkers({ reports, onCorroborate, selectedReportId }) {
+export default function IncidentMarkers({ reports, selectedReportId }) {
   const map = useMap()
   const markerRefs = useRef({})
 
@@ -39,7 +40,7 @@ export default function IncidentMarkers({ reports, onCorroborate, selectedReport
           const { lat, lng } = report.location.gps
           const color = TYPE_MARKER_COLORS[report.incident.type] ?? TYPE_MARKER_COLORS.other
           const radius = SEVERITY_RADIUS[report.incident.severity] ?? 10
-          const corroborated = (report.corroboration?.count ?? 0) >= 2
+          const upgraded = evidenceStatusLevel(report) !== EVIDENCE_STATUS.COMMUNITY_OBSERVED
 
           return (
             <Fragment key={report.id}>
@@ -47,8 +48,8 @@ export default function IncidentMarkers({ reports, onCorroborate, selectedReport
                 center={[lat, lng]}
                 radius={radius}
                 pathOptions={{
-                  color: corroborated ? '#ffffff' : color,
-                  weight: corroborated ? 3 : 1.5,
+                  color: upgraded ? '#ffffff' : color,
+                  weight: upgraded ? 3 : 1.5,
                   fillColor: color,
                   fillOpacity: 0.85,
                 }}
@@ -57,10 +58,10 @@ export default function IncidentMarkers({ reports, onCorroborate, selectedReport
                 }}
               >
                 <Popup>
-                  <IncidentPopup report={report} onCorroborate={onCorroborate} />
+                  <IncidentPopup report={report} />
                 </Popup>
               </CircleMarker>
-              {corroborated && (
+              {upgraded && (
                 <Marker
                   position={[lat, lng]}
                   icon={checkmarkBadgeIcon(radius)}

@@ -3,7 +3,6 @@ import IncidentCard from './IncidentCard.jsx'
 const SORT_OPTIONS = [
   { id: 'newest', label: 'Newest' },
   { id: 'severity', label: 'Severity' },
-  { id: 'corroborations', label: 'Corroborations' },
 ]
 
 export default function IncidentFeed({ reports, totalCount, sortBy, onSortChange, onSelectReport }) {

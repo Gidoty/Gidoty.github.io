@@ -64,12 +64,12 @@ export const CATEGORIES = [
     parameters: [
       {
         id: 'live-heatmap',
-        label: 'Live Heatmap',
+        label: 'Reporting Hotspot Map',
         icon: Map,
         status: 'built',
         panel: 'live-heatmap',
         description:
-          'A live Leaflet map of every community-submitted incident across the Niger Delta, with a severity-weighted heatmap layer, colour-coded markers, and the regional boundary overlay.',
+          'A Leaflet map of every community-submitted incident across the Niger Delta, with a severity-weighted reporting-density layer, colour-coded markers, and the regional boundary overlay. Density reflects where people reported, not measured pollution levels.',
         reference: 'GeoJSON coordinates, WGS84 · NDPA 2023 coarse-location display',
       },
       {
@@ -128,7 +128,7 @@ export const CATEGORIES = [
         status: 'built',
         panel: 'methane-emissions',
         description:
-          'Estimates methane released by a gas flare using IPCC 2006 Tier 1 methodology, calculated from a submitted report or manual flare observation entry.',
+          'Estimates methane slip from a gas flare using a mass-balance calculation from a user-supplied flared volume, calculated from a submitted report or standalone entry.',
         reference: 'IPCC 2006 Guidelines, Vol. 2, Ch. 4 · API Compendium (2009)',
       },
       {
@@ -167,7 +167,7 @@ export const CATEGORIES = [
         status: 'placeholder',
         panel: 'placeholder',
         description:
-          'The six-stage lifecycle of every incident — Submitted, Corroborated, NOSDRA Notified, JIV Scheduled, JIV Completed, Cleanup — shown as a visual pipeline.',
+          'The five-stage lifecycle of every incident — Submitted, NOSDRA Notified, JIV Scheduled, JIV Completed, Cleanup — shown as a visual pipeline.',
         reference: 'NOSDRA Act 2006 · Oil Spill Regulations 2011, Section 5',
       },
       {
@@ -247,7 +247,7 @@ export const CATEGORIES = [
         panel: 'methane-emission-report',
         description:
           'A full printable PDF summary of a methane emission calculation, including every input, formula, and result for the record.',
-        reference: 'IPCC 2006 Tier 1 methodology',
+        reference: 'Mass-balance methodology, IPCC AR6 WGI (GWP)',
       },
       {
         id: 'csv-data-export',
@@ -319,13 +319,13 @@ export const CATEGORIES = [
       },
       {
         id: 'corroboration-status',
-        label: 'Corroboration Status',
+        label: 'Evidence Status Board',
         icon: CheckCircle2,
         status: 'placeholder',
         panel: 'placeholder',
         description:
-          'Every report ranked by community corroboration count, highlighting which incidents still need more independent witnesses.',
-        reference: 'Oil Spill Recovery Regulations 2011, Section 5',
+          'Every report ranked by evidence status — community observed, externally referenced, or independently verified — highlighting which incidents still lack an external record or verification source.',
+        reference: 'Evidence status is a label only, not a claim of corroboration or admissibility',
       },
       {
         id: 'evidence-audit-log',

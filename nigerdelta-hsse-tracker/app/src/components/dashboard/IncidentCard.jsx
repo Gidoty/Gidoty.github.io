@@ -1,11 +1,11 @@
-import { CheckCircle2, Stethoscope } from 'lucide-react'
+import { ShieldCheck, Stethoscope } from 'lucide-react'
 import { t } from '../../data/translations.js'
 import { deriveStatus, formatTimeAgo } from '../../utils/dashboardUtils.js'
+import { evidenceStatusLabel, evidenceStatusLevel, EVIDENCE_STATUS } from '../../utils/evidenceStatus.js'
 import { TYPE_MARKER_COLORS, SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
 
 const STATUS_LABELS = {
   submitted: 'Submitted',
-  corroborated: 'Corroborated',
   nosdra_notified: 'NOSDRA Notified',
   resolved: 'Resolved',
 }
@@ -44,10 +44,9 @@ export default function IncidentCard({ report, onClick }) {
       {excerpt && <p className="mt-1.5 text-xs text-text">{excerpt}</p>}
 
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-2 text-[11px] text-muted">
-        {report.corroboration?.count > 0 && (
+        {evidenceStatusLevel(report) !== EVIDENCE_STATUS.COMMUNITY_OBSERVED && (
           <span className="flex items-center gap-1 text-safe">
-            <CheckCircle2 className="h-3 w-3" /> {report.corroboration.count} corroboration
-            {report.corroboration.count === 1 ? '' : 's'}
+            <ShieldCheck className="h-3 w-3" /> {evidenceStatusLabel(report)}
           </span>
         )}
         {report.health?.healthImpact && (

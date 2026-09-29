@@ -1,3 +1,5 @@
+import { defaultEvidenceStatus } from '../utils/evidenceStatus.js'
+
 const HOUR = 60 * 60 * 1000
 const DAY = 24 * HOUR
 
@@ -43,7 +45,7 @@ function baseReport(overrides) {
       willingToWitness: false,
       wantsNotification: false,
     },
-    corroboration: overrides.corroboration ?? { count: 0, corroborators: [] },
+    evidenceStatus: overrides.evidenceStatus ?? defaultEvidenceStatus(),
     regulatory: {
       nosdraNotified: overrides.nosdraNotified ?? false,
       nosdraNotifiedAt: null,
@@ -63,6 +65,14 @@ function baseReport(overrides) {
       userAgent: 'demo',
       reportHash: 'demo-data-not-hashed',
     },
+    integrity: {
+      algorithm: null,
+      canonicalization: 'legacy-v0-noncanonical',
+      payloadHash: 'demo-data-not-hashed',
+      photoHashes: [],
+      hashedAt: null,
+    },
+    events: [],
   }
 }
 
@@ -80,7 +90,16 @@ const FIXTURES = [
     ageMs: 3 * HOUR,
     description:
       'Large oil sheen spreading across Bodo Creek from a suspected pipeline leak, fishing waters heavily affected.',
-    corroboration: { count: 4, corroborators: [] },
+    evidenceStatus: {
+      level: 'externally_referenced',
+      externalReference: {
+        type: 'oil_spill_monitor',
+        id: 'NOSDRA-OSM-DEMO-001',
+        url: '',
+        accessedAt: new Date().toISOString().slice(0, 10),
+      },
+      verification: null,
+    },
     nosdraNotified: true,
     healthImpact: true,
     symptoms: ['breathing', 'smell'],
@@ -98,7 +117,6 @@ const FIXTURES = [
     severity: 'serious',
     ageMs: 30 * HOUR,
     description: 'Fish kill observed downstream of the Bodo Creek spill, dead fish washing up along the bank.',
-    corroboration: { count: 2, corroborators: [] },
   },
   {
     id: 3,
@@ -112,7 +130,6 @@ const FIXTURES = [
     severity: 'serious',
     ageMs: 6 * HOUR,
     description: 'Unusually large flare burning through the night near Obrikom, loud roaring noise disturbing residents.',
-    corroboration: { count: 1, corroborators: [] },
     healthImpact: true,
     symptoms: ['headache'],
     affectedCount: '6-20',
@@ -142,7 +159,6 @@ const FIXTURES = [
     severity: 'moderate',
     ageMs: 2 * DAY,
     description: 'Unidentified chemical odour and discoloured water reported along the Warri waterside settlement.',
-    corroboration: { count: 2, corroborators: [] },
     nosdraNotified: true,
     operatorResponse: 'acknowledged',
   },
@@ -173,7 +189,6 @@ const FIXTURES = [
     severity: 'serious',
     ageMs: 4 * DAY,
     description: 'Illegal bunkering activity suspected to have caused a spill along the Bonny Island shoreline.',
-    corroboration: { count: 3, corroborators: [] },
   },
   {
     id: 8,
@@ -200,7 +215,11 @@ const FIXTURES = [
     severity: 'critical',
     ageMs: 18 * HOUR,
     description: 'Wellhead blowout reported near Nembe, crude spraying visibly into surrounding mangrove for hours.',
-    corroboration: { count: 5, corroborators: [] },
+    evidenceStatus: {
+      level: 'independently_verified',
+      externalReference: null,
+      verification: { source: 'JIV report', reference: 'JIV-DEMO-2026-014', verifiedAt: new Date().toISOString().slice(0, 10) },
+    },
     nosdraNotified: true,
     healthImpact: true,
     symptoms: ['breathing', 'eyes', 'vulnerable'],
@@ -221,7 +240,6 @@ const FIXTURES = [
     healthImpact: true,
     symptoms: ['breathing', 'headache', 'vulnerable'],
     affectedCount: '21-100',
-    corroboration: { count: 2, corroborators: [] },
   },
   {
     id: 11,
@@ -280,7 +298,6 @@ const FIXTURES = [
     nosdraNotified: true,
     operatorResponse: 'cleanup dispatched',
     cleanupStatus: 'in_progress',
-    corroboration: { count: 1, corroborators: [] },
   },
   {
     id: 15,

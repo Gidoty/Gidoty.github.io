@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   FilePlus,
-  Users,
   Bell,
   Calendar,
   CheckSquare,
@@ -11,7 +10,7 @@ import {
 import { t } from '../../data/translations.js'
 import { formatTimeAgo } from '../../utils/dashboardUtils.js'
 import { SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
-import { hoursSince, formatElapsed, notificationTimerLevel, isJivOverdue } from '../../utils/trackerUtils.js'
+import { hoursSince, formatElapsed, notificationTimerLevel } from '../../utils/trackerUtils.js'
 import { fmt } from '../../utils/formatters.js'
 
 const CLEANUP_OPTIONS = [
@@ -48,12 +47,10 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
   const severityInfo = t('en', 'severityLevels')[report.incident.severity]
   const location = [report.location.state, report.location.lga].filter(Boolean).join(' · ')
 
-  const corroborated = (report.corroboration?.count ?? 0) >= 2
   const notified = Boolean(report.regulatory?.nosdraNotified)
   const jivScheduled = Boolean(report.regulatory?.jivScheduled)
   const jivCompleted = Boolean(report.regulatory?.jivCompleted)
   const cleanupStatus = report.regulatory?.cleanupStatus ?? 'pending'
-  const jivOverdue = isJivOverdue(report)
 
   const notifiedHours = hoursSince(report.regulatory?.nosdraNotifiedAt)
   const timerLevel = notifiedHours === null ? null : notificationTimerLevel(notifiedHours)
@@ -88,22 +85,7 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
 
         <div className="hidden h-0.5 flex-1 self-center bg-border md:block" />
 
-        {/* Stage 2: Corroborated */}
-        <div className="flex flex-1 gap-3 md:flex-col md:items-center md:text-center">
-          <StageCircle complete={corroborated} colorClass="text-safe" icon={Users} />
-          <div className="md:mt-1">
-            <p className="text-xs font-bold text-text">Corroborated</p>
-            <p className="text-[11px] text-muted">
-              {corroborated
-                ? `${report.corroboration.count} community witnesses`
-                : `Awaiting corroboration (${report.corroboration?.count ?? 0}/2 witnesses)`}
-            </p>
-          </div>
-        </div>
-
-        <div className="hidden h-0.5 flex-1 self-center bg-border md:block" />
-
-        {/* Stage 3: NOSDRA Notified */}
+        {/* Stage 2: NOSDRA Notified */}
         <div className="flex flex-1 gap-3 md:flex-col md:items-center md:text-center">
           <StageCircle complete={notified} colorClass="text-amber" icon={Bell} />
           <div className="md:mt-1">
@@ -124,7 +106,7 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
 
         <div className="hidden h-0.5 flex-1 self-center bg-border md:block" />
 
-        {/* Stage 4: JIV Scheduled */}
+        {/* Stage 3: JIV Scheduled */}
         <div className="flex flex-1 gap-3 md:flex-col md:items-center md:text-center">
           <StageCircle complete={jivScheduled} colorClass="text-[#3A86FF]" icon={Calendar} />
           <div className="md:mt-1">
@@ -136,15 +118,12 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
                 {notified ? 'Awaiting JIV scheduling' : 'Pending NOSDRA notification'}
               </p>
             )}
-            {jivOverdue && (
-              <p className="mt-1 text-[11px] font-bold text-amber">⚠ JIV not yet scheduled (72h+ elapsed)</p>
-            )}
           </div>
         </div>
 
         <div className="hidden h-0.5 flex-1 self-center bg-border md:block" />
 
-        {/* Stage 5: JIV Completed */}
+        {/* Stage 4: JIV Completed */}
         <div className="flex flex-1 gap-3 md:flex-col md:items-center md:text-center">
           <StageCircle complete={jivCompleted} colorClass="text-safe" icon={CheckSquare} />
           <div className="md:mt-1">
@@ -177,7 +156,7 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
 
         <div className="hidden h-0.5 flex-1 self-center bg-border md:block" />
 
-        {/* Stage 6: Cleanup */}
+        {/* Stage 5: Cleanup */}
         <div className="flex flex-1 gap-3 md:flex-col md:items-center md:text-center">
           <StageCircle
             complete
@@ -215,7 +194,7 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
           }`}
         >
           <p className="font-bold">
-            Time since NOSDRA notification: {formatElapsed(notifiedHours)}
+            Time since you recorded notifying NOSDRA: {formatElapsed(notifiedHours)}
             {' — '}
             {timerLevel === 'ok' && 'Within 24-hour legal window'}
             {timerLevel === 'warning' && '⚠ 24-hour window elapsed — operator response overdue'}
@@ -223,8 +202,9 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
           </p>
           <p className="mt-1 flex items-start gap-1.5 text-[11px] opacity-90">
             <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
-            Under NOSDRA Act 2006, operators face daily fines of ₦500,000 for failure to respond to
-            reported spills.
+            This measures time since you clicked "notify," not since the spill occurred. Under
+            NOSDRA Act 2006, operators are subject to penalties for failure to respond to reported
+            spills.
           </p>
         </div>
       )}

@@ -1,18 +1,18 @@
 import { useState } from 'react'
-import { CheckCircle2, Stethoscope } from 'lucide-react'
+import { ShieldCheck, Stethoscope } from 'lucide-react'
 import { t } from '../../data/translations.js'
 import { deriveStatus } from '../../utils/dashboardUtils.js'
+import { evidenceStatusLabel, evidenceStatusLevel, EVIDENCE_STATUS } from '../../utils/evidenceStatus.js'
 import { TYPE_MARKER_COLORS, SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
 import { fmt } from '../../utils/formatters.js'
 
 const STATUS_LABELS = {
   submitted: 'Submitted',
-  corroborated: 'Corroborated',
   nosdra_notified: 'NOSDRA Notified',
   resolved: 'Resolved',
 }
 
-export default function IncidentPopup({ report, onCorroborate }) {
+export default function IncidentPopup({ report }) {
   const [expanded, setExpanded] = useState(false)
   const typeLabel = t('en', 'incidentTypes')[report.incident.type] ?? report.incident.type
   const severityInfo = t('en', 'severityLevels')[report.incident.severity]
@@ -54,10 +54,9 @@ export default function IncidentPopup({ report, onCorroborate }) {
         )}
         <p className="text-text">📝 {excerpt}</p>
 
-        {report.corroboration?.count >= 2 && (
+        {evidenceStatusLevel(report) !== EVIDENCE_STATUS.COMMUNITY_OBSERVED && (
           <p className="flex items-center gap-1 font-medium text-safe">
-            <CheckCircle2 className="h-3.5 w-3.5" /> Corroborated by {report.corroboration.count}{' '}
-            community members
+            <ShieldCheck className="h-3.5 w-3.5" /> {evidenceStatusLabel(report)}
           </p>
         )}
         {report.health?.healthImpact && (
@@ -76,13 +75,6 @@ export default function IncidentPopup({ report, onCorroborate }) {
       </div>
 
       <div className="mt-3 flex gap-2">
-        <button
-          type="button"
-          onClick={() => onCorroborate(report)}
-          className="flex-1 rounded-md bg-teal px-2 py-1.5 text-[11px] font-bold text-white hover:bg-teal/90"
-        >
-          Corroborate This Report
-        </button>
         {description.length > 100 && (
           <button
             type="button"

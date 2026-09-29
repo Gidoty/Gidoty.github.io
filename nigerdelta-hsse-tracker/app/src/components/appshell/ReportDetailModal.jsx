@@ -1,9 +1,16 @@
 import { useState } from 'react'
-import { X, Fingerprint, ShieldCheck, ShieldAlert, Loader2 } from 'lucide-react'
+import { X, Fingerprint, ShieldCheck, ShieldAlert, Loader2, Link2 } from 'lucide-react'
 import { t } from '../../data/translations.js'
 import { deriveStatus, updateReportWithEvent } from '../../utils/dashboardUtils.js'
 import { hoursSince, formatElapsed, notificationTimerLevel } from '../../utils/trackerUtils.js'
 import { verifyReport } from '../../utils/integrity.js'
+import {
+  EVIDENCE_STATUS,
+  EVIDENCE_STATUS_LABELS,
+  EVIDENCE_STATUS_DESCRIPTIONS,
+  EXTERNAL_REFERENCE_TYPES,
+  evidenceStatusLevel,
+} from '../../utils/evidenceStatus.js'
 import { fmt } from '../../utils/formatters.js'
 import { SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
 import NosdraModal from '../tracker/NosdraModal.jsx'
@@ -12,7 +19,6 @@ const TABS = ['Details', 'Evidence', 'Health', 'Regulatory', 'Audit']
 
 const STATUS_LABELS = {
   submitted: 'Submitted',
-  corroborated: 'Corroborated',
   nosdra_notified: 'NOSDRA Notified',
   resolved: 'Resolved',
 }
@@ -23,6 +29,10 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
   const [current, setCurrent] = useState(report)
   const [verifyState, setVerifyState] = useState(null)
   const [verifying, setVerifying] = useState(false)
+  const [refForm, setRefForm] = useState({ type: EXTERNAL_REFERENCE_TYPES[0].id, id: '', url: '', accessedAt: new Date().toISOString().slice(0, 10) })
+  const [verifyForm, setVerifyForm] = useState({ source: '', reference: '', verifiedAt: new Date().toISOString().slice(0, 10) })
+  const [showRefForm, setShowRefForm] = useState(false)
+  const [showVerifyForm, setShowVerifyForm] = useState(false)
 
   const handleVerify = async () => {
     setVerifying(true)
@@ -34,6 +44,36 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
   const typeLabel = t('en', 'incidentTypes')[current.incident.type] ?? current.incident.type
   const severityInfo = t('en', 'severityLevels')[current.incident.severity]
   const isDemo = Boolean(current.incident.isDemoData)
+
+  const applyEvidenceStatus = async (level, extra) => {
+    const evidenceStatus = { ...current.evidenceStatus, level, ...extra }
+    if (isDemo) {
+      setCurrent((prev) => ({ ...prev, evidenceStatus }))
+      return
+    }
+    const updated = await updateReportWithEvent(current.id, 'evidence_status_changed', { level, ...extra }, (r) => ({
+      ...r,
+      evidenceStatus,
+    }))
+    setCurrent(updated.find((r) => r.id === current.id) ?? current)
+    onReportsChanged?.(updated)
+  }
+
+  const handleAddExternalReference = async () => {
+    if (!refForm.id.trim()) return
+    await applyEvidenceStatus(EVIDENCE_STATUS.EXTERNALLY_REFERENCED, {
+      externalReference: { ...refForm },
+    })
+    setShowRefForm(false)
+  }
+
+  const handleAddVerification = async () => {
+    if (!verifyForm.source.trim() || !verifyForm.reference.trim()) return
+    await applyEvidenceStatus(EVIDENCE_STATUS.INDEPENDENTLY_VERIFIED, {
+      verification: { ...verifyForm },
+    })
+    setShowVerifyForm(false)
+  }
 
   const handleMarkNotified = async (reportId) => {
     const notifiedAt = new Date().toISOString()
@@ -173,6 +213,134 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
           {tab === 'Regulatory' && (
             <div className="space-y-4">
               <Row label="Lifecycle stage" value={STATUS_LABELS[deriveStatus(current)]} />
+
+              <div className="rounded-lg border border-border bg-panel p-3">
+                <p className="flex items-center gap-1.5 text-sm font-bold text-text">
+                  <ShieldCheck className="h-4 w-4 text-teal" />
+                  Evidence status: {EVIDENCE_STATUS_LABELS[evidenceStatusLevel(current)]}
+                </p>
+                <p className="mt-1 text-xs text-muted">{EVIDENCE_STATUS_DESCRIPTIONS[evidenceStatusLevel(current)]}</p>
+
+                {current.evidenceStatus?.externalReference && (
+                  <p className="mt-2 text-xs text-text">
+                    Linked: {current.evidenceStatus.externalReference.type} · {current.evidenceStatus.externalReference.id}
+                    {current.evidenceStatus.externalReference.url && (
+                      <>
+                        {' · '}
+                        <a href={current.evidenceStatus.externalReference.url} target="_blank" rel="noreferrer" className="text-teal underline">
+                          source
+                        </a>
+                      </>
+                    )}
+                    {' · accessed '}
+                    {current.evidenceStatus.externalReference.accessedAt}
+                  </p>
+                )}
+                {current.evidenceStatus?.verification && (
+                  <p className="mt-2 text-xs text-text">
+                    Verified via: {current.evidenceStatus.verification.source} — {current.evidenceStatus.verification.reference}
+                    {' · '}
+                    {current.evidenceStatus.verification.verifiedAt}
+                  </p>
+                )}
+
+                {evidenceStatusLevel(current) !== EVIDENCE_STATUS.INDEPENDENTLY_VERIFIED && !isDemo && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowRefForm((v) => !v)}
+                      className="flex min-h-[36px] items-center gap-1.5 rounded-lg border border-teal px-3 text-xs font-bold text-teal hover:bg-teal/10"
+                    >
+                      <Link2 className="h-3.5 w-3.5" />
+                      Link External Record
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowVerifyForm((v) => !v)}
+                      className="flex min-h-[36px] items-center gap-1.5 rounded-lg border border-safe px-3 text-xs font-bold text-safe hover:bg-safe/10"
+                    >
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      Add Verification Source
+                    </button>
+                  </div>
+                )}
+
+                {showRefForm && (
+                  <div className="mt-3 space-y-2 rounded-lg border border-border bg-card p-3">
+                    <select
+                      value={refForm.type}
+                      onChange={(e) => setRefForm((f) => ({ ...f, type: e.target.value }))}
+                      className="min-h-[36px] w-full rounded-md border border-border bg-panel px-2 text-xs text-text focus:border-teal focus:outline-none"
+                    >
+                      {EXTERNAL_REFERENCE_TYPES.map((opt) => (
+                        <option key={opt.id} value={opt.id}>{opt.label}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={refForm.id}
+                      onChange={(e) => setRefForm((f) => ({ ...f, id: e.target.value }))}
+                      placeholder="Record ID / site name (required)"
+                      className="min-h-[36px] w-full rounded-md border border-border bg-panel px-2 text-xs text-text placeholder:text-muted focus:border-teal focus:outline-none"
+                    />
+                    <input
+                      type="url"
+                      value={refForm.url}
+                      onChange={(e) => setRefForm((f) => ({ ...f, url: e.target.value }))}
+                      placeholder="URL (optional)"
+                      className="min-h-[36px] w-full rounded-md border border-border bg-panel px-2 text-xs text-text placeholder:text-muted focus:border-teal focus:outline-none"
+                    />
+                    <input
+                      type="date"
+                      value={refForm.accessedAt}
+                      onChange={(e) => setRefForm((f) => ({ ...f, accessedAt: e.target.value }))}
+                      className="min-h-[36px] w-full rounded-md border border-border bg-panel px-2 text-xs text-text focus:border-teal focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddExternalReference}
+                      disabled={!refForm.id.trim()}
+                      className="flex min-h-[36px] w-full items-center justify-center rounded-md bg-teal text-xs font-bold text-white hover:bg-teal/90 disabled:opacity-50"
+                    >
+                      Save Reference
+                    </button>
+                  </div>
+                )}
+
+                {showVerifyForm && (
+                  <div className="mt-3 space-y-2 rounded-lg border border-border bg-card p-3">
+                    <input
+                      type="text"
+                      value={verifyForm.source}
+                      onChange={(e) => setVerifyForm((f) => ({ ...f, source: e.target.value }))}
+                      placeholder="Verification source, e.g. JIV report (required)"
+                      className="min-h-[36px] w-full rounded-md border border-border bg-panel px-2 text-xs text-text placeholder:text-muted focus:border-safe focus:outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={verifyForm.reference}
+                      onChange={(e) => setVerifyForm((f) => ({ ...f, reference: e.target.value }))}
+                      placeholder="Reference number / citation (required)"
+                      className="min-h-[36px] w-full rounded-md border border-border bg-panel px-2 text-xs text-text placeholder:text-muted focus:border-safe focus:outline-none"
+                    />
+                    <input
+                      type="date"
+                      value={verifyForm.verifiedAt}
+                      onChange={(e) => setVerifyForm((f) => ({ ...f, verifiedAt: e.target.value }))}
+                      className="min-h-[36px] w-full rounded-md border border-border bg-panel px-2 text-xs text-text focus:border-safe focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddVerification}
+                      disabled={!verifyForm.source.trim() || !verifyForm.reference.trim()}
+                      className="flex min-h-[36px] w-full items-center justify-center rounded-md bg-safe text-xs font-bold text-white hover:bg-safe/90 disabled:opacity-50"
+                    >
+                      Save Verification
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <Row label="NOSDRA notified" value={current.regulatory?.nosdraNotified ? 'Yes' : 'No'} />
               {current.regulatory?.nosdraNotified && (
                 <Row

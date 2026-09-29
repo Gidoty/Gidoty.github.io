@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { generateDemoReports } from '../data/demoReports.js'
-import { loadRealReports, updateReportInStorage } from '../utils/dashboardUtils.js'
+import { loadRealReports } from '../utils/dashboardUtils.js'
 
 const REFRESH_INTERVAL_MS = 30000
 const DEMO_THRESHOLD = 3
 
 export function useReportsWithDemo() {
   const [realReports, setRealReports] = useState(() => loadRealReports())
-  const [demoReports, setDemoReports] = useState(() => generateDemoReports())
+  const demoReports = useMemo(() => generateDemoReports(), [])
   const [demoBannerDismissed, setDemoBannerDismissed] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
-  const [corroborationReport, setCorroborationReport] = useState(null)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -47,39 +46,6 @@ export function useReportsWithDemo() {
     setLastUpdated(new Date())
   }
 
-  const handleCorroborate = (report) => setCorroborationReport(report)
-
-  const handleConfirmCorroboration = (entry) => {
-    const report = corroborationReport
-    if (!report) return
-
-    if (report.incident?.isDemoData) {
-      setDemoReports((prev) =>
-        prev.map((r) =>
-          r.id === report.id
-            ? {
-                ...r,
-                corroboration: {
-                  count: r.corroboration.count + 1,
-                  corroborators: [...r.corroboration.corroborators, entry],
-                },
-              }
-            : r,
-        ),
-      )
-    } else {
-      const updated = updateReportInStorage(report.id, (r) => ({
-        ...r,
-        corroboration: {
-          count: (r.corroboration?.count ?? 0) + 1,
-          corroborators: [...(r.corroboration?.corroborators ?? []), entry],
-        },
-      }))
-      setRealReports(updated)
-    }
-    setLastUpdated(new Date())
-  }
-
   return {
     realReports,
     combinedReports,
@@ -88,9 +54,5 @@ export function useReportsWithDemo() {
     dismissDemoBanner: () => setDemoBannerDismissed(true),
     lastUpdated,
     refresh,
-    corroborationReport,
-    handleCorroborate,
-    handleConfirmCorroboration,
-    closeCorroboration: () => setCorroborationReport(null),
   }
 }
