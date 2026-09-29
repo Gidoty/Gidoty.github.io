@@ -133,4 +133,20 @@ work.
   official NOSDRA document." If the manuscript implies these documents are
   authoritative NOSDRA correspondence, correct that.
 
-*(Further entries will be added as Phases 6–8 are completed.)*
+## Phase 6 — WHO air-quality panel
+
+- Added ozone (O₃) to the WHO AQG reference panel, completing all six WHO
+  2021 AQG criteria pollutants (PM2.5, PM10, O₃, NO₂, SO₂, CO). If the
+  manuscript lists only five pollutants, add ozone.
+- Moved benzene out of the WHO AQG panel into a separate "Other
+  Petroleum-Related Substances" section, since the UNEP Ogoniland figure
+  cited is a **drinking-water** concentration, not an air concentration —
+  it was previously presented alongside air-quality guideline values,
+  which conflates the two. If the manuscript describes benzene as part of
+  the app's WHO AQG comparison, correct that.
+- Added the disclaimer "This app does not measure pollutant concentrations.
+  Reported symptoms are not diagnoses or exposure measurements" to the
+  panel. The four Niger Delta context sources remain unverified pending
+  DOI checks — see `AUTHOR_ACTION_REQUIRED.md`.
+
+*(Further entries will be added as Phases 7–8 are completed.)*

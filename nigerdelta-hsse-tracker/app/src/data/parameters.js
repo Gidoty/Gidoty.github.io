@@ -285,7 +285,7 @@ export const CATEGORIES = [
         status: 'built',
         panel: 'who-aqg-reference-panel',
         description:
-          'A static reference card of WHO 2021 Air Quality Guideline limits for PM2.5, PM10, SO₂, NO₂, and benzene, with documented Niger Delta exceedances.',
+          'A static reference card of WHO 2021 Air Quality Guideline limits for PM2.5, PM10, O₃, SO₂, NO₂, and CO, with documented Niger Delta exceedances.',
         reference: 'WHO 2021 AQG · Nwosisi et al. 2021, Scientific African',
       },
       {
