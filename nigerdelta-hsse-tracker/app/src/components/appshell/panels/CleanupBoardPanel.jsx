@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Recycle } from 'lucide-react'
 import { t } from '../../../data/translations.js'
-import { updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import { updateReportWithEvent } from '../../../utils/dashboardUtils.js'
 import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { SEVERITY_BADGE_CLASSES, TYPE_MARKER_COLORS } from '../../../data/markerColors.js'
 import PanelHeader from './shared/PanelHeader.jsx'
@@ -31,8 +31,8 @@ export default function CleanupBoardPanel() {
     return groups
   }, [reports])
 
-  const moveTo = (reportId, status) => {
-    const updated = updateReportInStorage(reportId, (r) => ({
+  const moveTo = async (reportId, status) => {
+    const updated = await updateReportWithEvent(reportId, 'cleanup_status_changed', { status }, (r) => ({
       ...r,
       regulatory: { ...r.regulatory, cleanupStatus: status },
     }))

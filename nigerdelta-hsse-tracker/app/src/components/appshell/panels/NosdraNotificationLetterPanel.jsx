@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Bell, Copy, Download, CheckCircle2 } from 'lucide-react'
 import PanelHeader from './shared/PanelHeader.jsx'
 import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
-import { updateReportInStorage } from '../../../utils/dashboardUtils.js'
+import { updateReportWithEvent } from '../../../utils/dashboardUtils.js'
 import { useLiveReports } from '../../../hooks/useLiveReports.js'
 import { generateNosdraNotificationText } from '../../../utils/trackerUtils.js'
 import { fmt } from '../../../utils/formatters.js'
@@ -73,10 +73,11 @@ export default function NosdraNotificationLetterPanel() {
   const [selectedId, setSelectedId] = useState(reports[0]?.id ?? '')
   const selectedReport = reports.find((r) => r.id === selectedId)
 
-  const handleMarkNotified = (reportId) => {
-    const updated = updateReportInStorage(reportId, (report) => ({
+  const handleMarkNotified = async (reportId) => {
+    const notifiedAt = new Date().toISOString()
+    const updated = await updateReportWithEvent(reportId, 'nosdra_notified', { notifiedAt }, (report) => ({
       ...report,
-      regulatory: { ...report.regulatory, nosdraNotified: true, nosdraNotifiedAt: new Date().toISOString() },
+      regulatory: { ...report.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt },
     }))
     setReports(updated)
   }

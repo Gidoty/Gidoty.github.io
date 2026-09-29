@@ -8,9 +8,9 @@ import {
   loadDraft,
   clearDraft,
   generateReferenceNumber,
-  hashReport,
   saveReport,
 } from '../utils/reportStorage.js'
+import { sealReport } from '../utils/integrity.js'
 import ConsentScreen from '../components/report/ConsentScreen.jsx'
 import LanguageToggle from '../components/report/LanguageToggle.jsx'
 import StepProgress from '../components/report/StepProgress.jsx'
@@ -231,12 +231,11 @@ export default function Report() {
         consentTimestamp: consent?.timestamp ?? null,
         language,
         userAgent: navigator.userAgent,
-        reportHash: null,
       },
     }
 
-    report.audit.reportHash = await hashReport(report)
-    saveReport(report)
+    const sealedReport = await sealReport(report)
+    saveReport(sealedReport)
     clearDraft()
 
     if (!online && 'serviceWorker' in navigator && 'SyncManager' in window) {

@@ -59,4 +59,34 @@ work.
 - Feature-count claims must drop from 27 to 25 tools across 7 categories,
   and the Home page's feature grid from 11 to 10 items.
 
-*(Further entries will be added as Phases 3–8 are completed.)*
+## Phase 3 — Integrity hashing reworked
+
+- The manuscript must not claim the app's SHA-256 fingerprint "meets
+  Nigerian Evidence Act 2011 Sections 84–87 requirements for admissibility."
+  This claim has been removed from every UI surface. The correct framing,
+  used everywhere in the app now: it is a **tamper-evident fingerprint**
+  that detects later changes to a saved record; it does not establish
+  truth, authorship, or legal admissibility. Describe it this way in the
+  manuscript too.
+- The hashing method changed: the app now hashes a canonically-serialised
+  (sorted keys, fixed formatting) **immutable evidence payload** —
+  incident fields, location, timestamps, description, per-photo SHA-256
+  hashes, health fields, language, consent version, and app version —
+  explicitly excluding the reporter's contact details, browser user agent,
+  and the regulatory/corroboration fields (which change after submission).
+  Regulatory and corroboration mutations (NOSDRA notification, cleanup
+  status changes) are now recorded in a separate, append-only,
+  hash-chained events log per report, independently verifiable without
+  touching the original evidence hash. If the manuscript describes the
+  hashing method, it must describe this scheme, not a single whole-object
+  `JSON.stringify` hash.
+- Reports saved before this change are tagged
+  `integrity.canonicalization: "legacy-v0-noncanonical"` and are not
+  re-verifiable — if the manuscript discusses any pre-existing test data,
+  say so.
+- A "Verify Integrity" action now exists in the report detail view,
+  independently re-deriving the payload hash and event-chain hashes. An
+  independent Python re-implementation (`validation/verify_export.py`,
+  Phase 8) exists for verifying exported records outside the app.
+
+*(Further entries will be added as Phases 4–8 are completed.)*

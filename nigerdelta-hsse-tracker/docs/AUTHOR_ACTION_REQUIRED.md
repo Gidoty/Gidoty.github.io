@@ -5,6 +5,19 @@ audit and need the author's direct attention before submission. Nothing in
 this list has been silently defaulted in the app — each item is either an
 explicit user input with no default, or flagged inline where it appears.
 
+## General finding — unwired components
+
+`src/components/tracker/TimelineCard.jsx`, `EscalationStats.jsx`,
+`EscalationTable.jsx`, and `FoiGenerator.jsx` are not imported or rendered
+anywhere in the live app — `parameters.js` marks the TRACK-category features
+they were presumably built for ("Incident Response Timeline", "Operator
+Response Timer", "JIV Status Tracker") as `status: 'placeholder'`, served by
+a generic placeholder panel instead. If the manuscript describes these as
+implemented features, that is incorrect and needs correcting. This audit
+still fixed the wording inside `TimelineCard.jsx` (Phases 4–5) since it is
+real source code in the repository, but it remains unreachable from the UI
+as shipped.
+
 ## Phase 1 — Emission calculations
 
 - **CH₄ fraction of Niger Delta associated gas (x_CH4).** The app defaults

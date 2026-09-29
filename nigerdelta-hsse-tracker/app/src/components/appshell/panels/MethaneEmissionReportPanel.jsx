@@ -129,7 +129,7 @@ export default function MethaneEmissionReportPanel() {
         Download Full Report (PDF)
       </button>
 
-      <LegalBasisBadge text="Tamper-evident fingerprint only — does not establish admissibility" />
+      <LegalBasisBadge text="Tamper-evident fingerprint. Detects later changes to the saved record. Does not establish that the report is true, who made it, or legal admissibility." />
     </div>
   )
 }

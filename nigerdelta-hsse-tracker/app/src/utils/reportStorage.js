@@ -101,18 +101,6 @@ export function dataUrlByteSize(dataUrl) {
   return Math.round((base64.length * 3) / 4) - padding
 }
 
-export async function hashReport(report) {
-  const { audit, ...rest } = report
-  const { reportHash: _unused, ...auditWithoutHash } = audit
-  const hashable = { ...rest, audit: auditWithoutHash }
-  const hashBuffer = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(JSON.stringify(hashable)),
-  )
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
-}
-
 export function saveReport(report) {
   storage.saveReport(report)
 }

@@ -15,7 +15,7 @@ const NIGERIAN_LEGISLATION = [
   'Oil Spill Regulations 2011, Section 5',
   'Petroleum Industry Act (PIA) 2021',
   'Freedom of Information Act 2011',
-  'Nigerian Evidence Act 2011, ss.84–87',
+  'Nigerian Evidence Act 2011',
   'Nigeria Data Protection Act (NDPA) 2023',
   'Climate Change Act 2021',
 ]

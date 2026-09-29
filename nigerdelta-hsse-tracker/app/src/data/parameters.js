@@ -335,7 +335,7 @@ export const CATEGORIES = [
         panel: 'placeholder',
         description:
           'A table of every report’s SHA-256 audit fingerprint and submission timestamp, forming the immutable evidentiary record.',
-        reference: 'Nigerian Evidence Act 2011, Sections 84–87',
+        reference: 'Tamper-evident fingerprint. Detects later changes to the saved record. Does not establish that the report is true, who made it, or legal admissibility.',
       },
     ],
   },

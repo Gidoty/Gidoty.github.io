@@ -63,8 +63,8 @@ ${report.incident.description ?? ''}
 
 This incident was reported via the NigerDelta HSSE Tracker (community environmental monitoring platform) at ${fmt.datetime(report.submittedAt)}.
 
-Report Hash (Nigerian Evidence Act 2011, Sections 84–87 audit fingerprint):
-${report.audit?.reportHash ?? 'not available'}
+Report Fingerprint (SHA-256, tamper-evident only — does not establish admissibility):
+${report.integrity?.payloadHash ?? report.audit?.reportHash ?? 'not available'}
 
 Corroboration Status: ${report.corroboration?.count ?? 0} community witness(es)
 

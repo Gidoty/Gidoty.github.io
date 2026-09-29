@@ -1,4 +1,5 @@
 import { storage } from './storage.js'
+import { appendEvent } from './integrity.js'
 
 export const INCIDENT_TYPE_LIST = [
   'oil_spill',
@@ -31,6 +32,20 @@ export function updateReportInStorage(id, updater) {
   const index = reports.findIndex((r) => r.id === id)
   if (index === -1) return reports
   return storage.saveReport(updater(reports[index]))
+}
+
+// Like updateReportInStorage, but first appends a hash-chained event
+// recording the mutation (NOSDRA notification, cleanup status change,
+// corroboration, etc.) before applying the denormalized field update the
+// updater function describes. The events array is the audit trail; the
+// fields it also updates are a materialized "current state" view kept for
+// fast reads and filtering — both are updated together so they never drift.
+export async function updateReportWithEvent(id, eventType, eventData, updater) {
+  const reports = storage.getReports()
+  const index = reports.findIndex((r) => r.id === id)
+  if (index === -1) return reports
+  const withEvent = await appendEvent(reports[index], eventType, eventData)
+  return storage.saveReport(updater(withEvent))
 }
 
 export function deriveStatus(report) {

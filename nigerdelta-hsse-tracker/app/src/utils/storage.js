@@ -1,12 +1,31 @@
+import { markLegacy } from './integrity.js'
+
 const REPORTS_KEY = 'hsse_reports'
 const PREFS_KEY = 'hsse_prefs'
 const CONSENT_KEY = 'hsse_consent'
 const LAST_PARAM_KEY = 'hsse_last_param'
 
+// Reports saved before the integrity rework have no `integrity` block.
+// Tag them as legacy on read rather than silently computing a canonical
+// hash for evidence content that was never captured under this scheme.
+function migrateLegacyReports(reports) {
+  let changed = false
+  const migrated = reports.map((r) => {
+    if (r.integrity) return r
+    changed = true
+    return markLegacy(r)
+  })
+  if (changed) {
+    localStorage.setItem(REPORTS_KEY, JSON.stringify(migrated))
+  }
+  return migrated
+}
+
 export const storage = {
   getReports: () => {
     try {
-      return JSON.parse(localStorage.getItem(REPORTS_KEY) || '[]')
+      const reports = JSON.parse(localStorage.getItem(REPORTS_KEY) || '[]')
+      return migrateLegacyReports(reports)
     } catch {
       return []
     }

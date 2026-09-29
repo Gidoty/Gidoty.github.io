@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { X, Fingerprint } from 'lucide-react'
+import { X, Fingerprint, ShieldCheck, ShieldAlert, Loader2 } from 'lucide-react'
 import { t } from '../../data/translations.js'
-import { deriveStatus, updateReportInStorage } from '../../utils/dashboardUtils.js'
+import { deriveStatus, updateReportWithEvent } from '../../utils/dashboardUtils.js'
 import { hoursSince, formatElapsed, notificationTimerLevel } from '../../utils/trackerUtils.js'
+import { verifyReport } from '../../utils/integrity.js'
 import { fmt } from '../../utils/formatters.js'
 import { SEVERITY_BADGE_CLASSES } from '../../data/markerColors.js'
 import NosdraModal from '../tracker/NosdraModal.jsx'
@@ -20,23 +21,33 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
   const [tab, setTab] = useState('Details')
   const [notifyOpen, setNotifyOpen] = useState(false)
   const [current, setCurrent] = useState(report)
+  const [verifyState, setVerifyState] = useState(null)
+  const [verifying, setVerifying] = useState(false)
+
+  const handleVerify = async () => {
+    setVerifying(true)
+    const result = await verifyReport(current)
+    setVerifyState(result)
+    setVerifying(false)
+  }
 
   const typeLabel = t('en', 'incidentTypes')[current.incident.type] ?? current.incident.type
   const severityInfo = t('en', 'severityLevels')[current.incident.severity]
   const isDemo = Boolean(current.incident.isDemoData)
 
-  const handleMarkNotified = (reportId) => {
+  const handleMarkNotified = async (reportId) => {
+    const notifiedAt = new Date().toISOString()
     if (isDemo) {
       setCurrent((prev) => ({
         ...prev,
-        regulatory: { ...prev.regulatory, nosdraNotified: true, nosdraNotifiedAt: new Date().toISOString() },
+        regulatory: { ...prev.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt },
       }))
       setNotifyOpen(false)
       return
     }
-    const updated = updateReportInStorage(reportId, (r) => ({
+    const updated = await updateReportWithEvent(reportId, 'nosdra_notified', { notifiedAt }, (r) => ({
       ...r,
-      regulatory: { ...r.regulatory, nosdraNotified: true, nosdraNotifiedAt: new Date().toISOString() },
+      regulatory: { ...r.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt },
     }))
     setCurrent(updated.find((r) => r.id === reportId) ?? current)
     onReportsChanged?.(updated)
@@ -197,19 +208,72 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
 
           {tab === 'Audit' && (
             <div className="space-y-3">
-              <Row label="Report hash (SHA-256)" value={current.audit?.reportHash ?? 'not available'} mono />
+              <Row
+                label="Payload hash (SHA-256)"
+                value={current.integrity?.payloadHash ?? current.audit?.reportHash ?? 'not available'}
+                mono
+              />
+              <Row
+                label="Canonicalization"
+                value={current.integrity?.canonicalization ?? 'unknown'}
+                mono
+              />
               <Row label="Submission timestamp" value={fmt.datetime(current.submittedAt)} />
               <Row label="Consent version" value={current.audit?.consentVersion ?? '—'} />
               <Row label="Language used" value={current.audit?.language ?? '—'} />
-              <Row label="User agent" value={current.audit?.userAgent ?? '—'} mono />
+              <Row label="Events recorded" value={String(current.events?.length ?? 0)} />
 
-              <div className="mt-4 flex gap-2 rounded-lg border border-teal/30 bg-teal/10 p-3 text-xs text-text">
-                <Fingerprint className="h-4 w-4 shrink-0 text-teal" />
+              <div className="mt-4 flex gap-2 rounded-lg border border-border bg-panel p-3 text-xs text-muted">
+                <Fingerprint className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
                 <p>
-                  This audit record meets Nigerian Evidence Act 2011 Sections 84–87 requirements
-                  for computer-generated evidence admissibility.
+                  Tamper-evident fingerprint. Detects later changes to the saved record. Does not
+                  establish that the report is true, who made it, or legal admissibility.
                 </p>
               </div>
+
+              <button
+                type="button"
+                onClick={handleVerify}
+                disabled={verifying}
+                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg border border-teal text-sm font-bold text-teal hover:bg-teal/10 disabled:opacity-60"
+              >
+                {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                Verify Integrity
+              </button>
+
+              {verifyState && (
+                <div
+                  className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${
+                    verifyState.payloadValid === null
+                      ? 'border-border bg-panel text-muted'
+                      : verifyState.payloadValid && verifyState.eventChainValid
+                        ? 'border-safe/40 bg-safe/10 text-safe'
+                        : 'border-danger/40 bg-danger/10 text-danger'
+                  }`}
+                >
+                  {verifyState.payloadValid === null ? (
+                    <Fingerprint className="mt-0.5 h-4 w-4 shrink-0" />
+                  ) : verifyState.payloadValid && verifyState.eventChainValid ? (
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
+                  ) : (
+                    <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                  )}
+                  <div>
+                    {verifyState.payloadValid === null ? (
+                      <p>{verifyState.details.reason}</p>
+                    ) : (
+                      <>
+                        <p className="font-bold">
+                          Evidence payload: {verifyState.payloadValid ? 'matches recorded hash' : 'DOES NOT MATCH — record may have been altered'}
+                        </p>
+                        <p className="mt-1 font-bold">
+                          Event chain ({verifyState.details.eventCount}): {verifyState.eventChainValid ? 'intact' : 'BROKEN — chain does not verify'}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
