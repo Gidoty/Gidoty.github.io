@@ -2,8 +2,9 @@ export const fmt = {
   // Tonnes with 4 decimal places
   tonnes: (n) => `${n.toFixed(4)} tonnes`,
 
-  // CO2e with 2 decimal places
-  co2e: (n) => `${n.toFixed(2)} tonnes CO₂e`,
+  // CO2e with 2 decimal places — always paired with its time horizon, per
+  // IPCC guidance that a bare "CO2e" figure is meaningless without one.
+  co2eHorizon: (n, years) => `${n.toFixed(2)} tonnes CO₂e (${years}-yr)`,
 
   // Large numbers with commas
   number: (n) => n.toLocaleString('en-NG'),

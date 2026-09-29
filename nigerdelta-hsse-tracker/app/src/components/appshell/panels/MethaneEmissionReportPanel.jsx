@@ -5,12 +5,15 @@ import LegalBasisBadge from './shared/LegalBasisBadge.jsx'
 import ResultCard from './shared/ResultCard.jsx'
 import FormulaBlock from './shared/FormulaBlock.jsx'
 import { useLiveReports } from '../../../hooks/useLiveReports.js'
-import { calculateContext } from '../../../utils/methaneCalc.js'
+import { REFERENCE_CONDITIONS, GWP } from '../../../utils/methaneCalc.js'
 import { t } from '../../../data/translations.js'
 import { fmt } from '../../../utils/formatters.js'
 
-const FLAME_PRESSURE_LABELS = { low: 'Low pressure', medium: 'Medium pressure', high: 'High pressure', unknown: 'Unknown / not sure' }
-const STACK_LABELS = { small: 'Small (< 10 m)', medium: 'Medium (10–30 m)', large: 'Large (30–60 m)', very_large: 'Very large (> 60 m)' }
+const VOLUME_SOURCE_LABELS = {
+  operator_data: 'Operator-reported data',
+  satellite_estimate: 'NOSDRA/SDN Gas Flare Tracker satellite estimate',
+  user_assumption: 'User assumption',
+}
 
 export default function MethaneEmissionReportPanel() {
   const [allReports] = useLiveReports()
@@ -21,7 +24,7 @@ export default function MethaneEmissionReportPanel() {
   if (reports.length === 0) {
     return (
       <div className="mx-auto max-w-3xl">
-        <PanelHeader icon={FileBarChart} color="#06B6D4" title="Methane Emission Report" badges={['IPCC 2006 Tier 1']} />
+        <PanelHeader icon={FileBarChart} color="#06B6D4" title="Methane Emission Report" badges={['Mass balance']} />
         <div className="flex min-h-[40vh] items-center justify-center rounded-xl border border-border bg-card px-4 text-center text-sm text-muted">
           No saved methane calculations yet. Run the Methane Emissions calculator under Calculate and save
           a result to a report to generate a printable summary here.
@@ -31,12 +34,12 @@ export default function MethaneEmissionReportPanel() {
   }
 
   const { inputs, results } = report.methane
-  const context = calculateContext(results.co2e_100yr_tonnes)
+  const referenceCondition = REFERENCE_CONDITIONS[inputs.referenceConditionId] ?? REFERENCE_CONDITIONS['15C']
   const typeLabel = t('en', 'incidentTypes')[report.incident.type] ?? report.incident.type
 
   return (
     <div className="mx-auto max-w-3xl">
-      <PanelHeader icon={FileBarChart} color="#06B6D4" title="Methane Emission Report" badges={['IPCC 2006 Tier 1', 'Full Record Summary']} />
+      <PanelHeader icon={FileBarChart} color="#06B6D4" title="Methane Emission Report" badges={['Mass balance', 'Full Record Summary']} />
 
       <label className="mb-1.5 block text-xs font-medium text-text" htmlFor="mer-select">Select Report</label>
       <select
@@ -64,70 +67,56 @@ export default function MethaneEmissionReportPanel() {
         <table className="mt-2 w-full text-left text-xs">
           <tbody>
             <tr className="border-t border-border">
-              <td className="py-2 text-muted">Flame Pressure</td>
-              <td className="py-2 text-text">{FLAME_PRESSURE_LABELS[inputs.flarePressure] ?? inputs.flarePressure} ({fmt.number(inputs.baseFlowRate)} m³/hr base)</td>
+              <td className="py-2 text-muted">Flared Volume (V_g)</td>
+              <td className="py-2 text-text">{fmt.volume(inputs.volumeM3)} at {referenceCondition.label}</td>
             </tr>
             <tr className="border-t border-border">
-              <td className="py-2 text-muted">Stack Height</td>
-              <td className="py-2 text-text">{STACK_LABELS[inputs.stackHeight] ?? inputs.stackHeight} (×{inputs.stackMultiplier})</td>
+              <td className="py-2 text-muted">Volume Source</td>
+              <td className="py-2 text-text">{VOLUME_SOURCE_LABELS[inputs.volumeSource] ?? inputs.volumeSource}</td>
             </tr>
             <tr className="border-t border-border">
-              <td className="py-2 text-muted">Duration</td>
-              <td className="py-2 text-text">{inputs.durationHours} hours</td>
+              <td className="py-2 text-muted">CH₄ Fraction (x_CH4)</td>
+              <td className="py-2 text-text">{Math.round(inputs.ch4Fraction * 100)}%{inputs.ch4Fraction === 0.9 ? ' (assumed default)' : ''}</td>
             </tr>
             <tr className="border-t border-border">
-              <td className="py-2 text-muted">CH₄ Fraction</td>
-              <td className="py-2 text-text">{Math.round(inputs.ch4Fraction * 100)}%</td>
+              <td className="py-2 text-muted">Combustion Efficiency (η_f)</td>
+              <td className="py-2 text-text">{fmt.pct(inputs.combustionEfficiency)}</td>
             </tr>
           </tbody>
         </table>
 
         <h3 className="mt-5 text-sm font-bold text-text">Results</h3>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
-          <ResultCard title="Flared Volume">
-            <p className="text-lg font-bold text-text">{fmt.volume(results.flaredVolume_m3)}</p>
-          </ResultCard>
-          <ResultCard title="CH₄ Emitted (IPCC Tier 1)">
-            <p className="text-lg font-bold text-text">{fmt.tonnes(results.ch4_primary_tonnes)}</p>
-          </ResultCard>
-          <ResultCard title="CH₄ Emitted (Cross-check)">
-            <p className="text-lg font-bold text-text">{fmt.tonnes(results.ch4_crosscheck_tonnes)}</p>
+          <ResultCard title="CH₄ Slip">
+            <p className="text-lg font-bold text-text">{fmt.tonnes(results.ch4SlipTonnes)}</p>
           </ResultCard>
           <ResultCard title="CO₂ from Combustion">
-            <p className="text-lg font-bold text-text">{fmt.tonnes(results.co2_combustion_tonnes)}</p>
+            <p className="text-lg font-bold text-text">{fmt.tonnes(results.co2FromCombustionTonnes)}</p>
           </ResultCard>
-          <ResultCard title="CO₂e (20-year)">
-            <p className="text-lg font-bold text-amber">{fmt.co2e(results.co2e_20yr_tonnes)}</p>
+          <ResultCard title="CO₂e (20-yr horizon)">
+            <p className="text-lg font-bold text-amber">{fmt.co2eHorizon(results.co2e20yrTonnes, 20)}</p>
           </ResultCard>
-          <ResultCard title="CO₂e (100-year)">
-            <p className="text-lg font-bold text-safe">{fmt.co2e(results.co2e_100yr_tonnes)}</p>
+          <ResultCard title="CO₂e (100-yr horizon)">
+            <p className="text-lg font-bold text-safe">{fmt.co2eHorizon(results.co2e100yrTonnes, 100)}</p>
           </ResultCard>
         </div>
 
         <h3 className="mt-5 text-sm font-bold text-text">Formulas Applied</h3>
         <FormulaBlock
-          citation="IPCC 2006 Tier 1 + AR6 WGI 2021"
+          citation="Mass balance + IPCC AR6 WGI"
           lines={[
-            'V_flared = baseFlowRate × stackMultiplier × durationHours',
-            'CH4_ipcc = V_flared × 2,000 / 1,000,000',
-            'CH4_crosscheck = V_flared × ch4Fraction × 0.02 × 0.67 / 1000',
-            'CO2_combustion = V_flared × 2,000 / 1,000,000',
-            'CO2e_20yr = CH4_ipcc × 84',
-            'CO2e_100yr = CH4_ipcc × 29.8',
+            'm_CH4_slip = V_g × x_CH4 × ρ_CH4(T_ref,P_ref) × (1 − η_f)',
+            'CO2_combustion = V_g × x_CH4 × ρ_CH4 × η_f × (44.009/16.043)',
+            `CO2e(20-yr) = m_CH4_slip × ${GWP.GWP20}`,
+            `CO2e(100-yr) = m_CH4_slip × ${GWP.GWP100}`,
           ]}
         />
 
-        <div className="mt-4 rounded-lg border border-teal/40 bg-teal/5 p-3 text-sm text-text">
-          Equivalent to roughly <strong>{context.car_years} cars'</strong> annual emissions, or the annual
-          footprint of <strong>{context.nigerian_households} average Nigerian households</strong>.
-        </div>
-
         <p className="mt-5 text-[11px] text-muted">
-          Methodology: IPCC (2006) Guidelines for National Greenhouse Gas Inventories, Vol. 2, Ch. 4 · API
-          Compendium of GHG Emissions Estimation Methodologies for the Oil and Gas Industry (2009) · IPCC
-          AR6 WGI (2021), Table 7.SM.7. Generated by the NigerDelta HSSE Tracker on{' '}
-          {fmt.datetime(new Date().toISOString())}. Indicative estimate for community documentation, not a substitute
-          for operator-measured emissions data.
+          Methodology: mass-balance methane slip using CH₄ density from the ideal gas law; CO₂-from-combustion
+          is methane-only (C2+ hydrocarbons excluded); {GWP.source}. Generated by the NigerDelta HSSE Tracker
+          on {fmt.datetime(new Date().toISOString())}. Indicative estimate for community documentation, not a
+          substitute for operator-measured emissions data.
         </p>
       </div>
 
@@ -140,7 +129,7 @@ export default function MethaneEmissionReportPanel() {
         Download Full Report (PDF)
       </button>
 
-      <LegalBasisBadge text="Nigerian Evidence Act 2011, Sections 84–87" />
+      <LegalBasisBadge text="Tamper-evident fingerprint only — does not establish admissibility" />
     </div>
   )
 }

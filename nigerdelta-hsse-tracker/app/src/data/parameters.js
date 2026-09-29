@@ -12,7 +12,6 @@ import {
   Flame,
   Globe2,
   Wind,
-  DollarSign,
   GitBranch,
   Calendar,
   AlarmClock,
@@ -150,17 +149,7 @@ export const CATEGORIES = [
         panel: 'co2-from-combustion',
         description:
           'A standalone calculator for the CO₂ released when a given volume of flared gas is combusted, independent of any specific report.',
-        reference: 'IPCC 2006 Tier 1 emission factor: 2,000 tonnes CO₂ per 10⁶ m³',
-      },
-      {
-        id: 'carbon-credit-potential',
-        label: 'Carbon Credit Potential',
-        icon: DollarSign,
-        status: 'built',
-        panel: 'carbon-credit-potential',
-        description:
-          'Estimates the indicative carbon credit value of eliminating a flare, using an adjustable price-per-tonne slider against voluntary and compliance markets.',
-        reference: 'Paris Agreement Article 6.4 · requires independent third-party verification',
+        reference: 'CO₂ from methane combustion only; C2+ hydrocarbons excluded',
       },
     ],
   },
@@ -269,16 +258,6 @@ export const CATEGORIES = [
         description:
           'A full export of the incident database in CSV format, stripped of full-precision GPS coordinates in line with data protection requirements.',
         reference: 'Nigeria Data Protection Act 2023 — coarse location only',
-      },
-      {
-        id: 'carbon-credit-data-package',
-        label: 'Carbon Credit Data Package',
-        icon: Globe2,
-        status: 'built',
-        panel: 'carbon-credit-data-package',
-        description:
-          'A structured export of gas flare and methane data formatted for Gold Standard and Verra VCS baseline documentation.',
-        reference: 'Paris Agreement Article 6.4 — community-observed baseline data',
       },
     ],
   },

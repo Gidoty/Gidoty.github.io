@@ -9,7 +9,6 @@ import {
   Stethoscope,
   WifiOff,
   ShieldCheck,
-  Leaf,
   Clock,
   Languages,
   Code,
@@ -133,13 +132,6 @@ const FEATURES = [
     accent: 'text-safe',
     bg: 'bg-safe/10',
     text: 'Full anonymity option. Explicit consent before data collection. Compliant with Nigeria Data Protection Act 2023.',
-  },
-  {
-    icon: Leaf,
-    title: 'Carbon Credit Data Export',
-    accent: 'text-safe',
-    bg: 'bg-safe/10',
-    text: 'Article 6.4 Paris Agreement aligned. Structured data export for Gold Standard and Verra VCS baseline documentation.',
   },
   {
     icon: Clock,
@@ -378,7 +370,7 @@ export default function Home() {
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-text">Eleven Integrated Features</h2>
+            <h2 className="text-3xl font-bold text-text">Ten Integrated Features</h2>
             <p className="mt-3 text-muted">
               Built to global standard, designed for Niger Delta realities
             </p>

@@ -100,7 +100,7 @@ export default function About() {
       {/* WHAT THE PLATFORM DOES */}
       <section className="border-t border-border bg-panel px-4 py-16 sm:px-6 lg:px-8">
         <SectionHeading
-          eyebrow="27 Features · 7 Categories"
+          eyebrow="25 Features · 7 Categories"
           title="What the Platform Does"
           subtitle="Every feature in the app, organised exactly as it appears in the drawer"
         />
@@ -184,23 +184,18 @@ export default function About() {
           {[
             {
               icon: FlaskConical,
-              title: 'Methane Emission Calculation',
-              text: 'Flare volume and methane mass are estimated using the IPCC 2006 Guidelines for National Greenhouse Gas Inventories, Tier 1 default methodology, applying a Nigerian associated-gas composition of approximately 90% CH₄ by volume — the appropriate approach where no operator-measured flow data exists.',
+              title: 'Methane Slip Calculation',
+              text: 'Methane slip is estimated from a user-entered flared gas volume using a mass-balance calculation — volume × methane fraction × CH₄ density at the chosen reference conditions × the unburned fraction — rather than a fixed volumetric emission factor. Density is computed from the ideal gas law; combustion efficiency is selectable between a design assumption and a field-measured value, each separately cited in the calculator.',
             },
             {
               icon: FlaskConical,
               title: 'Global Warming Potential (GWP) Framework',
-              text: 'Methane’s CO₂-equivalent climate impact is converted using IPCC AR6 (2021) global warming potentials — GWP₂₀ = 84 and GWP₁₀₀ = 29.8 — capturing both methane’s outsized short-term warming effect and the conventional 100-year basis used in national inventories.',
+              text: 'Methane’s CO₂-equivalent climate impact is converted using IPCC AR6 (2021) fossil-methane global warming potentials — GWP₂₀ = 82.5 and GWP₁₀₀ = 29.8 — capturing both methane’s outsized short-term warming effect and the conventional 100-year basis used in national inventories.',
             },
             {
               icon: ShieldCheck,
               title: 'Evidence Integrity',
-              text: 'Every submitted report is fingerprinted with a SHA-256 cryptographic hash at the moment of submission, in line with the Nigerian Evidence Act 2011, Sections 84–87, which govern the admissibility of computer-generated evidence in Nigerian courts.',
-            },
-            {
-              icon: Scale,
-              title: 'Carbon Credit Data',
-              text: 'Structured exports of community-observed flare and methane data are formatted to support Gold Standard and Verra VCS baseline documentation, consistent with the internationally transferred mitigation outcome framework under Article 6.4 of the Paris Agreement.',
+              text: 'Every submitted report is fingerprinted with a canonicalised SHA-256 hash at the moment of submission. This is a tamper-evident fingerprint: it detects later changes to the saved record. It does not establish that the report is true, who made it, or legal admissibility.',
             },
           ].map((item) => (
             <div key={item.title} className="rounded-2xl border border-border bg-card p-6">

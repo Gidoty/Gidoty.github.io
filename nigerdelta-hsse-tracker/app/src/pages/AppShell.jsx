@@ -21,7 +21,6 @@ const PANEL_COMPONENTS = {
   'methane-emissions': lazy(() => import('../components/appshell/panels/MethaneEmissionsPanel.jsx')),
   'co2-equivalent': lazy(() => import('../components/appshell/panels/Co2EquivalentPanel.jsx')),
   'co2-from-combustion': lazy(() => import('../components/appshell/panels/Co2CombustionPanel.jsx')),
-  'carbon-credit-potential': lazy(() => import('../components/appshell/panels/CarbonCreditPotentialPanel.jsx')),
   'community-symptom-monitor': lazy(() => import('../components/appshell/panels/CommunitySymptomMonitorPanel.jsx')),
   'who-aqg-reference-panel': lazy(() => import('../components/appshell/panels/WhoAqgReferencePanel.jsx')),
   'affected-population-counter': lazy(() => import('../components/appshell/panels/AffectedPopulationCounterPanel.jsx')),
@@ -29,7 +28,6 @@ const PANEL_COMPONENTS = {
   'foi-request-document': lazy(() => import('../components/appshell/panels/FoiRequestDocumentPanel.jsx')),
   'methane-emission-report': lazy(() => import('../components/appshell/panels/MethaneEmissionReportPanel.jsx')),
   'csv-data-export': lazy(() => import('../components/appshell/panels/CsvDataExportPanel.jsx')),
-  'carbon-credit-data-package': lazy(() => import('../components/appshell/panels/CarbonCreditDataPackagePanel.jsx')),
 }
 
 const FULL_BLEED_PANELS = new Set(['live-heatmap', 'incident-feed'])
