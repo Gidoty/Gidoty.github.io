@@ -50,7 +50,9 @@ ${requestLines.length > 0 ? requestLines.join('\n\n') : '[Select at least one it
 I note that under Section 4 of the FoI Act, public institutions shall respond within 7 days of receiving this request. Where the request is denied in whole or in part, I request that the institution state the specific grounds for denial in writing, as required under Section 7.
 
 Submitted by: ${name || '[name field — optional]'}
-Contact: ${contact || '[contact field — optional]'}`
+Contact: ${contact || '[contact field — optional]'}
+
+Prepared by the reporter using NigerDelta HSSE Tracker. This is not an official NOSDRA document.`
 }
 
 export default function FoiRequestDocumentPanel() {

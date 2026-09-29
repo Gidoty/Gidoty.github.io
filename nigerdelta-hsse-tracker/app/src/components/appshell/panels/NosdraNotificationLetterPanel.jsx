@@ -8,8 +8,14 @@ import { generateNosdraNotificationText } from '../../../utils/trackerUtils.js'
 import { fmt } from '../../../utils/formatters.js'
 
 function NotificationEditor({ report, onMarkNotified }) {
+  const [estimatedSpillOccurredAt, setEstimatedSpillOccurredAt] = useState('')
   const [text, setText] = useState(() => generateNosdraNotificationText(report))
   const [message, setMessage] = useState('')
+
+  const handleSpillTimeChange = (value) => {
+    setEstimatedSpillOccurredAt(value)
+    setText(generateNosdraNotificationText(report, value ? new Date(value).toISOString() : null))
+  }
 
   const flash = (msg) => {
     setMessage(msg)
@@ -27,6 +33,17 @@ function NotificationEditor({ report, onMarkNotified }) {
 
   return (
     <>
+      <label className="mt-4 block text-xs font-medium text-text" htmlFor="nosdra-letter-spill-occurred">
+        Estimated time the spill occurred (optional — your best estimate, not confirmed)
+      </label>
+      <input
+        id="nosdra-letter-spill-occurred"
+        type="datetime-local"
+        value={estimatedSpillOccurredAt}
+        onChange={(e) => handleSpillTimeChange(e.target.value)}
+        className="mt-1.5 min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-amber focus:outline-none print:hidden"
+      />
+
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -54,7 +71,7 @@ function NotificationEditor({ report, onMarkNotified }) {
         <button
           type="button"
           onClick={() => {
-            onMarkNotified(report.id)
+            onMarkNotified(report.id, estimatedSpillOccurredAt ? new Date(estimatedSpillOccurredAt).toISOString() : null)
             flash(`${report.referenceNumber} marked as NOSDRA-notified.`)
           }}
           className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-amber text-xs font-bold text-bg hover:bg-amber/90"
@@ -73,11 +90,11 @@ export default function NosdraNotificationLetterPanel() {
   const [selectedId, setSelectedId] = useState(reports[0]?.id ?? '')
   const selectedReport = reports.find((r) => r.id === selectedId)
 
-  const handleMarkNotified = async (reportId) => {
+  const handleMarkNotified = async (reportId, estimatedSpillOccurredAt) => {
     const notifiedAt = new Date().toISOString()
-    const updated = await updateReportWithEvent(reportId, 'nosdra_notified', { notifiedAt }, (report) => ({
+    const updated = await updateReportWithEvent(reportId, 'nosdra_notified', { notifiedAt, estimatedSpillOccurredAt }, (report) => ({
       ...report,
-      regulatory: { ...report.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt },
+      regulatory: { ...report.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt, estimatedSpillOccurredAt },
     }))
     setReports(updated)
   }

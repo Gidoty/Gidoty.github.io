@@ -6,7 +6,11 @@ import { fmt } from '../../utils/formatters.js'
 
 export default function NosdraModal({ report, onClose, onMarkNotified }) {
   const [copied, setCopied] = useState(false)
-  const notificationText = generateNosdraNotificationText(report)
+  const [estimatedSpillOccurredAt, setEstimatedSpillOccurredAt] = useState('')
+  const notificationText = generateNosdraNotificationText(
+    report,
+    estimatedSpillOccurredAt ? new Date(estimatedSpillOccurredAt).toISOString() : null,
+  )
   const typeLabel = t('en', 'incidentTypes')[report.incident.type] ?? report.incident.type
   const severityLabel = t('en', 'severityLevels')[report.incident.severity]?.label ?? report.incident.severity
   const location = [report.location.state, report.location.lga].filter(Boolean).join(' · ')
@@ -45,6 +49,17 @@ export default function NosdraModal({ report, onClose, onMarkNotified }) {
           <p className="mt-1">{fmt.datetime(report.submittedAt)}</p>
         </div>
 
+        <label className="mt-4 block text-xs font-medium text-text" htmlFor="nosdra-spill-occurred">
+          Estimated time the spill occurred (optional — your best estimate, not confirmed)
+        </label>
+        <input
+          id="nosdra-spill-occurred"
+          type="datetime-local"
+          value={estimatedSpillOccurredAt}
+          onChange={(e) => setEstimatedSpillOccurredAt(e.target.value)}
+          className="mt-1.5 min-h-[44px] w-full rounded-lg border border-border bg-panel px-3 text-sm text-text focus:border-teal focus:outline-none"
+        />
+
         <textarea
           readOnly
           value={notificationText}
@@ -71,7 +86,9 @@ export default function NosdraModal({ report, onClose, onMarkNotified }) {
           </button>
           <button
             type="button"
-            onClick={() => onMarkNotified(report.id)}
+            onClick={() =>
+              onMarkNotified(report.id, estimatedSpillOccurredAt ? new Date(estimatedSpillOccurredAt).toISOString() : null)
+            }
             className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-teal text-xs font-bold text-white hover:bg-teal/90"
           >
             Mark as Notified

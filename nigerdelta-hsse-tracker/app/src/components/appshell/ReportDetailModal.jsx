@@ -75,19 +75,19 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
     setShowVerifyForm(false)
   }
 
-  const handleMarkNotified = async (reportId) => {
+  const handleMarkNotified = async (reportId, estimatedSpillOccurredAt) => {
     const notifiedAt = new Date().toISOString()
     if (isDemo) {
       setCurrent((prev) => ({
         ...prev,
-        regulatory: { ...prev.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt },
+        regulatory: { ...prev.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt, estimatedSpillOccurredAt },
       }))
       setNotifyOpen(false)
       return
     }
-    const updated = await updateReportWithEvent(reportId, 'nosdra_notified', { notifiedAt }, (r) => ({
+    const updated = await updateReportWithEvent(reportId, 'nosdra_notified', { notifiedAt, estimatedSpillOccurredAt }, (r) => ({
       ...r,
-      regulatory: { ...r.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt },
+      regulatory: { ...r.regulatory, nosdraNotified: true, nosdraNotifiedAt: notifiedAt, estimatedSpillOccurredAt },
     }))
     setCurrent(updated.find((r) => r.id === reportId) ?? current)
     onReportsChanged?.(updated)
@@ -348,6 +348,12 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
                   value={fmt.datetime(current.regulatory.nosdraNotifiedAt)}
                 />
               )}
+              {current.regulatory?.estimatedSpillOccurredAt && (
+                <Row
+                  label="Estimated spill occurrence (reporter estimate)"
+                  value={fmt.datetime(current.regulatory.estimatedSpillOccurredAt)}
+                />
+              )}
               <Row label="Cleanup status" value={(current.regulatory?.cleanupStatus ?? 'pending').replace('_', ' ')} />
 
               {current.regulatory?.nosdraNotified ? (
@@ -360,7 +366,7 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
                         : 'border-danger bg-danger/10 text-danger'
                   }`}
                 >
-                  Time since NOSDRA notification: {formatElapsed(notifiedHours)}
+                  Time since you recorded notifying NOSDRA: {formatElapsed(notifiedHours)}
                 </div>
               ) : (
                 <button

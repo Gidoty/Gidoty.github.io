@@ -28,12 +28,6 @@ export function isAwaitingOperatorResponse(report) {
   return hours !== null && hours > 24
 }
 
-export function isJivOverdue(report) {
-  if (!report.regulatory?.nosdraNotified || report.regulatory?.jivScheduled) return false
-  const hours = hoursSince(report.regulatory?.nosdraNotifiedAt)
-  return hours !== null && hours > 72
-}
-
 export function computeEscalationStats(reports) {
   return {
     total: reports.length,
@@ -43,11 +37,12 @@ export function computeEscalationStats(reports) {
   }
 }
 
-export function generateNosdraNotificationText(report) {
+export function generateNosdraNotificationText(report, estimatedSpillOccurredAt) {
   const typeLabel = t('en', 'incidentTypes')[report.incident.type] ?? report.incident.type
   const severityLabel = t('en', 'severityLevels')[report.incident.severity]?.label ?? report.incident.severity
   const location = [report.location.state, report.location.lga].filter(Boolean).join(', ')
   const display = report.location.display
+  const spillOccurredAt = estimatedSpillOccurredAt ?? report.regulatory?.estimatedSpillOccurredAt
 
   return `NOSDRA INCIDENT NOTIFICATION
 
@@ -56,7 +51,7 @@ Reference: ${report.referenceNumber}
 Incident Type: ${typeLabel}
 Location: ${location}, approximately ${display ? `${display.lat}°N, ${display.lng}°E` : 'location not captured'}
 Severity: ${severityLabel}
-
+${spillOccurredAt ? `Estimated Time of Occurrence: ${fmt.datetime(spillOccurredAt)} (reporter estimate, not confirmed)\n` : ''}
 This notification is submitted pursuant to the NOSDRA Act 2006 and the Oil Spill Recovery, Clean-up, Remediation and Damage Assessment Regulations 2011.
 
 Community Description:
@@ -69,7 +64,9 @@ ${report.integrity?.payloadHash ?? report.audit?.reportHash ?? 'not available'}
 
 Evidence Status: ${evidenceStatusLabel(report)}
 
-Requesting immediate response and Joint Investigation Visit scheduling as required under NOSDRA Act 2006.`
+Requesting immediate response and Joint Investigation Visit scheduling as required under NOSDRA Act 2006.
+
+Prepared by the reporter using NigerDelta HSSE Tracker. This is not an official NOSDRA document.`
 }
 
 export function generateFoiRequestText({ state, dateFrom, dateTo, referenceNumber, name, contact }) {
@@ -91,7 +88,9 @@ Pursuant to the Freedom of Information Act 2011 (FoI Act), I hereby request the 
 I note that under Section 4 of the FoI Act, public institutions shall respond within 7 days of receiving this request.
 
 Submitted by: ${name || '[name field — optional]'}
-Contact: ${contact || '[contact field — optional]'}`
+Contact: ${contact || '[contact field — optional]'}
+
+Prepared by the reporter using NigerDelta HSSE Tracker. This is not an official NOSDRA document.`
 }
 
 function csvEscape(value) {

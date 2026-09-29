@@ -114,4 +114,23 @@ work.
   pollution levels. If the manuscript describes the heatmap as measuring
   pollution intensity, correct that.
 
-*(Further entries will be added as Phases 5–8 are completed.)*
+## Phase 5 — Legal and timer wording
+
+- The operator-response timer is labelled "Time since you recorded
+  notifying NOSDRA" everywhere it appears, not "time since the spill" — it
+  measures the reporter's own notification action, which NOSDRA Act 2006
+  s.6(2) does not directly govern (the Act's 24-hour duty runs from spill
+  occurrence and falls on the operator, not the reporter). A separate,
+  optional "estimated time the spill occurred" field was added to the
+  NOSDRA notification flow so the two timestamps are never conflated.
+- The unsourced "JIV not yet scheduled (72h+ elapsed)" warning has been
+  removed pending a citable provision (see `AUTHOR_ACTION_REQUIRED.md`).
+- An unverified "₦500,000 daily fine" figure was also removed from the
+  notification-timer warning text pending a citable provision — do not use
+  that figure in the manuscript unless it is independently sourced.
+- Every generated NOSDRA notification letter and FOI request now ends with
+  "Prepared by the reporter using NigerDelta HSSE Tracker. This is not an
+  official NOSDRA document." If the manuscript implies these documents are
+  authoritative NOSDRA correspondence, correct that.
+
+*(Further entries will be added as Phases 6–8 are completed.)*
