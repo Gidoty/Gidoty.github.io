@@ -1,17 +1,36 @@
-const CACHE_VERSION = 'hsse-v1'
+// Bumped for the Phase 7 storage/offline rework: the app shell is now
+// precached in full from a build-time manifest (see vite.config.js's
+// precacheManifestPlugin), not just the root document and icons, so a
+// first offline launch after install actually works.
+const CACHE_VERSION = 'hsse-v2'
 const STATIC_CACHE = `${CACHE_VERSION}-static`
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`
 const SCOPE = self.registration.scope
 
-const STATIC_ASSETS = [SCOPE, `${SCOPE}manifest.json`, `${SCOPE}icon-192.png`, `${SCOPE}icon-512.png`]
+const BASE_STATIC_ASSETS = [SCOPE, `${SCOPE}manifest.json`, `${SCOPE}icon-192.png`, `${SCOPE}icon-512.png`]
 
-// Install: cache static assets
+async function precacheManifestAssets() {
+  try {
+    const response = await fetch(`${SCOPE}precache-manifest.json`)
+    if (!response.ok) return []
+    const { assets } = await response.json()
+    return (assets ?? []).map((path) => `${SCOPE}${path}`)
+  } catch {
+    // No manifest (e.g. local dev without a build) — the base static
+    // assets below still get cached.
+    return []
+  }
+}
+
+// Install: cache the full app shell
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches
-      .open(STATIC_CACHE)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting()),
+    (async () => {
+      const manifestAssets = await precacheManifestAssets()
+      const cache = await caches.open(STATIC_CACHE)
+      await cache.addAll([...new Set([...BASE_STATIC_ASSETS, ...manifestAssets])])
+      await self.skipWaiting()
+    })(),
   )
 })
 
@@ -32,7 +51,7 @@ self.addEventListener('fetch', (e) => {
   // Skip non-GET requests and cross-origin requests
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) return
 
-  const isStaticAsset = STATIC_ASSETS.includes(e.request.url) || /\.(js|css|png|svg|ico|woff2?)$/.test(url.pathname)
+  const isStaticAsset = /\.(js|css|png|svg|ico|woff2?|json)$/.test(url.pathname)
 
   if (isStaticAsset) {
     e.respondWith(
@@ -49,7 +68,8 @@ self.addEventListener('fetch', (e) => {
     return
   }
 
-  // Network-first for everything else
+  // Network-first for everything else (e.g. navigations), falling back to
+  // the cached app shell so the app still loads offline.
   e.respondWith(
     fetch(e.request)
       .then((response) => {
@@ -59,27 +79,4 @@ self.addEventListener('fetch', (e) => {
       })
       .catch(() => caches.match(e.request).then((cached) => cached || caches.match(SCOPE))),
   )
-})
-
-// Background Sync for queued reports
-self.addEventListener('sync', (e) => {
-  if (e.tag === 'sync-reports') {
-    e.waitUntil(syncQueuedReports())
-  }
-})
-
-async function syncQueuedReports() {
-  // This app stores reports directly in localStorage (no backend API to POST to),
-  // so there is nothing to replay here — just tell open tabs connectivity is back
-  // so they can flip any locally-queued reports to submitted.
-  const clients = await self.clients.matchAll()
-  clients.forEach((client) => {
-    client.postMessage({ type: 'SYNC_COMPLETE', message: 'Queued reports submitted' })
-  })
-}
-
-self.addEventListener('message', (event) => {
-  if (event.data === 'SYNC_QUEUE') {
-    event.waitUntil(syncQueuedReports())
-  }
 })
