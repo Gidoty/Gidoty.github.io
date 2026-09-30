@@ -3,8 +3,11 @@
 
 Produces 100 fabricated reports covering every incident type, severity,
 and a spread of optional-field combinations (photos, health impact, GPS
-vs. landmark-only location, anonymous vs. named contact, and a subset with
-an appended evidence-status/NOSDRA/cleanup event). Every report is marked
+vs. landmark-only location, anonymous vs. named contact). Every record
+also carries 2-4 randomly chosen NOSDRA-notification / cleanup-status /
+evidence-status events, so the event-chain and truncation-detection
+tamper scenarios run against the full 100-record corpus rather than a
+handful of records. Every report is marked
 dataClass: "developer_test" and uses fictional coordinates and place names
 inside the Niger Delta's general bounding box — none of it describes a
 real incident, person, or location, and it must never be treated as real
@@ -23,7 +26,7 @@ import random
 import uuid
 from datetime import datetime, timedelta, timezone
 
-from canonical import seal_report
+from canonical import append_event, derive_regulatory_status, seal_report
 from synthetic_png import make_png_data_url
 
 SEED = 20260101
@@ -152,46 +155,67 @@ def build_report(rng, index):
 
     sealed = seal_report(report, hashed_at=submitted_at.isoformat().replace('+00:00', 'Z'))
 
-    # A subset of records also exercise the append-only event log, mirroring
-    # what src/utils/dashboardUtils.js's updateReportWithEvent does after
+    # Every record exercises the append-only event log, mirroring what
+    # src/utils/dashboardUtils.js's updateReportWithEvent does after
     # submission (NOSDRA notification, evidence-status upgrade, cleanup
-    # status change) — so tamper_test.py and manual reviewers have event
-    # chains to check, not just freshly-sealed empty ones.
-    if index % 7 == 0:
-        notified_at = (submitted_at + timedelta(hours=6)).isoformat().replace('+00:00', 'Z')
-        sealed = _append_synthetic_event(
-            rng, sealed, 'nosdra_notified', {'notifiedAt': notified_at}, notified_at
-        )
-        sealed['regulatory'] = {**sealed['regulatory'], 'nosdraNotified': True, 'nosdraNotifiedAt': notified_at}
-    if index % 11 == 0:
-        ref_at = (submitted_at + timedelta(days=2)).isoformat().replace('+00:00', 'Z')
-        external_reference = {
-            'type': 'oil_spill_monitor',
-            'id': f'NOSDRA-OSM-SYN-{index:04d}',
-            'url': f'https://example.org/synthetic/{index:04d}',
-            'accessedAt': ref_at[:10],
-        }
-        sealed = _append_synthetic_event(
-            rng, sealed, 'evidence_status_changed',
-            {'level': 'externally_referenced', 'externalReference': external_reference}, ref_at,
-        )
-        sealed['evidenceStatus'] = {
-            'level': 'externally_referenced', 'externalReference': external_reference, 'verification': None,
-        }
-    if index % 13 == 0:
-        status = CLEANUP_STATUSES[(index // 13) % len(CLEANUP_STATUSES)]
-        changed_at = (submitted_at + timedelta(days=5)).isoformat().replace('+00:00', 'Z')
-        sealed = _append_synthetic_event(rng, sealed, 'cleanup_status_changed', {'status': status}, changed_at)
-        sealed['regulatory'] = {**sealed['regulatory'], 'cleanupStatus': status}
+    # status change) — so tamper_test.py's event-chain and truncation
+    # scenarios have events to work with on the full corpus, not just a
+    # handful of records.
+    event_count = rng.randint(2, 4)
+    event_kinds = [
+        rng.choice(['nosdra_notified', 'cleanup_status_changed', 'evidence_status_changed'])
+        for _ in range(event_count)
+    ]
+    evidence_status = dict(sealed['evidenceStatus'])
+    for seq, kind in enumerate(event_kinds):
+        event_type, data, timestamp = _synthetic_event_content(kind, index, seq, submitted_at)
+        event_id = str(uuid.UUID(int=rng.getrandbits(128)))
+        sealed = append_event(sealed, event_id, event_type, timestamp, data)
+        if kind == 'evidence_status_changed':
+            evidence_status = {
+                'level': 'externally_referenced',
+                'externalReference': data['externalReference'],
+                'verification': None,
+            }
+
+    # Keep the denormalized regulatory fields consistent with what
+    # replaying the event log actually produces — the same replay
+    # verifyReport()/verify_report() now runs, so a freshly generated
+    # synthetic record verifies as statusConsistent by construction.
+    derived = derive_regulatory_status(sealed['events'])
+    sealed['regulatory'] = {
+        **sealed['regulatory'],
+        'nosdraNotified': derived['nosdraNotified'],
+        'nosdraNotifiedAt': derived['nosdraNotifiedAt'],
+        'cleanupStatus': derived['cleanupStatus'],
+    }
+    sealed['evidenceStatus'] = evidence_status
 
     return sealed
 
 
-def _append_synthetic_event(rng, report, event_type, data, timestamp):
-    from canonical import append_event
-
-    event_id = str(uuid.UUID(int=rng.getrandbits(128)))
-    return append_event(report, event_id, event_type, timestamp, data)
+def _synthetic_event_content(kind, index, seq, base_time):
+    if kind == 'nosdra_notified':
+        ts = (base_time + timedelta(hours=6 * (seq + 1))).isoformat().replace('+00:00', 'Z')
+        return 'nosdra_notified', {'notifiedAt': ts}, ts
+    if kind == 'cleanup_status_changed':
+        status = CLEANUP_STATUSES[min(seq, len(CLEANUP_STATUSES) - 1)]
+        ts = (base_time + timedelta(days=seq + 1)).isoformat().replace('+00:00', 'Z')
+        return 'cleanup_status_changed', {'status': status}, ts
+    if kind == 'evidence_status_changed':
+        ts = (base_time + timedelta(days=2 * (seq + 1))).isoformat().replace('+00:00', 'Z')
+        external_reference = {
+            'type': 'oil_spill_monitor',
+            'id': f'NOSDRA-OSM-SYN-{index:04d}-{seq}',
+            'url': f'https://example.org/synthetic/{index:04d}/{seq}',
+            'accessedAt': ts[:10],
+        }
+        return (
+            'evidence_status_changed',
+            {'level': 'externally_referenced', 'externalReference': external_reference},
+            ts,
+        )
+    raise ValueError(f'Unknown synthetic event kind: {kind}')
 
 
 def main():

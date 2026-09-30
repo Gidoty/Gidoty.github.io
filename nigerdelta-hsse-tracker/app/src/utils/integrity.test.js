@@ -7,6 +7,7 @@ import {
   appendEvent,
   verifyReport,
   markLegacy,
+  deriveRegulatoryStatus,
   CANONICALIZATION_VERSION,
   LEGACY_CANONICALIZATION,
 } from './integrity.js'
@@ -152,6 +153,96 @@ describe('event chain (appendEvent / verifyReport)', () => {
   })
 })
 
+describe('deriveRegulatoryStatus', () => {
+  it('defaults to not-notified/pending with no events', () => {
+    expect(deriveRegulatoryStatus([])).toEqual({ nosdraNotified: false, nosdraNotifiedAt: null, cleanupStatus: 'pending' })
+  })
+
+  it('takes the notifiedAt from the nosdra_notified event, and the status from the latest cleanup_status_changed event', () => {
+    const events = [
+      { type: 'nosdra_notified', data: { notifiedAt: '2026-01-02T00:00:00.000Z' } },
+      { type: 'cleanup_status_changed', data: { status: 'in_progress' } },
+      { type: 'cleanup_status_changed', data: { status: 'completed' } },
+    ]
+    expect(deriveRegulatoryStatus(events)).toEqual({
+      nosdraNotified: true,
+      nosdraNotifiedAt: '2026-01-02T00:00:00.000Z',
+      cleanupStatus: 'completed',
+    })
+  })
+
+  it('ignores event types it does not recognize', () => {
+    const events = [{ type: 'evidence_status_changed', data: { level: 'externally_referenced' } }]
+    expect(deriveRegulatoryStatus(events)).toEqual({ nosdraNotified: false, nosdraNotifiedAt: null, cleanupStatus: 'pending' })
+  })
+})
+
+describe('verifyReport: statusConsistent (regulatory status must match the replayed event log)', () => {
+  it('is true when regulatory fields were updated via appendEvent, matching the replay', async () => {
+    let report = await sealReport(minimalReport())
+    report = await appendEvent(report, 'nosdra_notified', { notifiedAt: '2026-01-02T00:00:00.000Z' })
+    report = { ...report, regulatory: { ...report.regulatory, nosdraNotified: true, nosdraNotifiedAt: '2026-01-02T00:00:00.000Z' } }
+
+    const result = await verifyReport(report)
+    expect(result.statusConsistent).toBe(true)
+  })
+
+  it('is false when a regulatory field is edited directly with no corresponding event', async () => {
+    const sealed = await sealReport(minimalReport())
+    const tampered = { ...sealed, regulatory: { ...sealed.regulatory, nosdraNotified: true, nosdraNotifiedAt: '2026-01-02T00:00:00.000Z' } }
+
+    const result = await verifyReport(tampered)
+    expect(result.statusConsistent).toBe(false)
+  })
+
+  it('is false when cleanupStatus is edited directly without a cleanup_status_changed event', async () => {
+    const sealed = await sealReport(minimalReport())
+    const tampered = { ...sealed, regulatory: { ...sealed.regulatory, cleanupStatus: 'completed' } }
+
+    const result = await verifyReport(tampered)
+    expect(result.statusConsistent).toBe(false)
+  })
+
+  it('is null for a legacy record, since it cannot be re-verified', () => {
+    const legacy = markLegacy(minimalReport())
+    return verifyReport(legacy).then((result) => {
+      expect(result.statusConsistent).toBeNull()
+    })
+  })
+})
+
+describe('verifyReport: eventLogComplete (truncation detection)', () => {
+  it('is true immediately after sealing, and after each appendEvent call', async () => {
+    let report = await sealReport(minimalReport())
+    expect(report.integrity.eventCount).toBe(0)
+    expect(report.integrity.headEventHash).toBeNull()
+    expect((await verifyReport(report)).eventLogComplete).toBe(true)
+
+    report = await appendEvent(report, 'nosdra_notified', { notifiedAt: '2026-01-02T00:00:00.000Z' })
+    expect(report.integrity.eventCount).toBe(1)
+    expect(report.integrity.headEventHash).toBe(report.events[0].eventHash)
+    expect((await verifyReport(report)).eventLogComplete).toBe(true)
+
+    report = await appendEvent(report, 'cleanup_status_changed', { status: 'in_progress' })
+    expect(report.integrity.eventCount).toBe(2)
+    expect(report.integrity.headEventHash).toBe(report.events[1].eventHash)
+    expect((await verifyReport(report)).eventLogComplete).toBe(true)
+  })
+
+  it('is false when the last event is dropped, even though the remaining chain is still self-consistent', async () => {
+    let report = await sealReport(minimalReport())
+    report = await appendEvent(report, 'nosdra_notified', { notifiedAt: '2026-01-02T00:00:00.000Z' })
+    report = await appendEvent(report, 'cleanup_status_changed', { status: 'in_progress' })
+
+    const truncated = { ...report, events: report.events.slice(0, 1) }
+    const result = await verifyReport(truncated)
+    // The remaining single-event chain is still internally valid...
+    expect(result.eventChainValid).toBe(true)
+    // ...but the stored high-water mark (2 events) no longer matches.
+    expect(result.eventLogComplete).toBe(false)
+  })
+})
+
 describe('legacy records', () => {
   it('markLegacy tags a record with no integrity block and does not compute a canonical hash', () => {
     const legacy = markLegacy({ ...minimalReport(), audit: { ...minimalReport().audit, reportHash: 'old-hash-123' } })
@@ -170,6 +261,8 @@ describe('legacy records', () => {
     return verifyReport(legacy).then((result) => {
       expect(result.payloadValid).toBeNull()
       expect(result.eventChainValid).toBeNull()
+      expect(result.statusConsistent).toBeNull()
+      expect(result.eventLogComplete).toBeNull()
     })
   })
 })

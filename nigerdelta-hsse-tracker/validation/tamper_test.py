@@ -3,21 +3,27 @@
 raise false alarms on fields that are meant to change after submission.
 
 Takes sealed records from validation/synthetic/synthetic_reports.json (run
-make_synthetic.py first), applies one tampering scenario at a time to a
-fresh copy of each record, and checks that verify_report() flags it. Also
-runs the inverse check: legitimate mutable-field changes (NOSDRA
-notification, cleanup status) must NOT be flagged, since those fields are
-deliberately excluded from the hashed evidence payload.
+make_synthetic.py first, with 2-4 events per record), applies one
+tampering scenario at a time to a fresh copy of each record, and checks
+that verify_report() flags it via payloadValid, eventChainValid,
+statusConsistent, or eventLogComplete. Also runs the inverse check:
+legitimate mutable-state changes made through a proper appendEvent() call
+must NOT be flagged, while the same changes made by editing
+report.regulatory directly — with no corresponding event — now must be
+flagged by the statusConsistent check added after PR review (see
+docs/MANUSCRIPT_CHANGES.md, Phase 10).
 
-Standard library only. Writes a summary to
+Standard library only. Writes a summary (including each scenario's `n`,
+the record count it actually ran against) to
 validation/results/tamper_check.json. Run:
     python3 validation/tamper_test.py
 """
 import copy
 import json
 import os
+import uuid
 
-from canonical import verify_report
+from canonical import append_event, verify_report
 
 SYNTHETIC_PATH = os.path.join(os.path.dirname(__file__), 'synthetic', 'synthetic_reports.json')
 RESULTS_PATH = os.path.join(os.path.dirname(__file__), 'results', 'tamper_check.json')
@@ -71,15 +77,49 @@ def tamper_event_chain_link(report):
     return r
 
 
-def legitimate_nosdra_change(report):
+def tamper_event_truncation(report):
+    r = copy.deepcopy(report)
+    if len(r['events']) < 1:
+        return None
+    # Drop the last event but leave integrity.eventCount/headEventHash at
+    # their pre-truncation values — the remaining chain is still perfectly
+    # self-consistent, so only the eventCount/headEventHash cross-check
+    # (eventLogComplete) can catch this, not eventChainValid.
+    r['events'] = r['events'][:-1]
+    return r
+
+
+def legitimate_nosdra_via_event(report):
+    r = copy.deepcopy(report)
+    notified_at = '2026-12-31T00:00:00.000Z'
+    r = append_event(r, str(uuid.uuid4()), 'nosdra_notified', notified_at, {'notifiedAt': notified_at})
+    r['regulatory'] = {**r['regulatory'], 'nosdraNotified': True, 'nosdraNotifiedAt': notified_at}
+    return r
+
+
+def legitimate_nosdra_direct_edit(report):
     r = copy.deepcopy(report)
     r['regulatory'] = {**r['regulatory'], 'nosdraNotified': True, 'nosdraNotifiedAt': '2026-12-31T00:00:00.000Z'}
     return r
 
 
-def legitimate_cleanup_change(report):
+def legitimate_cleanup_via_event(report):
     r = copy.deepcopy(report)
+    changed_at = '2026-12-31T00:00:00.000Z'
+    r = append_event(r, str(uuid.uuid4()), 'cleanup_status_changed', changed_at, {'status': 'completed'})
     r['regulatory'] = {**r['regulatory'], 'cleanupStatus': 'completed'}
+    return r
+
+
+def legitimate_cleanup_direct_edit(report):
+    r = copy.deepcopy(report)
+    # Pick a status different from whatever the record's own random event
+    # sequence already derived, so the direct edit always actually changes
+    # something — a record whose events already ended at "completed" would
+    # otherwise show no inconsistency to detect.
+    current = r['regulatory'].get('cleanupStatus', 'pending')
+    new_status = 'completed' if current != 'completed' else 'pending'
+    r['regulatory'] = {**r['regulatory'], 'cleanupStatus': new_status}
     return r
 
 
@@ -96,11 +136,18 @@ TAMPER_SCENARIOS = [
     ('photo_single_byte', tamper_photo_byte, True),
     ('event_data', tamper_event_data, True),
     ('event_chain_link', tamper_event_chain_link, True),
+    ('event_truncation', tamper_event_truncation, True),
 ]
 
+# NOSDRA/cleanup status changes made through a proper appendEvent() call
+# must still verify cleanly; the same changes made by editing
+# report.regulatory directly, with no corresponding event, must now be
+# caught by the statusConsistent check.
 LEGITIMATE_SCENARIOS = [
-    ('nosdra_notification_change', legitimate_nosdra_change, False),
-    ('cleanup_status_change', legitimate_cleanup_change, False),
+    ('nosdra_via_event', legitimate_nosdra_via_event, False),
+    ('nosdra_direct_edit_no_event', legitimate_nosdra_direct_edit, True),
+    ('cleanup_via_event', legitimate_cleanup_via_event, False),
+    ('cleanup_direct_edit_no_event', legitimate_cleanup_direct_edit, True),
     ('contact_detail_change', legitimate_contact_change, False),
 ]
 
@@ -116,12 +163,18 @@ def run_scenario(name, mutate, should_detect, reports):
             continue
         attempted += 1
         result = verify_report(mutated)
-        flagged = (result['payloadValid'] is False) or (result['eventChainValid'] is False)
+        flagged = (
+            result['payloadValid'] is False
+            or result['eventChainValid'] is False
+            or result.get('statusConsistent') is False
+            or result.get('eventLogComplete') is False
+        )
         if flagged == should_detect:
             detected += 1
     return {
         'scenario': name,
         'expectedDetection': should_detect,
+        'n': attempted,
         'recordsAttempted': attempted,
         'recordsSkipped': skipped,
         'recordsCorrect': detected,

@@ -36,14 +36,6 @@ and needs correcting. This audit still fixed the wording inside these files
 (Phases 4–5) since they are real source code in the repository, but they
 remain unreachable from the UI as shipped.
 
-## Phase 5 (applied early) — unverified penalty figure
-
-`TimelineCard.jsx` previously stated operators "face daily fines of
-₦500,000" under the NOSDRA Act 2006. No such figure could be verified
-against the Act's text during this audit, so it was softened to "subject to
-penalties" without a number. If you can cite the specific provision and
-amount, it can be restored with that citation.
-
 ## Phase 1 — Emission calculations
 
 - **CH₄ fraction of Niger Delta associated gas (x_CH4).** The app defaults

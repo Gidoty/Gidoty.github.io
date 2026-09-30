@@ -98,6 +98,8 @@ def seal_report(report, hashed_at):
         'payloadHash': payload_hash,
         'photoHashes': photo_hashes,
         'hashedAt': hashed_at,
+        'eventCount': 0,
+        'headEventHash': None,
     }
     sealed['events'] = []
     return sealed
@@ -110,6 +112,19 @@ def event_signing_payload(event):
         'timestamp': event['timestamp'],
         'data': event['data'],
     }
+
+
+DEFAULT_REGULATORY_STATUS = {'nosdraNotified': False, 'nosdraNotifiedAt': None, 'cleanupStatus': 'pending'}
+
+
+def derive_regulatory_status(events):
+    state = dict(DEFAULT_REGULATORY_STATUS)
+    for event in events or []:
+        if event.get('type') == 'nosdra_notified':
+            state = {**state, 'nosdraNotified': True, 'nosdraNotifiedAt': event.get('data', {}).get('notifiedAt')}
+        elif event.get('type') == 'cleanup_status_changed':
+            state = {**state, 'cleanupStatus': event.get('data', {}).get('status', state['cleanupStatus'])}
+    return state
 
 
 def append_event(report, event_id, event_type, timestamp, data):
@@ -128,6 +143,8 @@ def append_event(report, event_id, event_type, timestamp, data):
     }
     updated = dict(report)
     updated['events'] = events + [event]
+    if report.get('integrity'):
+        updated['integrity'] = {**report['integrity'], 'eventCount': len(updated['events']), 'headEventHash': event_hash}
     return updated
 
 
@@ -137,6 +154,8 @@ def verify_report(report):
         return {
             'payloadValid': None,
             'eventChainValid': None,
+            'statusConsistent': None,
+            'eventLogComplete': None,
             'details': {'reason': 'Legacy record — predates canonical hashing and cannot be re-verified.'},
         }
 
@@ -158,12 +177,32 @@ def verify_report(report):
             break
         prev_event_hash = event['eventHash']
 
+    regulatory = report.get('regulatory', {}) or {}
+    derived_status = derive_regulatory_status(events)
+    status_consistent = (
+        derived_status['nosdraNotified'] == bool(regulatory.get('nosdraNotified'))
+        and derived_status['nosdraNotifiedAt'] == regulatory.get('nosdraNotifiedAt')
+        and derived_status['cleanupStatus'] == regulatory.get('cleanupStatus', 'pending')
+    )
+
+    expected_event_count = len(events)
+    expected_head_event_hash = events[-1]['eventHash'] if events else None
+    event_log_complete = (
+        (integrity.get('eventCount') or 0) == expected_event_count
+        and integrity.get('headEventHash') == expected_head_event_hash
+    )
+
     return {
         'payloadValid': payload_valid,
         'eventChainValid': event_chain_valid,
+        'statusConsistent': status_consistent,
+        'eventLogComplete': event_log_complete,
         'details': {
             'recomputedPayloadHash': recomputed_payload_hash,
             'storedPayloadHash': integrity.get('payloadHash'),
             'eventCount': len(events),
+            'derivedRegulatoryStatus': derived_status,
+            'storedEventCount': integrity.get('eventCount'),
+            'storedHeadEventHash': integrity.get('headEventHash'),
         },
     }

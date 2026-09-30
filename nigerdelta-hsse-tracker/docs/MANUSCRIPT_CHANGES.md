@@ -255,3 +255,58 @@ rather than changing app behavior. If the manuscript has (or needs) a
   author confirmation), `CITATION.cff`, `CHANGELOG.md`, and
   `docs/AI_ASSISTANCE.md` (required for a submission that used AI coding
   assistance). None of these change app behavior.
+
+## Phase 10 — Two integrity gaps closed on PR review
+
+A reviewer of the pull request implementing Phases 1-9 found two real gaps
+in the integrity scheme from Phase 3, both now fixed. If the manuscript
+describes the integrity/hashing scheme, these two points must be part of
+that description:
+
+- **Regulatory status could drift from the event log undetected.**
+  `report.regulatory.nosdraNotified`, `nosdraNotifiedAt`, and
+  `cleanupStatus` were writable independently of the event log that is
+  supposed to be their audit trail — nothing checked that a stored value
+  actually matched what the events said happened. `deriveRegulatoryStatus()`
+  (`app/src/utils/integrity.js`) now replays the event log as the source of
+  truth for these three fields, and `verifyReport()` returns a new
+  `statusConsistent: false` if the stored fields and the replayed value
+  disagree — catching a direct field edit made without going through
+  `appendEvent()`. The three fields are still also stored directly on
+  `report.regulatory` as a fast-read cache (unchanged for every UI read
+  site), but that cache is no longer trusted uncritically at verification
+  time.
+- **A truncated-but-internally-consistent event tail was undetectable.**
+  Deleting the last N events from `report.events` left the remaining chain
+  perfectly self-consistent — `eventChainValid` had no way to know events
+  were missing from the end. `integrity.eventCount` and
+  `integrity.headEventHash` are now updated on every `appendEvent()` call as
+  a running high-water mark, and `verifyReport()` returns
+  `eventLogComplete: false` when the current event array doesn't match that
+  recorded mark. **This detection has a real limit the manuscript must
+  state plainly: it only catches truncation on the device where the
+  truncation happened if whoever did it forgot to also update
+  `eventCount`/`headEventHash` to match.** An attacker with access to the
+  device's storage can rewrite the entire record, including those two
+  fields, consistently — nothing on that single device can then prove data
+  is missing. Real protection requires an independently held earlier copy
+  (an export taken before the truncation) to compare against; `verify_export.py`
+  now performs exactly that comparison between an export's top-level
+  summary and its embedded record, and between two exports of different
+  ages if you have both. Do not describe this as tamper-proof; describe it
+  as tamper-evident against an external reference copy, and only
+  best-effort on-device.
+- `validation/tamper_test.py`'s NOSDRA and cleanup "legitimate change"
+  scenarios were split in two: a change made through a proper `appendEvent`
+  call (must still verify cleanly) and a direct field edit with no event
+  (must now be detected). `validation/make_synthetic.py` now gives every
+  one of its 100 records 2-4 events (previously most had none), so the
+  event-chain and truncation scenarios exercise the full synthetic corpus
+  instead of a handful of records.
+- The ₦500,000 daily-fine figure removed in Phase 5 for lacking a citation
+  is restored in `TimelineCard.jsx`, now cited to NOSDRA Act 2006 s.6(2)
+  ("₦500,000 for each day of failure to report"). The corresponding item
+  in `docs/AUTHOR_ACTION_REQUIRED.md` is removed. This audit did not
+  itself re-verify the Act's text against this citation — the citation was
+  supplied directly by the author, who is responsible for its accuracy in
+  the manuscript.

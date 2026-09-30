@@ -203,8 +203,8 @@ export default function TimelineCard({ report, onNotifyClick, onMarkJivCompleted
           <p className="mt-1 flex items-start gap-1.5 text-[11px] opacity-90">
             <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
             This measures time since you clicked "notify," not since the spill occurred. Under
-            NOSDRA Act 2006, operators are subject to penalties for failure to respond to reported
-            spills.
+            NOSDRA Act 2006, s.6(2), operators face ₦500,000 for each day of failure to report a
+            spill.
           </p>
         </div>
       )}

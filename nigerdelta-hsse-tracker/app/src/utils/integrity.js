@@ -93,6 +93,16 @@ export async function sealReport(report) {
       payloadHash,
       photoHashes,
       hashedAt: new Date().toISOString(),
+      // A running count and the latest event's hash, updated on every
+      // appendEvent call. Lets verifyReport notice a missing tail — a
+      // truncated-but-otherwise-self-consistent event array would
+      // otherwise pass eventChainValid undetected. See the "on-device
+      // protection is limited" note in docs/MANUSCRIPT_CHANGES.md: an
+      // attacker with device access can rewrite these two fields to
+      // match a truncated array, so real detection needs an independently
+      // held export from before the truncation, not just this record.
+      eventCount: 0,
+      headEventHash: null,
     },
     events: [],
   }
@@ -102,7 +112,27 @@ function eventSigningPayload(event) {
   return { prevEventHash: event.prevEventHash, type: event.type, timestamp: event.timestamp, data: event.data }
 }
 
-// Appends a mutable-state event (NOSDRA notification, corroboration status
+// Replays the append-only event log to derive the current NOSDRA-
+// notification and cleanup status — the source of truth for these three
+// fields. report.regulatory carries a denormalized copy for fast
+// synchronous reads across the UI, but verifyReport (below) cross-checks
+// it against this replay so a direct field edit that bypasses
+// appendEvent is detected rather than silently trusted.
+const DEFAULT_REGULATORY_STATUS = { nosdraNotified: false, nosdraNotifiedAt: null, cleanupStatus: 'pending' }
+
+export function deriveRegulatoryStatus(events = []) {
+  let state = { ...DEFAULT_REGULATORY_STATUS }
+  for (const event of events) {
+    if (event.type === 'nosdra_notified') {
+      state = { ...state, nosdraNotified: true, nosdraNotifiedAt: event.data?.notifiedAt ?? null }
+    } else if (event.type === 'cleanup_status_changed') {
+      state = { ...state, cleanupStatus: event.data?.status ?? state.cleanupStatus }
+    }
+  }
+  return state
+}
+
+// Appends a mutable-state event (NOSDRA notification, evidence-status
 // change, cleanup update, etc.) to the report's hash-chained event log.
 // Returns a new report object; does not mutate the input.
 export async function appendEvent(report, type, data) {
@@ -111,16 +141,26 @@ export async function appendEvent(report, type, data) {
   const timestamp = new Date().toISOString()
   const eventHash = await sha256Hex(canonicalize(eventSigningPayload({ prevEventHash, type, timestamp, data })))
   const event = { id: crypto.randomUUID(), type, timestamp, prevEventHash, eventHash, data }
-  return { ...report, events: [...events, event] }
+  const nextEvents = [...events, event]
+  return {
+    ...report,
+    events: nextEvents,
+    integrity: report.integrity
+      ? { ...report.integrity, eventCount: nextEvents.length, headEventHash: eventHash }
+      : report.integrity,
+  }
 }
 
-// Re-derives the payload hash and the event-chain hashes from a report's
-// current content and compares them against the stored values. Read-only.
+// Re-derives the payload hash, the event-chain hashes, the regulatory
+// status, and the event-log length from a report's current content and
+// compares them against the stored values. Read-only.
 export async function verifyReport(report) {
   if (!report.integrity || report.integrity.canonicalization === LEGACY_CANONICALIZATION) {
     return {
       payloadValid: null,
       eventChainValid: null,
+      statusConsistent: null,
+      eventLogComplete: null,
       details: { reason: 'Legacy record — predates canonical hashing and cannot be re-verified.' },
     }
   }
@@ -146,13 +186,34 @@ export async function verifyReport(report) {
     prevEventHash = event.eventHash
   }
 
+  const derivedStatus = deriveRegulatoryStatus(events)
+  const statusConsistent =
+    derivedStatus.nosdraNotified === Boolean(report.regulatory?.nosdraNotified) &&
+    derivedStatus.nosdraNotifiedAt === (report.regulatory?.nosdraNotifiedAt ?? null) &&
+    derivedStatus.cleanupStatus === (report.regulatory?.cleanupStatus ?? 'pending')
+
+  // A truncated-but-still-internally-consistent tail (the remaining
+  // events still chain correctly) would pass eventChainValid above with
+  // no complaint — this catches that by comparing the event log's
+  // recorded high-water mark against what's actually present now.
+  const expectedEventCount = events.length
+  const expectedHeadEventHash = events.length > 0 ? events[events.length - 1].eventHash : null
+  const eventLogComplete =
+    (report.integrity.eventCount ?? 0) === expectedEventCount &&
+    (report.integrity.headEventHash ?? null) === expectedHeadEventHash
+
   return {
     payloadValid,
     eventChainValid,
+    statusConsistent,
+    eventLogComplete,
     details: {
       recomputedPayloadHash,
       storedPayloadHash: report.integrity.payloadHash,
       eventCount: events.length,
+      derivedRegulatoryStatus: derivedStatus,
+      storedEventCount: report.integrity.eventCount ?? null,
+      storedHeadEventHash: report.integrity.headEventHash ?? null,
     },
   }
 }
@@ -167,10 +228,12 @@ export function buildSubmissionExport(report) {
     exportedAt: new Date().toISOString(),
     record: report,
     verification: {
-      note: 'Recompute the payload hash from `record` using the canonicalization documented in this project’s validation/verify_export.py, and compare it to record.integrity.payloadHash.',
+      note: 'Recompute the payload hash from `record` using the canonicalization documented in this project’s validation/verify_export.py, and compare it to record.integrity.payloadHash. eventCount/headEventHash let you detect a later-truncated event log by comparing this export’s values against a newer copy of the same record.',
       algorithm: report.integrity?.algorithm ?? null,
       canonicalization: report.integrity?.canonicalization ?? null,
       payloadHash: report.integrity?.payloadHash ?? null,
+      eventCount: report.integrity?.eventCount ?? null,
+      headEventHash: report.integrity?.headEventHash ?? null,
     },
   }
 }
