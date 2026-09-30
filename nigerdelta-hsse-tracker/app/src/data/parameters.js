@@ -139,7 +139,7 @@ export const CATEGORIES = [
         panel: 'co2-equivalent',
         description:
           'Converts a given mass of methane into CO₂-equivalent impact over both 20-year and 100-year time horizons using current global warming potentials.',
-        reference: 'GWP₂₀ = 84, GWP₁₀₀ = 29.8 · IPCC AR6 WGI (2021), Table 7.SM.7',
+        reference: 'GWP₂₀ = 82.5, GWP₁₀₀ = 29.8 · IPCC AR6 WGI (2021), Table 7.SM.7',
       },
       {
         id: 'co2-from-combustion',

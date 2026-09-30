@@ -243,3 +243,15 @@ rather than changing app behavior. If the manuscript has (or needs) a
   in sequence, and writes `validation/results/SUMMARY.md` from the actual
   output of that run — every number in it is read back from the real
   results files, never hand-typed.
+
+## Phase 9 — Availability docs and a leftover GWP figure
+
+- `app/src/data/parameters.js`'s CO₂ Equivalent feature description still
+  cited GWP₂₀ = 84 (the AR5/AR6 mixing error Phase 1 fixed everywhere
+  else) — missed because it lives in the feature catalog, not
+  `methaneCalc.js` or a panel. Corrected to 82.5. If the manuscript quotes
+  this feature-catalog text anywhere, use the corrected figure.
+- Added `README.md` methodology/validation sections, `LICENSE` (MIT, per
+  author confirmation), `CITATION.cff`, `CHANGELOG.md`, and
+  `docs/AI_ASSISTANCE.md` (required for a submission that used AI coding
+  assistance). None of these change app behavior.
