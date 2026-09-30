@@ -17,6 +17,23 @@
       content="NigerDelta HSSE Tracker — community environmental monitoring for the Niger Delta. Geo-tagged, photo-supported oil spill, gas flare, and health incident reporting aligned with Nigeria's legal framework."
     />
     <title>NigerDelta HSSE Tracker — Community Environmental Monitoring</title>
+    <script>
+      // GitHub Pages serves /404.html for deep links such as /report. That
+      // page redirects here as ?p=<path>; restore the real path before the
+      // router starts. Also remember ?mode=test for the whole tab session.
+      (function () {
+        var q = new URLSearchParams(window.location.search)
+        var p = q.get('p')
+        if (p !== null) {
+          var base = window.location.pathname.replace(/\/?$/, '/')
+          window.history.replaceState(null, '', base + p + window.location.hash)
+          q = new URLSearchParams(window.location.search)
+        }
+        try {
+          if (q.get('mode') === 'test') sessionStorage.setItem('hsse_test_mode', '1')
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

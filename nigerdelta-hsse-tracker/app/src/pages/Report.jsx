@@ -20,7 +20,9 @@ import { APP_VERSION } from '../utils/appVersion.js'
 // submissions (e.g. when device-testing per validation/offline_test.md).
 function currentDataClass() {
   try {
-    return new URLSearchParams(window.location.search).get('mode') === 'test' ? 'developer_test' : 'operational'
+    const fromUrl = new URLSearchParams(window.location.search).get('mode') === 'test'
+    const fromSession = sessionStorage.getItem('hsse_test_mode') === '1'
+    return fromUrl || fromSession ? 'developer_test' : 'operational'
   } catch {
     return 'operational'
   }
