@@ -2,7 +2,7 @@
 // precached in full from a build-time manifest (see vite.config.js's
 // precacheManifestPlugin), not just the root document and icons, so a
 // first offline launch after install actually works.
-const CACHE_VERSION = 'hsse-v2'
+const CACHE_VERSION = 'hsse-v3'
 const STATIC_CACHE = `${CACHE_VERSION}-static`
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`
 const SCOPE = self.registration.scope
@@ -59,8 +59,10 @@ self.addEventListener('fetch', (e) => {
         (cached) =>
           cached ||
           fetch(e.request).then((response) => {
-            const clone = response.clone()
-            caches.open(STATIC_CACHE).then((c) => c.put(e.request, clone))
+            if (response.ok) {
+              const clone = response.clone()
+              caches.open(STATIC_CACHE).then((c) => c.put(e.request, clone))
+            }
             return response
           }),
       ),
@@ -68,15 +70,37 @@ self.addEventListener('fetch', (e) => {
     return
   }
 
-  // Network-first for everything else (e.g. navigations), falling back to
-  // the cached app shell so the app still loads offline.
+  // Navigations: every in-app route is served the built app shell (the
+  // scope root), network-first with the cached copy as the offline
+  // fallback. Never cache whatever the server returns for a deep link:
+  // on GitHub Pages /app/ is a source folder and other routes are 404s,
+  // and caching those produced a permanent white screen.
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(SCOPE)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone()
+            caches.open(STATIC_CACHE).then((c) => c.put(SCOPE, clone))
+          }
+          return response
+        })
+        .catch(() => caches.match(SCOPE)),
+    )
+    return
+  }
+
+  // Other same-origin requests: network-first, cache only successful
+  // responses, fall back to the cache when offline.
   e.respondWith(
     fetch(e.request)
       .then((response) => {
-        const clone = response.clone()
-        caches.open(DYNAMIC_CACHE).then((c) => c.put(e.request, clone))
+        if (response.ok) {
+          const clone = response.clone()
+          caches.open(DYNAMIC_CACHE).then((c) => c.put(e.request, clone))
+        }
         return response
       })
-      .catch(() => caches.match(e.request).then((cached) => cached || caches.match(SCOPE))),
+      .catch(() => caches.match(e.request)),
   )
 })

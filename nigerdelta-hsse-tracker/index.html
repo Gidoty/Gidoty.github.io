@@ -34,11 +34,22 @@
         } catch (e) {}
       })()
     </script>
-    <script type="module" crossorigin src="/nigerdelta-hsse-tracker/assets/index-CtYD3Opj.js"></script>
+    <script type="module" crossorigin src="/nigerdelta-hsse-tracker/assets/index-j__piijd.js"></script>
     <link rel="modulepreload" crossorigin href="/nigerdelta-hsse-tracker/assets/jsx-runtime-DxmMVGVZ.js">
     <link rel="stylesheet" crossorigin href="/nigerdelta-hsse-tracker/assets/index-B86pJ07j.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // If GitHub Pages serves this unbuilt source file (the address
+      // /nigerdelta-hsse-tracker/app/ points at the source folder), send the
+      // visitor to the built app's dashboard instead of a blank page.
+      (function () {
+        var m = document.querySelector('script[type="module"]')
+        if (m && m.getAttribute('src') === '/src/main.jsx' && /github\.io$/.test(window.location.hostname)) {
+          window.location.replace('/nigerdelta-hsse-tracker/?p=' + encodeURIComponent('dashboard' + window.location.search))
+        }
+      })()
+    </script>
   </body>
 </html>

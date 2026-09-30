@@ -4,7 +4,7 @@ import { Droplet } from 'lucide-react'
 const FOOTER_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/report', label: 'Report Incident' },
-  { to: '/app', label: 'Dashboard' },
+  { to: '/dashboard', label: 'Dashboard' },
   { to: '/about', label: 'About' },
 ]
 

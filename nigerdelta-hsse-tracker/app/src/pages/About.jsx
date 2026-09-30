@@ -311,7 +311,7 @@ export default function About() {
             Submit a report
           </Link>{' '}
           or{' '}
-          <Link to="/app" className="font-bold text-teal hover:underline">
+          <Link to="/dashboard" className="font-bold text-teal hover:underline">
             open the dashboard
           </Link>
           .

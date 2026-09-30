@@ -35,7 +35,7 @@ export default function App() {
       </Route>
 
       <Route
-        path="/app"
+        path="/dashboard"
         element={
           <Suspense fallback={<PageLoader />}>
             <AppShell />
@@ -44,10 +44,10 @@ export default function App() {
       />
 
       {/* Old routes from the previous multi-page architecture now live inside /app */}
-      <Route path="/dashboard" element={<Navigate to="/app" replace />} />
-      <Route path="/tracker" element={<Navigate to="/app" replace />} />
-      <Route path="/methane" element={<Navigate to="/app" replace />} />
-      <Route path="/data" element={<Navigate to="/app" replace />} />
+      <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/tracker" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/methane" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/data" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
 }

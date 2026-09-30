@@ -9,7 +9,7 @@ import { storage } from '../utils/storage.js'
 // included — so every tool is always one click away, no matter the device.
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
-  { to: '/app', label: 'Dashboard' },
+  { to: '/dashboard', label: 'Dashboard' },
   { to: '/about', label: 'About' },
 ]
 
@@ -53,7 +53,7 @@ export default function Navbar() {
       return
     }
     storage.setLastParam({ category: categoryId, parameter: parameterId })
-    navigate('/app')
+    navigate('/dashboard')
     closeMenu()
   }
 
