@@ -10,6 +10,8 @@ export const translations = {
     consentIntro:
       'This platform collects location data, photos, and incident descriptions to document environmental incidents in the Niger Delta.',
     consentProtected: 'Your data is protected under the Nigeria Data Protection Act 2023 (NDPA).',
+    consentStorage:
+      'Your report is saved only on this device. It is not sent to NOSDRA, this app’s developer, or anyone else unless you choose to export or share it yourself.',
     consentCollectTitle: 'What we collect:',
     consentCollect: [
       'Incident type and description',
@@ -104,17 +106,13 @@ export const translations = {
     errorSeverity: 'Please select how serious it is',
 
     submitReport: 'Submit Report',
-    submitting: 'Submitting...',
+    submitting: 'Saving...',
 
-    successTitle: 'Report Submitted',
-    successText: 'Your report has been recorded. Reference number:',
-    shareWithNosdra: 'Share this reference with NOSDRA: nosdra.gov.ng',
+    successTitle: 'Report Saved',
+    successText: 'Your report has been saved on this device. Reference number:',
+    shareWithNosdra: 'This report stays on your device. To reach NOSDRA, generate a notification letter from the dashboard, or share this reference number directly.',
     submitAnother: 'Submit Another Report',
     viewDashboard: 'View Your Report on Dashboard',
-
-    offlineTitle: 'Saved Offline',
-    offlineText:
-      'No internet connection. Your report has been saved and will be submitted automatically when you reconnect.',
 
     incidentTypes: {
       oil_spill: 'Oil Spill',
@@ -184,6 +182,8 @@ export const translations = {
     consentIntro:
       'This platform dey collect location, photo, and wetin happen so we fit record environmental problems for Niger Delta.',
     consentProtected: 'Your data dey protected under the Nigeria Data Protection Act 2023 (NDPA).',
+    consentStorage:
+      'Your report dey save for this device only. E no dey go to NOSDRA, the person wey build this app, or anybody else unless na you yourself choose to export am or share am.',
     consentCollectTitle: 'Wetin we dey collect:',
     consentCollect: [
       'Type of problem and wetin happen',
@@ -278,17 +278,13 @@ export const translations = {
     errorSeverity: 'Abeg choose how bad e be',
 
     submitReport: 'Submit Report',
-    submitting: 'E dey submit...',
+    submitting: 'E dey save...',
 
-    successTitle: 'Report Don Submit',
-    successText: 'We don receive your report. Reference number:',
-    shareWithNosdra: 'Share this reference number with NOSDRA: nosdra.gov.ng',
+    successTitle: 'Report Don Save',
+    successText: 'We don save your report for this phone/device. Reference number:',
+    shareWithNosdra: 'This report dey stay for your device. To reach NOSDRA, use the notification letter for dashboard, or share this reference number directly.',
     submitAnother: 'Submit Another Report',
     viewDashboard: 'See Your Report for Dashboard',
-
-    offlineTitle: 'Saved for Phone',
-    offlineText:
-      'No internet. We don save your report for your phone. E go submit automatically when internet come back.',
 
     incidentTypes: {
       oil_spill: 'Oil Spill',

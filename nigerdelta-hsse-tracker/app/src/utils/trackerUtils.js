@@ -114,7 +114,7 @@ const ESCALATION_CSV_HEADERS = [
 
 export function exportEscalationCsv(reports) {
   const rows = reports
-    .filter((report) => !report.incident?.isDemoData)
+    .filter((report) => !report.incident?.isDemoData && (report.dataClass ?? 'operational') === 'operational')
     .map((report) => {
       const hours = hoursSince(report.regulatory?.nosdraNotifiedAt)
       return [

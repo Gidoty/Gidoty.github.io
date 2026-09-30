@@ -93,7 +93,6 @@ export default function AppShell() {
   const handleCloseDrawer = useCallback(() => setDrawerOpen(false), [])
 
   const overdueReports = reports.filter(isAwaitingOperatorResponse)
-  const queuedCount = reports.filter((r) => r.status === 'queued').length
 
   const quickAction = useMemo(() => {
     const label = activeCategory.quickAction
@@ -128,7 +127,6 @@ export default function AppShell() {
         activeParameterId={activeParameterId}
         onSelectParameter={handleSelectParameter}
         reportsCount={reports.length}
-        queuedCount={queuedCount}
       />
 
       {drawerOpen && (

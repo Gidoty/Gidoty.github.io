@@ -1,31 +1,21 @@
 import { Link } from 'react-router-dom'
-import { CheckCircle2, CloudOff } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { t } from '../../data/translations.js'
 
-export default function ResultScreen({ language, status, referenceNumber, onSubmitAnother }) {
-  const isSuccess = status === 'success'
-
+export default function ResultScreen({ language, referenceNumber, onSubmitAnother }) {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-4 py-16 text-center">
-      <span
-        className={`flex h-20 w-20 items-center justify-center rounded-full ${
-          isSuccess ? 'bg-safe/15 text-safe' : 'bg-amber/15 text-amber'
-        }`}
-      >
-        {isSuccess ? <CheckCircle2 className="h-10 w-10" /> : <CloudOff className="h-10 w-10" />}
+      <span className="flex h-20 w-20 items-center justify-center rounded-full bg-safe/15 text-safe">
+        <CheckCircle2 className="h-10 w-10" />
       </span>
 
-      <h1 className="mt-6 text-2xl font-bold text-text">
-        {t(language, isSuccess ? 'successTitle' : 'offlineTitle')}
-      </h1>
+      <h1 className="mt-6 text-2xl font-bold text-text">{t(language, 'successTitle')}</h1>
 
-      <p className="mt-3 text-sm leading-normal text-muted">
-        {t(language, isSuccess ? 'successText' : 'offlineText')}
-      </p>
+      <p className="mt-3 text-sm leading-normal text-muted">{t(language, 'successText')}</p>
 
       <p className="mt-4 text-2xl font-bold tracking-wide text-teal">{referenceNumber}</p>
 
-      {isSuccess && <p className="mt-4 text-xs text-muted">{t(language, 'shareWithNosdra')}</p>}
+      <p className="mt-4 text-xs text-muted">{t(language, 'shareWithNosdra')}</p>
 
       <div className="mt-8 flex w-full flex-col gap-3">
         <button

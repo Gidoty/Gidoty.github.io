@@ -15,6 +15,7 @@ export default function ConsentScreen({ language, onAccept, onAnonymous }) {
 
         <p className="mt-4 text-sm leading-normal text-muted">{t(language, 'consentIntro')}</p>
         <p className="mt-3 text-sm leading-normal text-muted">{t(language, 'consentProtected')}</p>
+        <p className="mt-3 text-sm font-medium leading-normal text-text">{t(language, 'consentStorage')}</p>
 
         <p className="mt-4 text-sm font-bold text-text">{t(language, 'consentCollectTitle')}</p>
         <ul className="mt-2 space-y-1.5 text-sm text-muted">

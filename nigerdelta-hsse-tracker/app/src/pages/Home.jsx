@@ -121,10 +121,10 @@ const FEATURES = [
   },
   {
     icon: WifiOff,
-    title: 'Offline-First PWA',
+    title: 'Device-Local, Offline-First PWA',
     accent: 'text-teal',
     bg: 'bg-teal/10',
-    text: 'Works without internet. Reports queued on-device and submitted when connectivity returns. Built for Niger Delta realities.',
+    text: 'Works fully without internet — reports are saved on your device, not a server. Export or share a report yourself whenever you’re ready. Built for Niger Delta realities.',
   },
   {
     icon: ShieldCheck,

@@ -149,4 +149,42 @@ work.
   panel. The four Niger Delta context sources remain unverified pending
   DOI checks — see `AUTHOR_ACTION_REQUIRED.md`.
 
-*(Further entries will be added as Phases 7–8 are completed.)*
+## Phase 7 — Storage, offline behaviour, and consent
+
+- Reports now live in IndexedDB, not `localStorage`. `localStorage` had a
+  roughly 5 MB quota that a handful of photo-bearing reports could exceed;
+  IndexedDB does not have that practical ceiling. A one-time migration
+  copies any existing `localStorage` reports into IndexedDB, verifies the
+  record count matches, and only then clears the old key — if the manuscript
+  states a storage mechanism, it must say IndexedDB, not localStorage.
+- The service worker now precaches the entire built app shell (every
+  content-hashed JS/CSS file from the actual build output, via a
+  build-time manifest) rather than just the root document and icons, so a
+  first offline launch after install works. Cache version bumped
+  accordingly.
+- **The "submits automatically when you reconnect" claim was false and has
+  been removed everywhere it appeared** — the no-typo-server architecture
+  never queued anything for later transmission; every report was already
+  fully saved locally the instant it was created, online or not. Removed:
+  the no-op `syncQueuedReports` in `sw.js`, the `sync-reports` Background
+  Sync registration in `Report.jsx`, the `'queued'`/`'offline'` result
+  states, the "queued offline" counter in the drawer, and the
+  "Awaiting submission" badge. The connectivity banner and consent screen
+  now say a report is saved on this device, full stop — reaching NOSDRA or
+  anyone else requires an explicit export or share action. This directly
+  contradicts any prior manuscript claim of background sync or automatic
+  submission-on-reconnect; correct that section.
+- Added an "Export for Submission" action producing a single JSON file
+  containing the canonical record and its integrity hash — this is now the
+  documented way a report leaves the device.
+- Added `dataClass` (`operational` / `developer_test` / `demo`) to every
+  report. Demo fixture data is tagged `demo` and was already structurally
+  excluded from real-report views (it is generated in memory, never
+  written to storage); CSV exports now also explicitly filter to
+  `operational` records only. A `?mode=test` URL flag labels records
+  created during device testing as `developer_test` (see
+  `validation/offline_test.md`, Phase 8).
+- Added `appVersion` (package version + build commit SHA, injected at
+  build time) to every newly-created report's audit metadata.
+
+*(Further entries will be added as Phase 8 is completed.)*

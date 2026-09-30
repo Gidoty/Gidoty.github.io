@@ -5,6 +5,23 @@ audit and need the author's direct attention before submission. Nothing in
 this list has been silently defaulted in the app — each item is either an
 explicit user input with no default, or flagged inline where it appears.
 
+## Phase 7 — new Pidgin consent strings
+
+The following new/changed Pidgin strings in `translations.js` need a native
+speaker's check before submission — they were written by this audit, not
+translated by a fluent Pidgin speaker:
+
+- `consentStorage` (pidgin): "Your report dey save for this device only. E
+  no dey go to NOSDRA, the person wey build this app, or anybody else
+  unless na you yourself choose to export am or share am."
+- `submitting` (pidgin): "E dey save..."
+- `successTitle` (pidgin): "Report Don Save"
+- `successText` (pidgin): "We don save your report for this phone/device.
+  Reference number:"
+- `shareWithNosdra` (pidgin): "This report dey stay for your device. To
+  reach NOSDRA, use the notification letter for dashboard, or share this
+  reference number directly."
+
 ## General finding — unwired components
 
 `src/components/tracker/TimelineCard.jsx`, `EscalationStats.jsx`,

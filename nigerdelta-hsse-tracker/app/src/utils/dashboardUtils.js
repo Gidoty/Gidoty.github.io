@@ -148,7 +148,7 @@ const CSV_HEADERS = [
 
 export function exportReportsToCsv(reports) {
   const rows = reports
-    .filter((report) => !report.incident?.isDemoData)
+    .filter((report) => !report.incident?.isDemoData && (report.dataClass ?? 'operational') === 'operational')
     .map((report) => [
       report.referenceNumber,
       report.incident.dateTime,

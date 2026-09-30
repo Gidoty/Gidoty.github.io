@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { X, Fingerprint, ShieldCheck, ShieldAlert, Loader2, Link2 } from 'lucide-react'
+import { X, Fingerprint, ShieldCheck, ShieldAlert, Loader2, Link2, Download } from 'lucide-react'
 import { t } from '../../data/translations.js'
 import { deriveStatus, updateReportWithEvent } from '../../utils/dashboardUtils.js'
 import { hoursSince, formatElapsed, notificationTimerLevel } from '../../utils/trackerUtils.js'
-import { verifyReport } from '../../utils/integrity.js'
+import { verifyReport, downloadSubmissionExport } from '../../utils/integrity.js'
 import {
   EVIDENCE_STATUS,
   EVIDENCE_STATUS_LABELS,
@@ -448,6 +448,19 @@ export default function ReportDetailModal({ report, onClose, onReportsChanged })
                   </div>
                 </div>
               )}
+
+              <button
+                type="button"
+                onClick={() => downloadSubmissionExport(current)}
+                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg bg-generate text-sm font-bold text-bg hover:bg-generate/90"
+              >
+                <Download className="h-4 w-4" />
+                Export for Submission
+              </button>
+              <p className="text-[11px] text-muted">
+                Downloads a single JSON file with this report and its integrity hash — the only way
+                this report leaves your device. Nothing is sent automatically.
+              </p>
             </div>
           )}
         </div>

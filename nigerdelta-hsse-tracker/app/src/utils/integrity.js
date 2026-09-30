@@ -157,6 +157,37 @@ export async function verifyReport(report) {
   }
 }
 
+// Builds the single-file JSON export a reporter can hand to anyone else —
+// the device-local architecture has no server to submit to, so getting a
+// report to NOSDRA, a journalist, or anyone besides the reporter is always
+// this explicit export/share action, never automatic.
+export function buildSubmissionExport(report) {
+  return {
+    exportFormat: 'nigerdelta-hsse-tracker-report-v1',
+    exportedAt: new Date().toISOString(),
+    record: report,
+    verification: {
+      note: 'Recompute the payload hash from `record` using the canonicalization documented in this project’s validation/verify_export.py, and compare it to record.integrity.payloadHash.',
+      algorithm: report.integrity?.algorithm ?? null,
+      canonicalization: report.integrity?.canonicalization ?? null,
+      payloadHash: report.integrity?.payloadHash ?? null,
+    },
+  }
+}
+
+export function downloadSubmissionExport(report) {
+  const payload = buildSubmissionExport(report)
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${report.referenceNumber}-export.json`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
 // Marks a pre-existing (pre-integrity-rework) record as legacy without
 // attempting to compute a canonical hash for content never captured under
 // this scheme. Idempotent — a report that already has an `integrity` block

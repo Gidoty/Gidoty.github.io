@@ -12,6 +12,19 @@ import {
 } from '../utils/reportStorage.js'
 import { sealReport } from '../utils/integrity.js'
 import { defaultEvidenceStatus } from '../utils/evidenceStatus.js'
+import { APP_VERSION } from '../utils/appVersion.js'
+
+// A developer-test toggle, never shown in the UI: append ?mode=test to the
+// report URL to label records created in this session as developer_test
+// rather than operational, so they can be told apart from real community
+// submissions (e.g. when device-testing per validation/offline_test.md).
+function currentDataClass() {
+  try {
+    return new URLSearchParams(window.location.search).get('mode') === 'test' ? 'developer_test' : 'operational'
+  } catch {
+    return 'operational'
+  }
+}
 import ConsentScreen from '../components/report/ConsentScreen.jsx'
 import LanguageToggle from '../components/report/LanguageToggle.jsx'
 import StepProgress from '../components/report/StepProgress.jsx'
@@ -165,7 +178,6 @@ export default function Report() {
 
     setSubmitting(true)
 
-    const online = navigator.onLine
     const referenceNumber = generateReferenceNumber()
     const dateTime = new Date(`${evidenceData.incidentDate}T${evidenceData.incidentTime}:00`).toISOString()
     const consent = consentRecord ?? getConsent()
@@ -174,7 +186,8 @@ export default function Report() {
       id: crypto.randomUUID(),
       referenceNumber,
       submittedAt: new Date().toISOString(),
-      status: online ? 'submitted' : 'queued',
+      status: 'submitted',
+      dataClass: currentDataClass(),
       location: {
         gps: location.gps
           ? {
@@ -232,6 +245,7 @@ export default function Report() {
         consentTimestamp: consent?.timestamp ?? null,
         language,
         userAgent: navigator.userAgent,
+        appVersion: APP_VERSION,
       },
     }
 
@@ -239,18 +253,8 @@ export default function Report() {
     saveReport(sealedReport)
     clearDraft()
 
-    if (!online && 'serviceWorker' in navigator && 'SyncManager' in window) {
-      try {
-        const registration = await navigator.serviceWorker.ready
-        await registration.sync.register('sync-reports')
-      } catch {
-        // Background Sync unsupported or registration failed — the queued
-        // report still sits in localStorage and will resend on next visit.
-      }
-    }
-
     setSubmitting(false)
-    setResult({ status: online ? 'success' : 'offline', referenceNumber })
+    setResult({ referenceNumber })
   }
 
   const handleSubmitAnother = () => {
@@ -273,7 +277,6 @@ export default function Report() {
     return (
       <ResultScreen
         language={language}
-        status={result.status}
         referenceNumber={result.referenceNumber}
         onSubmitAnother={handleSubmitAnother}
       />

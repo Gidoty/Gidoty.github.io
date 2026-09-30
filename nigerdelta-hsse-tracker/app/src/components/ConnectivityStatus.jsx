@@ -8,7 +8,7 @@ export default function ConnectivityStatus() {
     return (
       <div className="flex items-center justify-center gap-2 border-b border-amber/40 bg-amber/10 px-4 py-2 text-center text-xs font-medium text-amber">
         <WifiOff className="h-3.5 w-3.5 shrink-0" />
-        You are offline. Reports will be saved to your device and submitted when you reconnect.
+        You are offline. Reports are saved on this device — nothing here requires a connection.
       </div>
     )
   }
@@ -17,7 +17,7 @@ export default function ConnectivityStatus() {
     return (
       <div className="flex items-center justify-center gap-2 border-b border-safe/40 bg-safe/10 px-4 py-2 text-center text-xs font-medium text-safe">
         <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-        Back online. Submitting queued reports...
+        Back online.
       </div>
     )
   }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ClipboardList, Camera, Stethoscope, ShieldCheck, RefreshCw } from 'lucide-react'
+import { ClipboardList, Camera, Stethoscope, ShieldCheck } from 'lucide-react'
 import { t } from '../../../data/translations.js'
 import { fmt } from '../../../utils/formatters.js'
 import { sortReports, deriveStatus } from '../../../utils/dashboardUtils.js'
@@ -68,11 +68,6 @@ function ReportListCard({ report, onView }) {
         {evidenceStatusLevel(report) !== EVIDENCE_STATUS.COMMUNITY_OBSERVED && (
           <span className="flex items-center gap-1 text-safe">
             <ShieldCheck className="h-3 w-3" /> {evidenceStatusLabel(report)}
-          </span>
-        )}
-        {report.status === 'queued' && (
-          <span className="flex items-center gap-1 text-amber">
-            <RefreshCw className="h-3 w-3" /> Awaiting submission
           </span>
         )}
       </div>

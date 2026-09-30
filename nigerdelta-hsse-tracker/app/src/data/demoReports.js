@@ -15,6 +15,7 @@ function baseReport(overrides) {
     referenceNumber: `HSSE-DEMO${overrides.id}`,
     submittedAt: new Date(Date.now() - overrides.ageMs).toISOString(),
     status: overrides.status ?? 'submitted',
+    dataClass: 'demo',
     location: {
       gps: { lat, lng, accuracy: 25, capturedAt: Date.now() - overrides.ageMs },
       display: displayCoords(lat, lng),

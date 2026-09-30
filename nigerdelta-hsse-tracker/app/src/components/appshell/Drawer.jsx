@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Search, X, Droplet } from 'lucide-react'
 import { CATEGORIES, TOTAL_PARAMETER_COUNT } from '../../data/parameters.js'
 
-export default function Drawer({ open, onClose, activeParameterId, onSelectParameter, reportsCount, queuedCount }) {
+export default function Drawer({ open, onClose, activeParameterId, onSelectParameter, reportsCount }) {
   const [query, setQuery] = useState('')
   const [highlightIndex, setHighlightIndex] = useState(-1)
   const searchRef = useRef(null)
@@ -130,8 +130,7 @@ export default function Drawer({ open, onClose, activeParameterId, onSelectParam
       <div className="border-t border-border p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <p className="flex items-center gap-2 text-xs text-muted">
           <span className="h-2 w-2 rounded-full bg-safe" />
-          {reportsCount} report{reportsCount === 1 ? '' : 's'} in database
-          {queuedCount > 0 && ` · ${queuedCount} queued offline`}
+          {reportsCount} report{reportsCount === 1 ? '' : 's'} saved on this device
         </p>
         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
           <Link to="/about" className="hover:text-text">
