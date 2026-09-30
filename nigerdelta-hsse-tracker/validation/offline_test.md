@@ -10,9 +10,8 @@ or network stack. Run this protocol on at least the devices/browsers the
 manuscript claims support for, and record every trial in
 `validation/results/offline_trials.csv`.
 
-**AUTHOR ACTION REQUIRED**: these trials must be run on physical
-hardware before submission — see `docs/AUTHOR_ACTION_REQUIRED.md`. This
-file is the protocol only; nobody has executed it yet.
+Trials were run on three Android phones on 30 September 2026; results are in
+`validation/results/offline_trials.csv`.
 
 ## Setup
 
@@ -28,45 +27,33 @@ file is the protocol only; nobody has executed it yet.
    session are tagged `dataClass: "developer_test"` and can be told apart
    from real submissions afterward.
 
-## Trial script
+## Trial script (phones, as run on 30 September 2026)
 
-Run all of Steps 1-8 in one sitting per device/browser combination. Note
-the exact device model, browser name and version, and OS in the CSV.
+Run all nine steps in one sitting per phone and browser. Record the phone
+model, Android or iOS version and browser version in the CSV. Use made-up
+details only: no real names or phone numbers.
 
-1. **First load, online.** Load the app fresh (clear site data first).
-   Confirm the app shell renders and the service worker registers
-   (check DevTools → Application → Service Workers).
-2. **Go offline.** In DevTools, switch Network to "Offline" (or enable
-   Airplane Mode on the device). Reload the page.
-   - Expected: the app shell still loads fully from the cache. No blank
-     screen, no "you are offline" browser error page.
-3. **Submit a report while offline.** Fill in and submit a test report
-   (include at least one photo). Confirm the success screen appears.
-   - Expected: submission succeeds with no network request attempted —
-     there is no sync/queue mechanism to fall back to, so this must work
-     purely from local storage.
-4. **Verify local persistence, still offline.** Open "My Submitted
-   Reports". Confirm the new report is listed. Reload the page (still
-   offline) and confirm it is still listed.
-5. **Close and reopen, still offline.** Fully close the browser tab/app
-   (or force-quit on mobile). Reopen it, still offline. Confirm the
-   report is still present and its reference number matches Step 3.
-6. **Verify integrity, still offline.** Open the report's detail view and
-   run "Verify Integrity". Confirm it reports valid — this must work
-   without any network access, since verification is purely local
-   recomputation.
-7. **Go back online.** Re-enable networking and reload.
-   - Expected: nothing is auto-submitted or synced anywhere — the report
-     stays exactly where it was, only reachable through this device's
-     storage, until the reporter explicitly runs "Export for Submission".
-     If anything makes a network request tied to the report at this
-     point, that is a bug (the app claims no auto-sync).
-8. **Export for Submission.** Run "Export for Submission" on the report
-   and confirm a `.json` file downloads. Verify it independently with:
-   ```
-   python3 validation/verify_export.py path/to/downloaded-export.json
-   ```
-   - Expected: `PASS`.
+1. With internet on, open
+   `https://gidoty.github.io/nigerdelta-hsse-tracker/report?mode=test`
+   and wait 10 seconds.
+2. Turn on airplane mode and refresh. The report form must still show.
+3. Tap **Report Anonymously**, fill the form with fake details, add one
+   photo and tap **Submit Report**. Note the reference number.
+4. Refresh. The page must still load.
+5. Open **Menu → Dashboard → My Submitted Reports**. The report must be
+   listed.
+6. Close the browser completely, reopen the same link (still offline).
+   The report and its reference number must still be there.
+7. Tap **View Full Report → Audit → Verify Integrity**. It must report
+   that the evidence payload matches the recorded hash.
+8. Turn airplane mode off and refresh. The report must be unchanged.
+   (No report data is ever transmitted; the code contains no request that
+   carries report content.)
+9. On the Audit tab tap **Export for Submission**, then verify the file:
+   `python3 validation/verify_export.py <file>` must print PASS.
+
+If the phone previously showed a blank page, first clear site data for
+gidoty.github.io (Chrome: Settings → Site settings → All sites).
 
 ## Recording results
 

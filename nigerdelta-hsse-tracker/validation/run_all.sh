@@ -50,6 +50,7 @@ CALC_CHECK_ALL_PASSED=$(python3 -c "import json; print(json.load(open('$RESULTS_
 TAMPER_ALL_PASSED=$(python3 -c "import json; print(json.load(open('$RESULTS_DIR/tamper_check.json'))['allScenariosPassed'])" 2>/dev/null || echo "unknown")
 SYNTHETIC_COUNT=$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/synthetic/synthetic_reports.json'))['recordCount'])" 2>/dev/null || echo "unknown")
 XIMPL_LINE=$(python3 -c "import json; d=json.load(open('$RESULTS_DIR/cross_implementation.json')); print(f\"{d['allAgree']} (JS exports verified in Python {d['jsSealedExportsVerifiedInPython']}/{d['jsSealedExports']}; Python records verified in JS {d['pythonSealedRecordsVerifiedInJs']}/{d['pythonSealedRecords']}; number vectors {d['numberFormatVectors']-d['numberFormatMismatches']}/{d['numberFormatVectors']})\")" 2>/dev/null || echo "unknown")
+OFFLINE_LINE=$(python3 -c "import csv; r=list(csv.DictReader(open('$RESULTS_DIR/offline_trials.csv'))); print(f\"{sum(x['overall_pass']=='pass' for x in r)}/{len(r)} phone trials passed (validation/results/offline_trials.csv)\" if r else 'not yet run')" 2>/dev/null || echo "unknown")
 GENERATED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 rm -f "$NPM_TEST_OUTPUT"
@@ -69,7 +70,7 @@ Vitest run) — not hand-typed. Re-run the script to refresh it.
 | Synthetic test reports generated | $([ $SYNTH_STATUS -eq 0 ] && echo "OK ($SYNTHETIC_COUNT records)" || echo "FAILED") |
 | Tamper-detection check (all scenarios) | $TAMPER_ALL_PASSED |
 | Cross-implementation agreement (JS vs Python) | $XIMPL_LINE |
-| Manual offline/device trials | see \`validation/offline_trials.csv\` — **not yet run**, see \`docs/AUTHOR_ACTION_REQUIRED.md\` |
+| Manual offline/device trials | $OFFLINE_LINE |
 
 Detail files:
 - \`validation/test_vectors.json\` — Python-generated reference vectors
