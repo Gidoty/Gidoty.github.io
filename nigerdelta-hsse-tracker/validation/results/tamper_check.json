@@ -1,0 +1,79 @@
+{
+  "generatedBy": "validation/tamper_test.py",
+  "sourceRecordCount": 100,
+  "allScenariosPassed": true,
+  "scenarios": [
+    {
+      "scenario": "incident_description",
+      "expectedDetection": true,
+      "recordsAttempted": 100,
+      "recordsSkipped": 0,
+      "recordsCorrect": 100,
+      "allCorrect": true
+    },
+    {
+      "scenario": "location_state",
+      "expectedDetection": true,
+      "recordsAttempted": 100,
+      "recordsSkipped": 0,
+      "recordsCorrect": 100,
+      "allCorrect": true
+    },
+    {
+      "scenario": "incident_severity",
+      "expectedDetection": true,
+      "recordsAttempted": 100,
+      "recordsSkipped": 0,
+      "recordsCorrect": 100,
+      "allCorrect": true
+    },
+    {
+      "scenario": "photo_single_byte",
+      "expectedDetection": true,
+      "recordsAttempted": 67,
+      "recordsSkipped": 33,
+      "recordsCorrect": 67,
+      "allCorrect": true
+    },
+    {
+      "scenario": "event_data",
+      "expectedDetection": true,
+      "recordsAttempted": 29,
+      "recordsSkipped": 71,
+      "recordsCorrect": 29,
+      "allCorrect": true
+    },
+    {
+      "scenario": "event_chain_link",
+      "expectedDetection": true,
+      "recordsAttempted": 3,
+      "recordsSkipped": 97,
+      "recordsCorrect": 3,
+      "allCorrect": true
+    },
+    {
+      "scenario": "nosdra_notification_change",
+      "expectedDetection": false,
+      "recordsAttempted": 100,
+      "recordsSkipped": 0,
+      "recordsCorrect": 100,
+      "allCorrect": true
+    },
+    {
+      "scenario": "cleanup_status_change",
+      "expectedDetection": false,
+      "recordsAttempted": 100,
+      "recordsSkipped": 0,
+      "recordsCorrect": 100,
+      "allCorrect": true
+    },
+    {
+      "scenario": "contact_detail_change",
+      "expectedDetection": false,
+      "recordsAttempted": 100,
+      "recordsSkipped": 0,
+      "recordsCorrect": 100,
+      "allCorrect": true
+    }
+  ]
+}

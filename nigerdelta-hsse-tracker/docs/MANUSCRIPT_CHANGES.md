@@ -187,4 +187,59 @@ work.
 - Added `appVersion` (package version + build commit SHA, injected at
   build time) to every newly-created report's audit metadata.
 
-*(Further entries will be added as Phase 8 is completed.)*
+## Phase 8 — Validation methodology
+
+This phase built the validation evidence a JEAS submission needs to cite,
+rather than changing app behavior. If the manuscript has (or needs) a
+"Validation" or "Testing" section, it should describe this:
+
+- **Independent cross-check of the methane calculator.**
+  `validation/reference_calcs.py` is a from-scratch Python
+  reimplementation of the mass-balance formula in
+  `src/utils/methaneCalc.js` (shares no code with it), generating 23 hand-
+  picked test vectors (typical, boundary, and invalid inputs) into
+  `validation/test_vectors.json`. A Vitest test
+  (`src/utils/methaneCalc.test.js`) asserts the JS calculator reproduces
+  every non-error vector within 1e-9 relative tolerance and raises for
+  every vector marked invalid, writing the comparison to
+  `validation/results/calculator_check.json`. If the manuscript claims the
+  calculator was validated, this is the validation — cite the tolerance
+  and vector count, not a general assertion.
+- **Unit tests.** `src/utils/*.test.js` (Vitest) cover the integrity/hash
+  module (canonicalization, sealing, tamper detection, the event chain,
+  legacy records), the evidence-status transitions, and the
+  localStorage-to-IndexedDB migration (including the case where migration
+  undercounts and must not delete the original data). 60 tests, run via
+  `npm test` in `app/`.
+- **Synthetic test data.** `validation/make_synthetic.py` generates 100
+  fabricated reports (fixed random seed, stdlib only) covering every
+  incident type and severity and a spread of optional-field combinations,
+  with small generated PNG "photos" and fictional Niger Delta coordinates.
+  All are tagged `dataClass: "developer_test"`. **This is fabricated data
+  for testing only — if the manuscript presents any figures, counts, or
+  case examples, they must come from real submissions or clearly-labeled
+  hypothetical scenarios, never from this synthetic set.**
+- **Tamper-detection check.** `validation/tamper_test.py` applies nine
+  mutation scenarios to the synthetic records — six that should be
+  detected (description, location, severity, a single altered photo byte,
+  an altered event, a broken event-chain link) and three legitimate
+  mutable-field changes that should *not* be flagged (NOSDRA notification,
+  cleanup status, contact details) — and confirms the integrity module
+  gets all nine right. Results: `validation/results/tamper_check.json`.
+- **Independent export verification.** `validation/verify_export.py` is a
+  standalone CLI (no Node.js, no browser) that recomputes an exported
+  report's payload hash and event chain using the same canonicalization
+  algorithm, for use by an editor, reviewer, or investigator who receives
+  an exported file and wants to check it independently of this app's own
+  code.
+- **Manual offline/device protocol.** `validation/offline_test.md` is a
+  step-by-step protocol for verifying the device-local, no-sync storage
+  claim on real hardware. **This has not been run yet — see
+  `docs/AUTHOR_ACTION_REQUIRED.md`.** Any manuscript claim about offline
+  behavior on physical devices must wait for those trial results, not cite
+  this protocol's existence as if it were already executed.
+- **`validation/run_all.sh`** runs the Python reference implementation,
+  the synthetic-data and tamper-detection scripts, and the JS test suite
+  in sequence, and writes `validation/results/SUMMARY.md` from the actual
+  output of that run — every number in it is read back from the real
+  results files, never hand-typed.

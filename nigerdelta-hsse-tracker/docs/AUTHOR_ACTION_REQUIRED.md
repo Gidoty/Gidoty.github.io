@@ -85,6 +85,20 @@ figure cited, and that it says what the app claims it says:
 - HumAngle Media / Obrikom study, 2024 (NO₂, CO claims)
 - Wami-Amadi & Chisom Faith (2025) (exceedance summary text)
 
+## Phase 8 — Manual offline/device trials not yet run
+
+`validation/offline_test.md` is a step-by-step protocol for confirming the
+device-local, no-sync storage claim on real hardware (first load online,
+submit offline, close/reopen offline, verify integrity offline, confirm no
+auto-sync when back online, export and independently verify). Nobody has
+executed it yet — `validation/results/offline_trials.csv` is still just the
+empty header row. This audit could not run it because it requires physical
+devices and real browsers, not the tooling available here. Run it on at
+least the device/browser combinations the manuscript claims support for,
+fill in the CSV, and re-run `validation/run_all.sh` so
+`validation/results/SUMMARY.md` reflects real trial results before citing
+offline behavior as verified in the manuscript.
+
 ## Phase 9 — Archival DOI
 
 JEAS requires an archived version of the software with a DOI (e.g. via

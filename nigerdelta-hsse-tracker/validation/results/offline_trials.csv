@@ -1,0 +1,1 @@
+trial_date,device,os,browser_and_version,step1_first_load,step2_offline_shell,step3_offline_submit,step4_persist_offline,step5_close_reopen,step6_verify_offline,step7_no_autosync,step8_export_verifies,overall_pass,notes
