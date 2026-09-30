@@ -18,25 +18,30 @@ mkdir -p "$RESULTS_DIR"
 STATUS=0
 NPM_TEST_OUTPUT="$RESULTS_DIR/.npm_test_output.txt"
 
-echo "== 1/4: regenerating independent Python reference vectors =="
+echo "== 1/5: regenerating independent Python reference vectors =="
 ( cd "$SCRIPT_DIR" && python3 reference_calcs.py )
 REF_STATUS=$?
 [ $REF_STATUS -ne 0 ] && STATUS=1
 
-echo "== 2/4: regenerating synthetic test reports =="
+echo "== 2/5: regenerating synthetic test reports =="
 ( cd "$SCRIPT_DIR" && python3 make_synthetic.py )
 SYNTH_STATUS=$?
 [ $SYNTH_STATUS -ne 0 ] && STATUS=1
 
-echo "== 3/4: running JS unit tests (methane calc cross-check, integrity, evidence status, storage migration) =="
+echo "== 3/5: running JS unit tests (methane calc cross-check, integrity, evidence status, storage migration) =="
 ( cd "$APP_DIR" && npm test 2>&1 ) | tee "$NPM_TEST_OUTPUT"
 NPM_TEST_STATUS=${PIPESTATUS[0]}
 [ $NPM_TEST_STATUS -ne 0 ] && STATUS=1
 
-echo "== 4/4: running tamper-detection check on synthetic records =="
+echo "== 4/5: running tamper-detection check on synthetic records =="
 ( cd "$SCRIPT_DIR" && python3 tamper_test.py )
 TAMPER_STATUS=$?
 [ $TAMPER_STATUS -ne 0 ] && STATUS=1
+
+echo "== 5/5: cross-implementation check (JS vs independent Python verifier) =="
+( cd "$SCRIPT_DIR" && python3 cross_impl_check.py )
+XIMPL_STATUS=$?
+[ $XIMPL_STATUS -ne 0 ] && STATUS=1
 
 # --- Parse real output for the summary; never fabricate numbers here. ---
 TEST_SUMMARY_LINE=$(grep -E "Tests +[0-9]+ (passed|failed)" "$NPM_TEST_OUTPUT" | tail -1)
@@ -44,6 +49,7 @@ VECTOR_COUNT=$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/test_v
 CALC_CHECK_ALL_PASSED=$(python3 -c "import json; print(json.load(open('$RESULTS_DIR/calculator_check.json'))['allPassed'])" 2>/dev/null || echo "unknown")
 TAMPER_ALL_PASSED=$(python3 -c "import json; print(json.load(open('$RESULTS_DIR/tamper_check.json'))['allScenariosPassed'])" 2>/dev/null || echo "unknown")
 SYNTHETIC_COUNT=$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/synthetic/synthetic_reports.json'))['recordCount'])" 2>/dev/null || echo "unknown")
+XIMPL_LINE=$(python3 -c "import json; d=json.load(open('$RESULTS_DIR/cross_implementation.json')); print(f\"{d['allAgree']} (JS exports verified in Python {d['jsSealedExportsVerifiedInPython']}/{d['jsSealedExports']}; Python records verified in JS {d['pythonSealedRecordsVerifiedInJs']}/{d['pythonSealedRecords']}; number vectors {d['numberFormatVectors']-d['numberFormatMismatches']}/{d['numberFormatVectors']})\")" 2>/dev/null || echo "unknown")
 GENERATED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 rm -f "$NPM_TEST_OUTPUT"
@@ -62,6 +68,7 @@ Vitest run) — not hand-typed. Re-run the script to refresh it.
 | JS unit test suite (Vitest) | $TEST_SUMMARY_LINE |
 | Synthetic test reports generated | $([ $SYNTH_STATUS -eq 0 ] && echo "OK ($SYNTHETIC_COUNT records)" || echo "FAILED") |
 | Tamper-detection check (all scenarios) | $TAMPER_ALL_PASSED |
+| Cross-implementation agreement (JS vs Python) | $XIMPL_LINE |
 | Manual offline/device trials | see \`validation/offline_trials.csv\` — **not yet run**, see \`docs/AUTHOR_ACTION_REQUIRED.md\` |
 
 Detail files:

@@ -310,3 +310,28 @@ that description:
   itself re-verify the Act's text against this citation — the citation was
   supplied directly by the author, who is responsible for its accuracy in
   the manuscript.
+
+## Phase 11 — Cross-implementation agreement and evidence-status replay
+
+- **Number formatting now matches across implementations.** The Python
+  verifier (`validation/canonical.py`) formatted integer-valued floats
+  with a trailing ".0" (for example `14.0`), while the app writes `14`.
+  This made 6 of 100 Python-sealed synthetic records fail verification in
+  the app. The Python formatter now follows the ECMAScript number-to-string
+  rules, the same rules the JSON Canonicalization Scheme (RFC 8785) uses.
+- **The cross-implementation check is now part of `run_all.sh`.**
+  `app/src/utils/crossImplementation.test.js` verifies every Python-sealed
+  synthetic record in the app, writes app-sealed edge-case exports
+  (non-ASCII text, emoji, escapes, floats) for the Python verifier, and
+  writes seeded number-format vectors; `validation/cross_impl_check.py`
+  checks the Python side and writes
+  `validation/results/cross_implementation.json`. Restoring the old
+  formatter makes this check fail (94/100 and 5/6), so it detects the
+  original defect.
+- **Evidence status is now replayed from the event log.** A stored
+  evidence level raised without a logged, supported
+  `evidence_status_changed` event now fails `statusConsistent`. An
+  upgrade event counts only if it carries the reference the rules
+  require. `tamper_test.py` gained three scenarios (upgrade via event,
+  direct edit with no event, upgrade event without a reference) and now
+  records which of the four checks fired for each scenario.

@@ -24,6 +24,43 @@ CANONICALIZATION_VERSION = 'hsse-c14n-v1'
 LEGACY_CANONICALIZATION = 'legacy-v0-noncanonical'
 
 
+def _js_number(value):
+    """Format a number exactly as ECMAScript Number.prototype.toString /
+    JSON.stringify does, so hashes match the JS app byte for byte."""
+    if isinstance(value, int) and not isinstance(value, bool):
+        value_f = float(value)
+        if abs(value) < 10**21 and value_f == value:
+            return str(value)
+    value = float(value)
+    r = repr(value)  # shortest round-trip digits, same digit string JS uses
+    mant, _, exp = r.partition('e')
+    neg = mant.startswith('-')
+    mant = mant.lstrip('-')
+    if '.' in mant:
+        ip, fp = mant.split('.')
+    else:
+        ip, fp = mant, ''
+    digits = (ip + fp).lstrip('0')
+    point = len(ip) + (int(exp) if exp else 0)  # position of decimal point
+    if ip.strip('0') == '':
+        lead = len(fp) - len(fp.lstrip('0'))
+        point = -lead + (int(exp) if exp else 0)
+    digits = digits.rstrip('0') or '0'
+    k = len(digits)
+    n = point
+    if k <= n <= 21:
+        out = digits + '0' * (n - k)
+    elif 0 < n <= 21:
+        out = digits[:n] + '.' + digits[n:]
+    elif -6 < n <= 0:
+        out = '0.' + '0' * (-n) + digits
+    else:
+        e = n - 1
+        sign = '+' if e >= 0 else '-'
+        out = digits[0] + ('.' + digits[1:] if k > 1 else '') + 'e' + sign + str(abs(e))
+    return ('-' if neg else '') + out
+
+
 def canonicalize(value):
     if value is None:
         return 'null'
@@ -34,7 +71,7 @@ def canonicalize(value):
             raise ValueError('Cannot canonicalize a non-finite number')
         if value == 0:
             return '0'
-        return json.dumps(value)
+        return _js_number(value)
     if isinstance(value, str):
         return json.dumps(value, ensure_ascii=False)
     if isinstance(value, list):
@@ -127,6 +164,28 @@ def derive_regulatory_status(events):
     return state
 
 
+DEFAULT_EVIDENCE_LEVEL = 'community_observed'
+
+
+def derive_evidence_level(events):
+    """Mirror of deriveEvidenceLevel in integrity.js: an upgrade counts only
+    if the logged event carries the reference the evidence-status rules
+    require."""
+    level = DEFAULT_EVIDENCE_LEVEL
+    for event in events or []:
+        if event.get('type') != 'evidence_status_changed':
+            continue
+        data = event.get('data') or {}
+        if data.get('level') == 'community_observed':
+            level = 'community_observed'
+        elif data.get('level') == 'externally_referenced' and (data.get('externalReference') or {}).get('id'):
+            level = 'externally_referenced'
+        elif data.get('level') == 'independently_verified' and (data.get('verification') or {}).get('source') \
+                and (data.get('verification') or {}).get('reference'):
+            level = 'independently_verified'
+    return level
+
+
 def append_event(report, event_id, event_type, timestamp, data):
     events = list(report.get('events', []))
     prev_event_hash = events[-1]['eventHash'] if events else None
@@ -183,6 +242,7 @@ def verify_report(report):
         derived_status['nosdraNotified'] == bool(regulatory.get('nosdraNotified'))
         and derived_status['nosdraNotifiedAt'] == regulatory.get('nosdraNotifiedAt')
         and derived_status['cleanupStatus'] == regulatory.get('cleanupStatus', 'pending')
+        and derive_evidence_level(events) == ((report.get('evidenceStatus') or {}).get('level') or DEFAULT_EVIDENCE_LEVEL)
     )
 
     expected_event_count = len(events)

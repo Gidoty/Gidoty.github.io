@@ -132,6 +132,29 @@ export function deriveRegulatoryStatus(events = []) {
   return state
 }
 
+// Replays evidence_status_changed events to derive the evidence-status
+// level. An upgrade only counts if the event carries the reference the
+// rules require (an external record id for externally_referenced; a named
+// source and reference for independently_verified), so a stored level that
+// was raised without a logged, supported event is detected at verification.
+export const DEFAULT_EVIDENCE_LEVEL = 'community_observed'
+
+export function deriveEvidenceLevel(events = []) {
+  let level = DEFAULT_EVIDENCE_LEVEL
+  for (const event of events) {
+    if (event.type !== 'evidence_status_changed') continue
+    const data = event.data ?? {}
+    if (data.level === 'community_observed') {
+      level = 'community_observed'
+    } else if (data.level === 'externally_referenced' && data.externalReference?.id) {
+      level = 'externally_referenced'
+    } else if (data.level === 'independently_verified' && data.verification?.source && data.verification?.reference) {
+      level = 'independently_verified'
+    }
+  }
+  return level
+}
+
 // Appends a mutable-state event (NOSDRA notification, evidence-status
 // change, cleanup update, etc.) to the report's hash-chained event log.
 // Returns a new report object; does not mutate the input.
@@ -187,10 +210,12 @@ export async function verifyReport(report) {
   }
 
   const derivedStatus = deriveRegulatoryStatus(events)
+  const derivedEvidenceLevel = deriveEvidenceLevel(events)
   const statusConsistent =
     derivedStatus.nosdraNotified === Boolean(report.regulatory?.nosdraNotified) &&
     derivedStatus.nosdraNotifiedAt === (report.regulatory?.nosdraNotifiedAt ?? null) &&
-    derivedStatus.cleanupStatus === (report.regulatory?.cleanupStatus ?? 'pending')
+    derivedStatus.cleanupStatus === (report.regulatory?.cleanupStatus ?? 'pending') &&
+    derivedEvidenceLevel === (report.evidenceStatus?.level ?? DEFAULT_EVIDENCE_LEVEL)
 
   // A truncated-but-still-internally-consistent tail (the remaining
   // events still chain correctly) would pass eventChainValid above with
@@ -212,6 +237,7 @@ export async function verifyReport(report) {
       storedPayloadHash: report.integrity.payloadHash,
       eventCount: events.length,
       derivedRegulatoryStatus: derivedStatus,
+      derivedEvidenceLevel,
       storedEventCount: report.integrity.eventCount ?? null,
       storedHeadEventHash: report.integrity.headEventHash ?? null,
     },

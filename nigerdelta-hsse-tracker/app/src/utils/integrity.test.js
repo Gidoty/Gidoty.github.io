@@ -8,6 +8,7 @@ import {
   verifyReport,
   markLegacy,
   deriveRegulatoryStatus,
+  deriveEvidenceLevel,
   CANONICALIZATION_VERSION,
   LEGACY_CANONICALIZATION,
 } from './integrity.js'
@@ -264,5 +265,46 @@ describe('legacy records', () => {
       expect(result.statusConsistent).toBeNull()
       expect(result.eventLogComplete).toBeNull()
     })
+  })
+})
+
+describe('evidence-status replay', () => {
+  it('derives community_observed when no evidence events exist', () => {
+    expect(deriveEvidenceLevel([])).toBe('community_observed')
+  })
+
+  it('counts an upgrade only when the event carries the required reference', () => {
+    expect(deriveEvidenceLevel([{ type: 'evidence_status_changed', data: { level: 'externally_referenced' } }])).toBe(
+      'community_observed',
+    )
+    expect(
+      deriveEvidenceLevel([
+        { type: 'evidence_status_changed', data: { level: 'externally_referenced', externalReference: { id: 'OSM-1' } } },
+      ]),
+    ).toBe('externally_referenced')
+    expect(
+      deriveEvidenceLevel([
+        { type: 'evidence_status_changed', data: { level: 'independently_verified', verification: { source: 'JIV' } } },
+      ]),
+    ).toBe('community_observed')
+  })
+
+  it('flags a stored evidence level that was raised without a logged event', async () => {
+    const sealed = await sealReport(minimalReport({ evidenceStatus: { level: 'community_observed' } }))
+    const edited = { ...sealed, evidenceStatus: { level: 'independently_verified' } }
+    const result = await verifyReport(edited)
+    expect(result.payloadValid).toBe(true)
+    expect(result.statusConsistent).toBe(false)
+  })
+
+  it('accepts an evidence upgrade made through a supported event', async () => {
+    let r = await sealReport(minimalReport({ evidenceStatus: { level: 'community_observed' } }))
+    const verification = { source: 'JIV report', reference: 'JIV-1' }
+    r = await appendEvent(r, 'evidence_status_changed', { level: 'independently_verified', verification })
+    r = { ...r, evidenceStatus: { level: 'independently_verified', verification } }
+    const result = await verifyReport(r)
+    expect(result.statusConsistent).toBe(true)
+    expect(result.eventChainValid).toBe(true)
+    expect(result.eventLogComplete).toBe(true)
   })
 })

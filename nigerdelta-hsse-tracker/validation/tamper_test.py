@@ -123,6 +123,37 @@ def legitimate_cleanup_direct_edit(report):
     return r
 
 
+def legitimate_evidence_via_event(report):
+    # Raising the evidence level through a logged event that carries the
+    # required verification source and reference must verify cleanly.
+    r = copy.deepcopy(report)
+    changed_at = '2026-12-31T00:00:00.000Z'
+    verification = {'source': 'Synthetic JIV report', 'reference': 'JIV-SYN-0001'}
+    r = append_event(r, str(uuid.uuid4()), 'evidence_status_changed', changed_at,
+                     {'level': 'independently_verified', 'verification': verification})
+    r['evidenceStatus'] = {**r['evidenceStatus'], 'level': 'independently_verified', 'verification': verification}
+    return r
+
+
+def evidence_direct_edit(report):
+    # Raising the stored evidence level with no logged event must be detected.
+    r = copy.deepcopy(report)
+    r['evidenceStatus'] = {**r['evidenceStatus'], 'level': 'independently_verified',
+                           'verification': {'source': 'unlogged', 'reference': 'none'}}
+    return r
+
+
+def evidence_upgrade_without_reference(report):
+    # A logged upgrade that lacks the required verification source does not
+    # count under the rules, so a stored level raised on the strength of it
+    # must be detected.
+    r = copy.deepcopy(report)
+    changed_at = '2026-12-31T00:00:00.000Z'
+    r = append_event(r, str(uuid.uuid4()), 'evidence_status_changed', changed_at, {'level': 'independently_verified'})
+    r['evidenceStatus'] = {**r['evidenceStatus'], 'level': 'independently_verified'}
+    return r
+
+
 def legitimate_contact_change(report):
     r = copy.deepcopy(report)
     r['contact'] = {**r.get('contact', {}), 'name': 'Changed Name', 'phone': '+2348000000000'}
@@ -149,6 +180,9 @@ LEGITIMATE_SCENARIOS = [
     ('cleanup_via_event', legitimate_cleanup_via_event, False),
     ('cleanup_direct_edit_no_event', legitimate_cleanup_direct_edit, True),
     ('contact_detail_change', legitimate_contact_change, False),
+    ('evidence_status_via_event', legitimate_evidence_via_event, False),
+    ('evidence_status_direct_edit_no_event', evidence_direct_edit, True),
+    ('evidence_upgrade_without_reference', evidence_upgrade_without_reference, True),
 ]
 
 
@@ -156,6 +190,9 @@ def run_scenario(name, mutate, should_detect, reports):
     attempted = 0
     detected = 0
     skipped = 0
+    # How often each of the four checks fired, so the results show which
+    # mechanism caught each class of change, not only that one did.
+    checks_failed = {'payloadValid': 0, 'eventChainValid': 0, 'statusConsistent': 0, 'eventLogComplete': 0}
     for report in reports:
         mutated = mutate(report)
         if mutated is None:
@@ -163,6 +200,9 @@ def run_scenario(name, mutate, should_detect, reports):
             continue
         attempted += 1
         result = verify_report(mutated)
+        for key in checks_failed:
+            if result.get(key) is False:
+                checks_failed[key] += 1
         flagged = (
             result['payloadValid'] is False
             or result['eventChainValid'] is False
@@ -179,6 +219,7 @@ def run_scenario(name, mutate, should_detect, reports):
         'recordsSkipped': skipped,
         'recordsCorrect': detected,
         'allCorrect': attempted > 0 and detected == attempted,
+        'checksFailed': checks_failed,
     }
 
 
